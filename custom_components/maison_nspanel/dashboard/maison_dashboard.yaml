@@ -1036,9 +1036,9 @@ views:
                         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
         styles:
           grid:
-            - grid-template-areas: '"clock clock clock" "weather indoor air" "nav nav nav"'
+            - grid-template-areas: '"clock clock clock" "weather indoor air" "nav nav nav" "navb navb navb"'
             - grid-template-columns: 1fr 1fr 1fr
-            - grid-template-rows: 1fr min-content min-content
+            - grid-template-rows: 1fr min-content min-content min-content
             - column-gap: 8px
             - row-gap: 8px
           card:
@@ -1117,7 +1117,6 @@ views:
               - width: 100%
               - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'block' ]]]"
             navb:
-              - grid-area: nav
               - width: 100%
               - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'block' : 'none' ]]]"
 
