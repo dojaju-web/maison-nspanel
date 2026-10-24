@@ -63,6 +63,6 @@ L'intégration expose le résultat dans `sensor.maison_nspanel_vigilance` (état
 ## Style du dashboard
 **Configurer > Apparence** :
 - **Verre sombre** (défaut) : cartes teintées, titres en capitales italiques, photo météo en fond d'accueil.
-- **Ardoise** : cartes plates et très sombres sans bordure, éclairées d'un dégradé de couleur quand elles sont actives, petits sous-titres en capitales grises, titres en minuscules, pastilles d'icône sans halo, photo météo d'accueil conservée.
+- **Ardoise** : cartes plates et très sombres sans bordure, éclairées d'un dégradé de couleur quand elles sont actives, petits sous-titres en capitales grises, titres en minuscules, pastilles d'icône sans halo, photo météo d'accueil conservée, boutons de l'accueil en larges tuiles horizontales (icône, sous-titre, titre, pastille d'état).
 
 Le changement s'applique après rechargement de la page du panneau.

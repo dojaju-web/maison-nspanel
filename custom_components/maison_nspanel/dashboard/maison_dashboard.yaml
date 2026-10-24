@@ -837,7 +837,7 @@ views:
                       - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
                       - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
                   type: custom:button-card
-                  name: Lumières
+                  name: Éclairage
                   icon: mdi:lightbulb-group
                   triggers_update:
                   - switch.outlet_1
@@ -916,7 +916,7 @@ views:
                       - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
                       - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
                   type: custom:button-card
-                  name: Climat
+                  name: Climatisation
                   # Icône = mode en cours du Sensibo (froid, chaud, sec, ventilation, auto), thermostat si arrêt
                   icon: >
                     [[[
@@ -927,6 +927,113 @@ views:
                   triggers_update:
                   - climate.sejour_climatisation
                   label: "[[[\n  const c = states['climate.sejour_climatisation'];\n  if (!c) return '—';\n  if (c.state === 'off') return 'Arrêt';\n  const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventil.', heat_cool: 'Auto', auto: 'Auto' };\n  const t = c.attributes.temperature;\n  return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : '');\n]]]\n"
+          navb:
+            card:
+              type: grid
+              columns: 1
+              square: false
+              cards:
+                - type: custom:button-card
+                  show_icon: false
+                  show_name: false
+                  show_label: false
+                  triggers_update:
+                  - switch.outlet_1
+                  - light.sejour_cuisine
+                  - light.sejour_mur_tv
+                  - light.sejour_mur_sdb
+                  - light.jardin_jardin
+                  tap_action:
+                    action: navigate
+                    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''lumieres''; ]]]'
+                  custom_fields:
+                    c: >
+                      [[[
+                        const rgb = '250,204,21';
+                        const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                        const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
+                        const icon = 'mdi:lightbulb-group';
+                        const c1 = on ? rgb : '148,163,184';
+                        const sub = '';
+                        const n0 = ids.filter(i => states[i] && states[i].state === 'on').length;
+                        const right = '<div style="flex:none;padding:6px 10px;border-radius:10px;font-size:9px;font-weight:900;letter-spacing:.7px;white-space:nowrap;background:' + (n0 > 0 ? 'rgba(250,204,21,.12)' : 'rgba(255,255,255,.05)') + ';color:' + (n0 > 0 ? '#facc15' : 'rgba(255,255,255,.38)') + '">' + n0 + ' ALLUMÉE' + (n0 > 1 ? 'S' : '') + '</div>';
+                        return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
+                          + '<div style="flex:none;width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + (on ? '.18' : '.10') + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:rgb(' + c1 + ')"></ha-icon></div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:9px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.40)">ÉCLAIRAGE</div>'
+                          + '<div style="font-size:16px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Toutes les lumières</div>'
+                          + (sub ? '<div style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgb(' + rgb + ');text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
+                          + right + '</div>';
+                      ]]]
+                  styles:
+                    grid:
+                      - grid-template-areas: '"c"'
+                      - grid-template-columns: 1fr
+                    card:
+                      - padding: 9px 12px
+                      - border-radius: 16px
+                      - border: none
+                      - box-shadow: none
+                      - background: >
+                          [[[
+                            const rgb = '250,204,21';
+                            const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                            const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
+                            return on
+                              ? 'radial-gradient(circle at 0% 0%, rgba(' + rgb + ',.20), transparent 55%), linear-gradient(100deg, rgba(' + rgb + ',.16), rgba(5,12,22,.64) 45%, rgba(5,12,22,.58))'
+                              : 'radial-gradient(circle at 0% 0%, rgba(' + rgb + ',.10), transparent 55%), rgba(5,12,22,.58)';
+                          ]]]
+                    custom_fields:
+                      c:
+                        - width: 100%
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - type: custom:button-card
+                  show_icon: false
+                  show_name: false
+                  show_label: false
+                  triggers_update:
+                  - climate.sejour_climatisation
+                  tap_action:
+                    action: navigate
+                    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''climat''; ]]]'
+                  custom_fields:
+                    c: >
+                      [[[
+                        const rgb = '56,189,248';
+                        const ids = ['climate.sejour_climatisation'];
+                        const on = (() => { const c = states['climate.sejour_climatisation']; return !!(c && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(c.state)); })();
+                        const icon = (() => { const c = states['climate.sejour_climatisation']; const m = { cool: 'mdi:snowflake', heat: 'mdi:fire', dry: 'mdi:water-percent', fan_only: 'mdi:fan', heat_cool: 'mdi:autorenew', auto: 'mdi:autorenew' }; return (c && m[c.state]) || 'mdi:thermostat'; })();
+                        const c1 = on ? rgb : '148,163,184';
+                        const sub = (() => { const c = states['climate.sejour_climatisation']; if (!c) return '—'; if (c.state === 'off') return 'Arrêt'; const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventilation', heat_cool: 'Auto', auto: 'Auto' }; const t = c.attributes.temperature; return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : ''); })();
+                        const right = '<ha-icon icon="mdi:chevron-right" style="--mdc-icon-size:20px;color:rgba(255,255,255,.35);flex:none"></ha-icon>';
+                        return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
+                          + '<div style="flex:none;width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + (on ? '.18' : '.10') + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:rgb(' + c1 + ')"></ha-icon></div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:9px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.40)">CLIMATISATION</div>'
+                          + '<div style="font-size:16px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Climatisation du séjour</div>'
+                          + (sub ? '<div style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgb(' + rgb + ');text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
+                          + right + '</div>';
+                      ]]]
+                  styles:
+                    grid:
+                      - grid-template-areas: '"c"'
+                      - grid-template-columns: 1fr
+                    card:
+                      - padding: 9px 12px
+                      - border-radius: 16px
+                      - border: none
+                      - box-shadow: none
+                      - background: >
+                          [[[
+                            const rgb = '56,189,248';
+                            const ids = ['climate.sejour_climatisation'];
+                            const on = (() => { const c = states['climate.sejour_climatisation']; return !!(c && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(c.state)); })();
+                            return on
+                              ? 'radial-gradient(circle at 0% 0%, rgba(' + rgb + ',.20), transparent 55%), linear-gradient(100deg, rgba(' + rgb + ',.16), rgba(5,12,22,.64) 45%, rgba(5,12,22,.58))'
+                              : 'radial-gradient(circle at 0% 0%, rgba(' + rgb + ',.10), transparent 55%), rgba(5,12,22,.58)';
+                          ]]]
+                    custom_fields:
+                      c:
+                        - width: 100%
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
         styles:
           grid:
             - grid-template-areas: '"clock clock clock" "weather indoor air" "nav nav nav"'
@@ -1008,11 +1115,16 @@ views:
               - min-width: 0
             nav:
               - width: 100%
+              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'block' ]]]"
+            navb:
+              - grid-area: nav
+              - width: 100%
+              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'block' : 'none' ]]]"
 
   # ==========================================================
   #  PAGE 2 : LUMIÈRES
   # ==========================================================
-  - title: Lumières
+  - title: Éclairage
     path: lumieres
     type: panel
     background: "radial-gradient(120% 80% at 85% 0%, #15233f 0%, #0b1120 55%, #070b14 100%) fixed"
@@ -1025,7 +1137,7 @@ views:
             show_icon: true
             show_name: true
             show_label: true
-            name: Lumières
+            name: Éclairage
             size: 22px
             triggers_update:
               - switch.outlet_1
@@ -1227,7 +1339,7 @@ views:
   # ==========================================================
   #  PAGE 3 : CLIMAT (Sensibo Air Pro)
   # ==========================================================
-  - title: Climat
+  - title: Climatisation
     path: climat
     type: panel
     background: "radial-gradient(120% 80% at 85% 0%, #15233f 0%, #0b1120 55%, #070b14 100%) fixed"
