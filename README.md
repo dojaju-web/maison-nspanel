@@ -66,3 +66,8 @@ L'intégration expose le résultat dans `sensor.maison_nspanel_vigilance` (état
 - **Ardoise** : cartes plates et très sombres sans bordure, éclairées d'un dégradé de couleur quand elles sont actives, petits sous-titres en capitales grises, titres en minuscules, pastilles d'icône sans halo, photo météo d'accueil conservée, boutons de l'accueil en larges tuiles horizontales (icône, sous-titre, titre, pastille d'état).
 
 Le changement s'applique après rechargement de la page du panneau.
+
+
+## Publier une nouvelle version (mainteneur)
+Augmentez `version` dans `custom_components/maison_nspanel/manifest.json` puis poussez sur `main` :
+l'action *Release* crée seule la release `vX.Y.Z`, ce qui permet à HACS de proposer la mise à jour.

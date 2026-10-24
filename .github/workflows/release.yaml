@@ -1,0 +1,29 @@
+name: Release
+# Crée automatiquement une release GitHub (tag vX.Y.Z) quand la version du manifest change.
+# HACS s'appuie sur ces releases pour détecter les mises à jour.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "custom_components/maison_nspanel/manifest.json"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lire la version
+        id: v
+        run: echo "version=$(python3 -c "import json;print(json.load(open('custom_components/maison_nspanel/manifest.json'))['version'])")" >> "$GITHUB_OUTPUT"
+      - name: Créer la release si elle n'existe pas
+        env:
+          GH_TOKEN: ${{ github.token }}
+          V: ${{ steps.v.outputs.version }}
+        run: |
+          if gh release view "v$V" >/dev/null 2>&1; then
+            echo "La release v$V existe déjà."
+          else
+            gh release create "v$V" --target "${{ github.sha }}" --title "v$V" --generate-notes
+          fi
