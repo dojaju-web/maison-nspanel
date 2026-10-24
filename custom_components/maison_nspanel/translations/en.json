@@ -71,7 +71,7 @@
       },
       "vigilance": {
         "title": "Météo-France weather alert",
-        "description": "Shows an alert pill on the home page and forecasts. Leave the sensor empty to detect it automatically (sensor.<department>_weather_alert).",
+        "description": "Shows an alert pill on the home page and forecasts. Leave the sensor empty to detect it automatically (the « NN Weather alert » sensor).",
         "data": {
           "vigilance_min": "Show from level",
           "vigilance_entity": "Alert sensor (optional)"

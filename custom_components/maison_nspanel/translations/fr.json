@@ -73,7 +73,7 @@
       },
       "vigilance": {
         "title": "Vigilance Météo-France",
-        "description": "Affiche une pastille de vigilance sur l'accueil et les prévisions. Laissez le capteur vide pour le détecter automatiquement (sensor.<département>_weather_alert).",
+        "description": "Affiche une pastille de vigilance sur l'accueil et les prévisions. Laissez le capteur vide pour le détecter automatiquement (capteur « NN Weather alert »).",
         "data": {
           "vigilance_min": "Afficher à partir du niveau",
           "vigilance_entity": "Capteur de vigilance (optionnel)"
