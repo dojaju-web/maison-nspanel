@@ -1,0 +1,109 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Maison NSPanel",
+        "description": "Choose the weather entity used for the 7-day forecast. A \"Take out the bins\" reminder (Monday) is created by default and can be edited afterwards.",
+        "data": {
+          "weather_entity": "Weather entity"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Maison NSPanel is already installed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Maison NSPanel",
+        "description": "What would you like to do?",
+        "menu_options": {
+          "ajouter": "Add a reminder",
+          "choisir": "Edit a reminder",
+          "supprimer": "Delete reminders",
+          "meteo": "Change weather entity",
+          "vigilance": "Météo-France weather alert",
+          "apparence": "Dashboard style"
+        }
+      },
+      "ajouter": {
+        "title": "New reminder",
+        "data": {
+          "texte": "Text",
+          "icone": "Icon",
+          "jours": "Days",
+          "heure_debut": "Shown from",
+          "heure_fin": "Shown until",
+          "couleur": "Colour",
+          "actif": "Enabled"
+        }
+      },
+      "choisir": {
+        "title": "Edit a reminder",
+        "data": {
+          "rappel": "Reminder"
+        }
+      },
+      "modifier": {
+        "title": "Edit reminder",
+        "data": {
+          "texte": "Text",
+          "icone": "Icon",
+          "jours": "Days",
+          "heure_debut": "Shown from",
+          "heure_fin": "Shown until",
+          "couleur": "Colour",
+          "actif": "Enabled"
+        }
+      },
+      "supprimer": {
+        "title": "Delete reminders",
+        "data": {
+          "rappels": "Reminders to delete"
+        }
+      },
+      "meteo": {
+        "title": "Weather entity",
+        "data": {
+          "weather_entity": "Weather entity"
+        }
+      },
+      "vigilance": {
+        "title": "Météo-France weather alert",
+        "description": "Shows an alert pill on the home page and forecasts. Leave the sensor empty to detect it automatically (sensor.<department>_weather_alert).",
+        "data": {
+          "vigilance_min": "Show from level",
+          "vigilance_entity": "Alert sensor (optional)"
+        }
+      },
+      "apparence": {
+        "title": "Dashboard style",
+        "data": {
+          "style": "Style"
+        }
+      }
+    },
+    "error": {
+      "texte_requis": "Text is required.",
+      "jours_requis": "Pick at least one day."
+    }
+  },
+  "selector": {
+    "vigilance_min": {
+      "options": {
+        "jamais": "Never show",
+        "jaune": "Yellow (default)",
+        "orange": "Orange and red only",
+        "rouge": "Red only",
+        "toujours": "Always (even green)"
+      }
+    },
+    "style": {
+      "options": {
+        "verre": "Dark glass (default): tinted cards, uppercase titles",
+        "ardoise": "Slate: flat, very dark borderless cards, small kickers, sentence-case titles, weather photo kept"
+      }
+    }
+  }
+}

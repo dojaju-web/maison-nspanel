@@ -1,0 +1,14 @@
+{
+  "domain": "maison_nspanel",
+  "name": "Maison NSPanel",
+  "codeowners": ["@dojaju-web"],
+  "config_flow": true,
+  "dependencies": ["http"],
+  "documentation": "https://github.com/dojaju-web/maison-nspanel",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/dojaju-web/maison-nspanel/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "1.5.0"
+}

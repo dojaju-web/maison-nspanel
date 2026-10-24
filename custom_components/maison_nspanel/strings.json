@@ -1,0 +1,112 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Maison NSPanel",
+        "description": "Choisissez l'entité météo utilisée pour les prévisions à 7 jours. Le rappel « Sortir les poubelles » (lundi) est créé par défaut et reste modifiable ensuite.",
+        "data": {
+          "weather_entity": "Entité météo"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Maison NSPanel est déjà installé."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Maison NSPanel",
+        "description": "Que voulez-vous faire ?",
+        "menu_options": {
+          "ajouter": "Ajouter un rappel",
+          "choisir": "Modifier un rappel",
+          "supprimer": "Supprimer des rappels",
+          "meteo": "Changer l'entité météo",
+          "vigilance": "Vigilance Météo-France",
+          "apparence": "Apparence du dashboard"
+        }
+      },
+      "ajouter": {
+        "title": "Nouveau rappel",
+        "description": "Le rappel s'affiche sur l'accueil du panneau les jours et pendant la plage horaire choisis.",
+        "data": {
+          "texte": "Texte affiché",
+          "icone": "Icône",
+          "jours": "Jours d'affichage",
+          "heure_debut": "Affiché à partir de",
+          "heure_fin": "Affiché jusqu'à",
+          "couleur": "Couleur",
+          "actif": "Activé"
+        }
+      },
+      "choisir": {
+        "title": "Modifier un rappel",
+        "data": {
+          "rappel": "Rappel"
+        }
+      },
+      "modifier": {
+        "title": "Modifier le rappel",
+        "data": {
+          "texte": "Texte affiché",
+          "icone": "Icône",
+          "jours": "Jours d'affichage",
+          "heure_debut": "Affiché à partir de",
+          "heure_fin": "Affiché jusqu'à",
+          "couleur": "Couleur",
+          "actif": "Activé"
+        }
+      },
+      "supprimer": {
+        "title": "Supprimer des rappels",
+        "description": "Cochez les rappels à supprimer.",
+        "data": {
+          "rappels": "Rappels à supprimer"
+        }
+      },
+      "meteo": {
+        "title": "Entité météo",
+        "data": {
+          "weather_entity": "Entité météo"
+        }
+      },
+      "vigilance": {
+        "title": "Vigilance Météo-France",
+        "description": "Affiche une pastille de vigilance sur l'accueil et les prévisions. Laissez le capteur vide pour le détecter automatiquement (sensor.<département>_weather_alert).",
+        "data": {
+          "vigilance_min": "Afficher à partir du niveau",
+          "vigilance_entity": "Capteur de vigilance (optionnel)"
+        }
+      },
+      "apparence": {
+        "title": "Style du dashboard",
+        "data": {
+          "style": "Style"
+        }
+      }
+    },
+    "error": {
+      "texte_requis": "Le texte est obligatoire.",
+      "jours_requis": "Choisissez au moins un jour."
+    }
+  },
+  "entity": {},
+  "selector": {
+    "vigilance_min": {
+      "options": {
+        "jamais": "Ne jamais afficher",
+        "jaune": "Jaune (défaut)",
+        "orange": "Orange et rouge seulement",
+        "rouge": "Rouge seulement",
+        "toujours": "Toujours (même vert)"
+      }
+    },
+    "style": {
+      "options": {
+        "verre": "Verre sombre (défaut) : cartes teintées, titres en capitales",
+        "ardoise": "Ardoise : cartes plates très sombres sans bordure, petits sous-titres, titres en minuscules, photo météo conservée"
+      }
+    }
+  }
+}
