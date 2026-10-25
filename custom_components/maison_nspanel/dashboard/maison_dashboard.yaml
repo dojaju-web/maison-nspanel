@@ -978,8 +978,10 @@ views:
                             const rgb = '250,204,21';
                             const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
                             const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
-                            // Teinte limitée à la zone de l'icône (~100 px), allumé ou éteint
-                            return 'linear-gradient(90deg, rgba(' + rgb + ',.30) 0px, rgba(' + rgb + ',.14) 46px, rgba(' + rgb + ',0) 104px), rgba(5,12,22,.62)';
+                            // Éteint : halo circulaire autour de l'icône ; actif : dégradé 100° teinté
+                            return on
+                              ? 'linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.64) 24%, rgba(5,12,22,.59) 100%)'
+                              : 'radial-gradient(circle 100px at 34px 50%, rgba(' + rgb + ',.13), transparent 70%), rgba(5,12,22,.58)';
                           ]]]
                     custom_fields:
                       c:
@@ -997,7 +999,7 @@ views:
                   custom_fields:
                     c: >
                       [[[
-                        const rgb = '31,162,208';
+                        const rgb = '34,211,238';
                         const ids = ['climate.sejour_climatisation'];
                         const on = (() => { const c = states['climate.sejour_climatisation']; return !!(c && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(c.state)); })();
                         const icon = (() => { const c = states['climate.sejour_climatisation']; const m = { cool: 'mdi:snowflake', heat: 'mdi:fire', dry: 'mdi:water-percent', fan_only: 'mdi:fan', heat_cool: 'mdi:autorenew', auto: 'mdi:autorenew' }; return (c && m[c.state]) || 'mdi:thermostat'; })();
@@ -1022,11 +1024,13 @@ views:
                       - box-shadow: none
                       - background: >
                           [[[
-                            const rgb = '31,162,208';
+                            const rgb = '34,211,238';
                             const ids = ['climate.sejour_climatisation'];
                             const on = (() => { const c = states['climate.sejour_climatisation']; return !!(c && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(c.state)); })();
-                            // Teinte limitée à la zone de l'icône (~100 px), allumé ou éteint
-                            return 'linear-gradient(90deg, rgba(' + rgb + ',.30) 0px, rgba(' + rgb + ',.14) 46px, rgba(' + rgb + ',0) 104px), rgba(5,12,22,.62)';
+                            // Éteint : halo circulaire autour de l'icône ; actif : dégradé 100° teinté
+                            return on
+                              ? 'linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.64) 24%, rgba(5,12,22,.59) 100%)'
+                              : 'radial-gradient(circle 100px at 34px 50%, rgba(' + rgb + ',.13), transparent 70%), rgba(5,12,22,.58)';
                           ]]]
                     custom_fields:
                       c:
