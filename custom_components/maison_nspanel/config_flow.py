@@ -13,6 +13,8 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector as sel
 
 from .const import (
+    CONF_AIR,
+    CONF_CLIMATE,
     DEFAULT_STYLE,
     STYLES,
     CONF_RAPPELS,
@@ -23,6 +25,7 @@ from .const import (
     DOMAIN,
 )
 from .rappels import DAY_LABELS, DAYS, DEFAULT_REMINDER, describe, normalize
+from .dashboard import DEFAULT_CLIMATE
 from .vigilance import DEFAULT_MIN, MIN_CHOICES
 
 DAY_OPTIONS = [{"value": d, "label": DAY_LABELS[d]} for d in DAYS]
@@ -130,13 +133,24 @@ class MaisonOptionsFlow(OptionsFlow):
             options[CONF_RAPPELS] = rappels
         return self.async_create_entry(title="", data=options)
 
-    # -- menu -------------------------------------------------------------
+    # -- menu principal : 4 catégories ----------------------------------------
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        return self.async_show_menu(
+            step_id="init",
+            menu_options=["categorie_rappels", "categorie_meteo", "climatisation", "apparence"],
+        )
+
+    async def async_step_categorie_rappels(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         menu = ["ajouter"]
         if self._rappels():
             menu += ["choisir", "supprimer"]
-        menu += ["meteo", "vigilance", "apparence"]
-        return self.async_show_menu(step_id="init", menu_options=menu)
+        menu += ["init"]  # retour
+        return self.async_show_menu(step_id="categorie_rappels", menu_options=menu)
+
+    async def async_step_categorie_meteo(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        return self.async_show_menu(
+            step_id="categorie_meteo", menu_options=["meteo", "vigilance", "init"]
+        )
 
     # -- ajouter ------------------------------------------------------------
     async def async_step_ajouter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -270,3 +284,24 @@ class MaisonOptionsFlow(OptionsFlow):
             }
         )
         return self.async_show_form(step_id="apparence", data_schema=schema)
+
+    # -- climatisation --------------------------------------------------------
+    async def async_step_climatisation(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        if user_input is not None:
+            return self._save(
+                **{
+                    CONF_CLIMATE: user_input[CONF_CLIMATE],
+                    CONF_AIR: bool(user_input.get(CONF_AIR, True)),
+                }
+            )
+        climate = self._entry.options.get(CONF_CLIMATE) or DEFAULT_CLIMATE
+        air = self._entry.options.get(CONF_AIR, True)
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_CLIMATE, default=climate): sel.EntitySelector(
+                    sel.EntitySelectorConfig(domain="climate")
+                ),
+                vol.Required(CONF_AIR, default=air): sel.BooleanSelector(),
+            }
+        )
+        return self.async_show_form(step_id="climatisation", data_schema=schema)

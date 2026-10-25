@@ -17,14 +17,12 @@
     "step": {
       "init": {
         "title": "Maison NSPanel",
-        "description": "Que voulez-vous faire ?",
+        "description": "Que voulez-vous régler ?",
         "menu_options": {
-          "ajouter": "Ajouter un rappel",
-          "choisir": "Modifier un rappel",
-          "supprimer": "Supprimer des rappels",
-          "meteo": "Changer l'entité météo",
-          "vigilance": "Vigilance Météo-France",
-          "apparence": "Apparence du dashboard"
+          "categorie_rappels": "Rappels",
+          "categorie_meteo": "Météo et vigilance",
+          "climatisation": "Climatisation et qualité de l'air",
+          "apparence": "Apparence"
         }
       },
       "ajouter": {
@@ -83,6 +81,33 @@
         "title": "Style du dashboard",
         "data": {
           "style": "Style"
+        }
+      },
+      "categorie_rappels": {
+        "title": "Rappels",
+        "description": "Ajouter, modifier ou supprimer un rappel.",
+        "menu_options": {
+          "ajouter": "Ajouter un rappel",
+          "choisir": "Modifier un rappel",
+          "supprimer": "Supprimer des rappels",
+          "init": "← Retour"
+        }
+      },
+      "categorie_meteo": {
+        "title": "Météo et vigilance",
+        "description": "Entité météo et alerte Météo-France.",
+        "menu_options": {
+          "meteo": "Changer l'entité météo",
+          "vigilance": "Vigilance Météo-France",
+          "init": "← Retour"
+        }
+      },
+      "climatisation": {
+        "title": "Climatisation",
+        "description": "Choisissez l'entité de climatisation (les entités liées, comme la ventilation ou l'alerte de filtre, sont déduites de son nom). Rechargez ensuite la page du panneau.",
+        "data": {
+          "climate_entity": "Entité de climatisation",
+          "air_enabled": "Afficher la qualité de l'air"
         }
       }
     },

@@ -71,3 +71,12 @@ Le changement s'applique après rechargement de la page du panneau.
 ## Publier une nouvelle version (mainteneur)
 Augmentez `version` dans `custom_components/maison_nspanel/manifest.json` puis poussez sur `main` :
 l'action *Release* crée seule la release `vX.Y.Z`, ce qui permet à HACS de proposer la mise à jour.
+
+## Réglages (catégories)
+**Configurer** ouvre quatre catégories :
+- **Rappels** : ajouter, modifier, supprimer.
+- **Météo et vigilance** : entité météo, alerte Météo-France.
+- **Climatisation et qualité de l'air** : entité de climatisation (les entités liées — ventilation, alerte de filtre, capteurs d'air — sont déduites de son nom, comme `switch.<nom>_climate_react`) et affichage de la qualité de l'air. Désactivée, la tuile « Air » disparaît et les deux tuiles de température prennent toute la largeur.
+- **Apparence** : verre sombre ou ardoise.
+
+Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entité de climatisation change : **rechargez ensuite la page du panneau** (un redémarrage de Home Assistant peut être nécessaire la première fois).

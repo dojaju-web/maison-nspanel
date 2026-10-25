@@ -8,7 +8,8 @@ from pathlib import Path
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, STATIC_URL
+from .const import CONF_CLIMATE, DOMAIN, STATIC_URL
+from .dashboard import sync
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +36,15 @@ async def _async_register_images(hass: HomeAssistant) -> None:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Démarre l'intégration."""
     await _async_register_images(hass)
+    # Régénère le dashboard avec l'entité de climatisation choisie (dossier « dashboard »)
+    try:
+        changed = await hass.async_add_executor_job(
+            sync, Path(__file__).parent / "dashboard", entry.options.get(CONF_CLIMATE)
+        )
+        if changed:
+            _LOGGER.info("Dashboard régénéré pour %s", entry.options.get(CONF_CLIMATE))
+    except OSError as err:
+        _LOGGER.warning("Impossible de régénérer le dashboard : %s", err)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_reload_on_change))
     return True

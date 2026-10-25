@@ -17,14 +17,12 @@
     "step": {
       "init": {
         "title": "Maison NSPanel",
-        "description": "What would you like to do?",
+        "description": "What do you want to set up?",
         "menu_options": {
-          "ajouter": "Add a reminder",
-          "choisir": "Edit a reminder",
-          "supprimer": "Delete reminders",
-          "meteo": "Change weather entity",
-          "vigilance": "Météo-France weather alert",
-          "apparence": "Dashboard style"
+          "categorie_rappels": "Reminders",
+          "categorie_meteo": "Weather and alert",
+          "climatisation": "Air conditioning and air quality",
+          "apparence": "Appearance"
         }
       },
       "ajouter": {
@@ -81,6 +79,33 @@
         "title": "Dashboard style",
         "data": {
           "style": "Style"
+        }
+      },
+      "categorie_rappels": {
+        "title": "Reminders",
+        "description": "Add, edit or delete a reminder.",
+        "menu_options": {
+          "ajouter": "Add a reminder",
+          "choisir": "Edit a reminder",
+          "supprimer": "Delete reminders",
+          "init": "← Back"
+        }
+      },
+      "categorie_meteo": {
+        "title": "Weather and alert",
+        "description": "Weather entity and Météo-France alert.",
+        "menu_options": {
+          "meteo": "Change weather entity",
+          "vigilance": "Météo-France weather alert",
+          "init": "← Back"
+        }
+      },
+      "climatisation": {
+        "title": "Air conditioning",
+        "description": "Choose the climate entity (related entities such as fan or filter alert are derived from its name). Then reload the panel page.",
+        "data": {
+          "climate_entity": "Climate entity",
+          "air_enabled": "Show air quality"
         }
       }
     },

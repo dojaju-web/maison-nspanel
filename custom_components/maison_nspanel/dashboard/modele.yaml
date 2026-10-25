@@ -1,0 +1,1920 @@
+# ============================================================
+#  Dashboard Maison  //  NSPanel 86  //  style "verre sombre"
+#  Pages : Accueil (horloge + météo)  >  Lumières  /  Climat
+#          + Prévisions météo à 7 jours (ouverte depuis l'accueil)
+# ============================================================
+#  Prérequis (HACS > Frontend) :
+#    - button-card (custom:button-card) v7.0+
+#    - kiosk-mode (masque l'en-tête et le menu)
+#
+#  Climatisation / qualité de l'air : avec l'intégration, Configurer > Climatisation
+#    (choix de l'entité Sensibo, qualité de l'air activable ou non).
+#
+#  Style : « verre » (défaut) ou « ardoise » (cartes sobres, titres en minuscules,
+#    météo en fond conservée). Avec l'intégration Maison NSPanel : Configurer > Apparence.
+#    Sans l'intégration, le style reste « verre ».
+#
+#  Rappel poubelles : variable "rappels" de la carte Accueil (jours, texte,
+#    icône, couleur, plage horaire) — voir le bloc commenté dans la carte.
+#
+#  Retour auto à l'accueil : 15 s sans toucher l'écran (Lumières et Climat).
+#    Pour changer la durée : modifier IDLE_SECONDS (2 endroits : en-têtes
+#    des pages Lumières et Climat), puis recharger la page.
+#
+#  Navigation :
+#    - Accueil : deux grandes tuiles en bas (Lumières, Climat) et la
+#      petite température (appui = prévisions à 7 jours).
+#    - Lumières / Climat : touchez l'en-tête (titre ou pastille ACCUEIL)
+#      pour revenir à l'accueil.
+#    - Prévisions : touchez l'en-tête (pastille FERMER) pour revenir.
+#    Le dashboard détecte seul son adresse.
+#
+#  MÉTÉO — À FAIRE UNE FOIS :
+#    1) Avec l'intégration « Maison NSPanel » : rien à modifier dans ce fichier.
+#       L'entité météo (ex. Météo-France : weather.<votre_ville>) se choisit dans
+#       Paramètres > Appareils et services > Maison NSPanel > Configurer > Météo,
+#       et le dashboard la suit automatiquement.
+#       Sans l'intégration : remplacez "weather.forecast_maison" (valeur par défaut)
+#       par votre entité météo (chercher / remplacer dans tout le fichier).
+#    2) Les prévisions à 7 jours sont fournies par l'intégration
+#       (sensor.maison_nspanel_previsions). Sans elle, ajoutez
+#       previsions_meteo_sensor.yaml à votre configuration.
+#    3) Horloge : ajoutez l'intégration "Heure et date" (Paramètres >
+#       Appareils et services > Ajouter une intégration) et cochez
+#       "Heure" pour créer sensor.time, qui fait avancer l'horloge.
+#    4) Fond d'écran météo : copiez les 18 images du fichier meteo_images.zip
+#       dans /config/www/meteo/ (créer le dossier). Elles sont servies par
+#       HA à l'adresse /local/meteo/<nom>.jpg. Sans les images, un décor
+#       dessiné par le code s'affiche à la place. Pour utiliser vos propres
+#       photos, gardez les mêmes noms de fichiers ou modifiez la variable
+#       "images" de la carte de l'accueil.
+#
+#  Entités utilisées :
+#    weather.forecast_maison, sun.sun, sensor.time (horloge), sensor.previsions_meteo_7_jours (ou, avec l'intégration Maison NSPanel,
+#    sensor.maison_nspanel_previsions et sensor.maison_nspanel_rappels),
+#    sensor.sejour_climatisation_co2 ou _tvoc (qualité de l'air, détecté seul),
+#    switch.outlet_1, light.sejour_cuisine, light.sejour_mur_tv,
+#    light.sejour_mur_sdb, light.jardin_jardin,
+#    climate.sejour_climatisation,
+#    switch.sejour_climatisation_climate_react,
+#    binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis
+#
+#  Utilisation : nouveau tableau de bord > menu ⋮ > Éditeur de
+#  configuration brute > coller ce fichier.
+#
+#  Lumières : appui court = allumer / éteindre, appui long = fiche de
+#  l'entité (luminosité, couleur).
+# ============================================================
+
+button_card_templates:
+
+  # ==========================================================
+  #  Modèle de la page Accueil
+  # ==========================================================
+
+  # Tuile de navigation : s'allume si une des entités listées (ids) est active
+  tile_nav:
+    show_icon: true
+    show_name: true
+    show_label: true
+    size: 24px
+    variables:
+      rgb: "250,204,21"
+      dest: lumieres
+      ids: []
+      min_h: 16vh
+    tap_action:
+      action: navigate
+      navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/' + variables.dest; ]]]"
+    styles:
+      grid:
+        - grid-template-areas: '"i" "n" "l"'
+        - grid-template-rows: 1fr min-content min-content
+        - grid-template-columns: 1fr
+        - row-gap: 3px
+      card:
+        - position: relative
+        - overflow: hidden
+        - height: 100%
+        - min-height: "[[[ return variables.min_h ]]]"
+        - padding: 8px 6px
+        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+        - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.12') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.72) 62%)' ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+        - box-shadow: none
+        - transition: all .3s ease
+      img_cell:
+        - width: 42px
+        - height: 42px
+        - justify-self: center
+        - align-self: center
+        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '13px' ]]]"
+        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : ('rgba(' + variables.rgb + ',.14)') ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.28)') ]]]"
+        - transition: all .3s ease
+      icon:
+        - width: 24px
+        - color: "[[[ return 'rgb(' + variables.rgb + ')' ]]]"
+      name:
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        - font-size: 12px
+        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '800' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '1px' ]]]"
+        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#E2E8F0') ]]]"
+        - margin-top: 2px
+      label:
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        - font-size: 12px
+        - font-weight: 600
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#94A3B8') ]]]"
+        - padding-bottom: 2px
+        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+    state:
+      - operator: template
+        value: "[[[ return variables.ids.some(i => states[i] && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(states[i].state)); ]]]"
+        styles:
+          card:
+            - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.28') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.78) 68%)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.55)') ]]]"
+          img_cell:
+            - background: "[[[ return 'rgba(' + variables.rgb + ',.30)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.55)') ]]]"
+            - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('0 0 14px rgba(' + variables.rgb + ',.45)') ]]]"
+          name:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('rgb(' + variables.rgb + ')') ]]]"
+          label:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#E2E8F0') ]]]"
+            - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+            - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+
+  # ==========================================================
+  #  Modèles de la page Lumières
+  # ==========================================================
+
+  # ----------------------------------------------------------
+  # Tuile lumière : carte en verre + pastille d'icône teintée
+  # ----------------------------------------------------------
+  tile_light:
+    show_icon: true
+    show_name: true
+    show_label: true
+    size: 24px
+    variables:
+      rgb: "250,204,21"      # couleur du bouton, au format R,G,B
+      min_h: 18vh            # hauteur minimale
+    tap_action:
+      action: toggle
+    hold_action:
+      action: more-info
+    label: >
+      [[[
+        if (entity.state === 'unavailable') return 'Indisponible';
+        if (entity.state !== 'on') return 'Éteinte';
+        const b = entity.attributes.brightness;
+        return (b !== undefined && b !== null) ? 'Allumée · ' + Math.round(b / 2.55) + ' %' : 'Allumée';
+      ]]]
+    styles:
+      grid:
+        - grid-template-areas: '"i" "n" "l"'
+        - grid-template-rows: 1fr min-content min-content
+        - grid-template-columns: 1fr
+        - row-gap: 3px
+      card:
+        - position: relative
+        - overflow: hidden
+        - height: 100%
+        - min-height: "[[[ return variables.min_h ]]]"
+        - padding: 8px 6px
+        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+        - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.10') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 62%)' ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+        - box-shadow: none
+        - transition: all .3s ease
+      img_cell:
+        - width: 42px
+        - height: 42px
+        - justify-self: center
+        - align-self: center
+        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '13px' ]]]"
+        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : ('rgba(' + variables.rgb + ',.14)') ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.28)') ]]]"
+        - transition: all .3s ease
+      icon:
+        - width: 24px
+        - color: "[[[ return 'rgb(' + variables.rgb + ')' ]]]"
+      name:
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        - font-size: 12px
+        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '800' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '1px' ]]]"
+        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+        - white-space: nowrap
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#B4BED0') ]]]"
+        - margin-top: 2px
+        - transition: color .3s ease
+      label:
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        - font-size: 12px
+        - font-weight: 600
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#8A96A8') ]]]"
+        - padding-bottom: 2px
+        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+    state:
+      - operator: template
+        value: "[[[ return entity.state === 'on' ]]]"
+        styles:
+          card:
+            - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.26') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.86) 68%)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.50)') ]]]"
+          img_cell:
+            - background: "[[[ return 'rgba(' + variables.rgb + ',.30)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.55)') ]]]"
+            - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('0 0 14px rgba(' + variables.rgb + ',.45)') ]]]"
+          name:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('rgb(' + variables.rgb + ')') ]]]"
+          label:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#C7D2E5') ]]]"
+            - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+            - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+
+  # ----------------------------------------------------------
+  # Titre de section : texte à gauche + fine ligne qui s'efface
+  # ----------------------------------------------------------
+  section_title:
+    show_icon: false
+    show_name: false
+    show_label: false
+    tap_action:
+      action: none
+    variables:
+      text: SECTION
+    custom_fields:
+      sep: >
+        [[[
+          return `<div style="display:flex;align-items:center;gap:10px;width:100%">
+            <span>${variables.text}</span>
+            <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.14),transparent)"></span>
+          </div>`;
+        ]]]
+    styles:
+      grid:
+        - grid-template-areas: '"sep"'
+        - grid-template-columns: 1fr
+      card:
+        - background: transparent
+        - border: none
+        - box-shadow: none
+        - min-height: 4.5vh
+        - padding: 4px 6px
+      custom_fields:
+        sep:
+          - width: 100%
+          - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+          - font-size: 11px
+          - font-weight: 800
+          - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1.5px' : '3px' ]]]"
+          - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.34)' : '#6B7A99' ]]]"
+
+  # ==========================================================
+  #  Modèles de la page Climat
+  # ==========================================================
+
+  # ----------------------------------------------------------
+  # Base : carte en verre + pastille d'icône teintée
+  # ----------------------------------------------------------
+  tile_base:
+    show_icon: true
+    show_name: true
+    show_label: false
+    size: 20px
+    variables:
+      kind: none             # mode | fan | fancycle | swing | poscycle | on | none
+      value: ""
+      rgb: "148,163,184"     # couleur de la carte, au format R,G,B
+      min_h: 13.5vh          # hauteur minimale du bouton
+    styles:
+      grid:
+        - grid-template-areas: '"i" "n" "l"'
+        - grid-template-rows: 1fr min-content min-content
+        - grid-template-columns: 1fr
+        - row-gap: 2px
+      card:
+        - position: relative
+        - overflow: hidden
+        - height: 100%
+        - min-height: "[[[ return variables.min_h ]]]"
+        - padding: 6px 2px
+        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+        - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.10') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 62%)' ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+        - box-shadow: none
+        - transition: all .3s ease
+      img_cell:
+        - width: 34px
+        - height: 34px
+        - justify-self: center
+        - align-self: center
+        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '11px' ]]]"
+        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : ('rgba(' + variables.rgb + ',.14)') ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.28)') ]]]"
+        - transition: all .3s ease
+      icon:
+        - width: 20px
+        - color: "[[[ return 'rgb(' + variables.rgb + ')' ]]]"
+      name:
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        - font-size: 11px
+        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '800' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '1px' ]]]"
+        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#B4BED0') ]]]"
+        - margin-top: 2px
+        - transition: color .3s ease
+      label:
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        - font-size: 12px
+        - font-weight: 600
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#8A96A8') ]]]"
+        - padding-bottom: 2px
+        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+    state:
+      - operator: template
+        value: >
+          [[[
+            const k = variables.kind, v = variables.value;
+            if (k === 'mode') return entity.state === v;
+            const fan = String(entity.attributes.fan_mode || '').toLowerCase();
+            const sw = String(entity.attributes.swing_mode || '').toLowerCase();
+            if (k === 'fan') return fan === v;
+            if (k === 'fancycle') return ['low', 'medium', 'high'].includes(fan);
+            if (k === 'swing') return sw.startsWith('range');
+            if (k === 'poscycle') return sw.startsWith('fixed');
+            if (k === 'none') return false;
+            return entity.state === 'on';
+          ]]]
+        styles:
+          card:
+            - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.26') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.86) 68%)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.50)') ]]]"
+          img_cell:
+            - background: "[[[ return 'rgba(' + variables.rgb + ',.30)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.55)') ]]]"
+            - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('0 0 14px rgba(' + variables.rgb + ',.45)') ]]]"
+          name:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('rgb(' + variables.rgb + ')') ]]]"
+
+  # ----------------------------------------------------------
+  # Mode HVAC
+  # ----------------------------------------------------------
+  tile_mode:
+    template: tile_base
+    variables:
+      kind: mode
+    tap_action:
+      action: perform-action
+      perform_action: climate.set_hvac_mode
+      target:
+        entity_id: climate.sejour_climatisation
+      data:
+        hvac_mode: "[[[ return variables.value ]]]"
+
+  # ----------------------------------------------------------
+  # Vitesse de ventilation (bouton fixe, ex. Auto)
+  # ----------------------------------------------------------
+  tile_fan:
+    template: tile_base
+    show_label: true
+    label: "[[[ return String(entity.attributes.fan_mode || '').toLowerCase() === 'auto' ? 'Actif' : 'Off' ]]]"
+    variables:
+      kind: fan
+      rgb: "34,211,238"
+      min_h: 16vh
+    tap_action:
+      action: perform-action
+      perform_action: climate.set_fan_mode
+      target:
+        entity_id: climate.sejour_climatisation
+      data:
+        fan_mode: "[[[ return variables.value ]]]"
+
+  # ----------------------------------------------------------
+  # Vitesse défilante : Bas > Moyen > Fort > Bas ...
+  # ----------------------------------------------------------
+  tile_fan_cycle:
+    template: tile_base
+    name: Vitesse
+    show_label: true
+    variables:
+      kind: fancycle
+      rgb: "34,211,238"
+      min_h: 16vh
+    icon: >
+      [[[
+        const f = String(entity.attributes.fan_mode || '').toLowerCase();
+        return { low: 'mdi:fan-speed-1', medium: 'mdi:fan-speed-2', high: 'mdi:fan-speed-3' }[f] || 'mdi:fan';
+      ]]]
+    label: >
+      [[[
+        const f = String(entity.attributes.fan_mode || '').toLowerCase();
+        return { low: 'Bas', medium: 'Moyen', high: 'Fort' }[f] || '—';
+      ]]]
+    tap_action:
+      action: perform-action
+      perform_action: climate.set_fan_mode
+      target:
+        entity_id: climate.sejour_climatisation
+      data:
+        fan_mode: >
+          [[[
+            const order = ['low', 'medium', 'high'];
+            const avail = (entity.attributes.fan_modes || []).map(m => String(m).toLowerCase());
+            const list = order.filter(o => avail.length === 0 || avail.includes(o));
+            const cur = String(entity.attributes.fan_mode || '').toLowerCase();
+            const i = list.indexOf(cur);
+            return list[(i + 1) % list.length];
+          ]]]
+
+  # ----------------------------------------------------------
+  # Position défilante : Haut > Mi-haut > Milieu > Mi-bas > Bas > Haut ...
+  # ----------------------------------------------------------
+  tile_pos_cycle:
+    template: tile_base
+    name: Position
+    show_label: true
+    variables:
+      kind: poscycle
+      rgb: "45,212,191"
+      min_h: 16vh
+    icon: >
+      [[[
+        const m = String(entity.attributes.swing_mode || '').toLowerCase();
+        return {
+          fixedtop: 'mdi:arrow-up',
+          fixedmiddletop: 'mdi:arrow-top-right',
+          fixedmiddle: 'mdi:arrow-right',
+          fixedmiddlebottom: 'mdi:arrow-bottom-right',
+          fixedbottom: 'mdi:arrow-down'
+        }[m] || 'mdi:arrow-expand-vertical';
+      ]]]
+    label: >
+      [[[
+        const m = String(entity.attributes.swing_mode || '').toLowerCase();
+        return {
+          fixedtop: 'Haut',
+          fixedmiddletop: 'Mi-haut',
+          fixedmiddle: 'Milieu',
+          fixedmiddlebottom: 'Mi-bas',
+          fixedbottom: 'Bas'
+        }[m] || '—';
+      ]]]
+    tap_action:
+      action: perform-action
+      perform_action: climate.set_swing_mode
+      target:
+        entity_id: climate.sejour_climatisation
+      data:
+        swing_mode: >
+          [[[
+            const order = ['fixedtop', 'fixedmiddletop', 'fixedmiddle', 'fixedmiddlebottom', 'fixedbottom'];
+            const modes = entity.attributes.swing_modes || [];
+            const avail = modes.map(m => String(m).toLowerCase());
+            const list = order.filter(o => avail.length === 0 || avail.includes(o));
+            const cur = String(entity.attributes.swing_mode || '').toLowerCase();
+            const i = list.indexOf(cur);
+            const next = list[(i + 1) % list.length];
+            return modes.find(m => String(m).toLowerCase() === next) || next;
+          ]]]
+
+  # ----------------------------------------------------------
+  # Boutons - / + de consigne
+  # ----------------------------------------------------------
+  tile_step:
+    template: tile_base
+    show_name: false
+    size: 30px
+    variables:
+      kind: none
+      step: 1
+      rgb: "148,163,184"
+    styles:
+      img_cell:
+        - width: 54px
+        - height: 54px
+        - background: transparent
+        - border: none
+        - box-shadow: none
+      icon:
+        - width: 30px
+        - color: "#E6ECF7"
+    tap_action:
+      action: perform-action
+      perform_action: climate.set_temperature
+      target:
+        entity_id: climate.sejour_climatisation
+      data:
+        temperature: >
+          [[[
+            const t = (entity.attributes.temperature ?? 22) + variables.step;
+            const lo = entity.attributes.min_temp ?? 16;
+            const hi = entity.attributes.max_temp ?? 30;
+            return Math.min(hi, Math.max(lo, t));
+          ]]]
+
+# ============================================================
+#  DASHBOARD
+# ============================================================
+title: Maison
+
+# Masque la barre du haut et le menu latéral (nécessite kiosk-mode via HACS).
+# Pour les réafficher temporairement, ajoutez ?disable_km à l'adresse du dashboard.
+kiosk_mode:
+  hide_header: true
+  hide_sidebar: true
+
+views:
+  # ==========================================================
+  #  PAGE 1 : ACCUEIL
+  # ==========================================================
+  - title: Accueil
+    path: accueil
+    type: panel
+    background: "#070b14"
+    cards:
+      - type: custom:button-card
+        show_icon: false
+        show_name: false
+        show_label: false
+        triggers_update:
+          - weather.forecast_maison
+          - sensor.maison_nspanel_previsions
+          - sun.sun
+          - sensor.time
+          - climate.sejour_climatisation
+          - sensor.sejour_climatisation_co2
+          - sensor.sejour_climatisation_tvoc
+          - sensor.maison_nspanel_rappels
+          - sensor.84_weather_alert
+          - sensor.maison_nspanel_vigilance
+        variables:
+          # ------------------------------------------------------------
+          #  RAPPELS (notification sous l'heure) — FACILE À MODIFIER
+          #    jours : jours d'affichage, 0=dim 1=lun 2=mar 3=mer 4=jeu 5=ven 6=sam
+          #            ex. [1] = lundi seulement, [1, 4] = lundi et jeudi
+          #    de / a : plage horaire (heures, optionnel) ex. de: 18, a: 24
+          #    icone  : n'importe quelle icône mdi (ex. mdi:trash-can-outline)
+          #    texte  : message affiché
+          #    couleur: "R,V,B" (défaut : ambre "250,204,21", comme l'alerte filtre)
+          #  Pour ajouter un rappel, copiez un bloc "- jours: ..." ci-dessous.
+          #  Pour tester aujourd'hui, mettez le numéro du jour du jour.
+          # ------------------------------------------------------------
+          rappels:
+            - jours: [1]
+              de: 0
+              a: 24
+              icone: mdi:trash-can-outline
+              texte: Sortir les poubelles
+              couleur: "250,204,21"
+          # Images de fond : fournies par l'intégration Maison NSPanel (/maison_nspanel/meteo/).
+          # Sans l'intégration, copiez les images dans /config/www/meteo/ (dossier par défaut),
+          # ou changez le dossier ici. Si un fichier manque, le décor dessiné par le code prend le relais.
+          # images_dossier: /local/meteo
+          # Pour remplacer une image précise (clé = condition, ex. rainy ou rainy-night) :
+          # images:
+          #   sunny: /local/mes_photos/soleil.jpg
+          images: {}
+          # Vigilance Météo-France. Avec l'intégration Maison NSPanel, le réglage se fait dans
+          # Configurer > Vigilance (les 2 lignes ci-dessous ne servent alors plus). Sinon : capteur du département (ex. Vaucluse = sensor.84_weather_alert).
+          # Détecté automatiquement si ce nom est inexact.
+          # vigilance_min : 2 = à partir de jaune (défaut), 3 = orange et rouge seulement, 1 = toujours (même vert).
+          vigilance: sensor.84_weather_alert
+          vigilance_min: 2
+        tap_action:
+          action: none
+        custom_fields:
+          clock: >
+            [[[
+              const tz = hass.config.time_zone, d = new Date();
+              const time = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: tz });
+              const w = d.toLocaleDateString('fr-FR', { weekday: 'short', timeZone: tz });
+              const m = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', timeZone: tz });
+              const date = (w.charAt(0).toUpperCase() + w.slice(1)) + ' ' + m;
+              // Rappels du jour (voir variables.rappels)
+              const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
+              const dow = now.getDay(), hr = now.getHours();
+              // Si l'intégration « Maison NSPanel » est installée, les rappels viennent de son capteur
+              // (modifiables dans l'interface). Sinon : variables.rappels ci-dessus.
+              const rs = states['sensor.maison_nspanel_rappels'];
+              const actifs = (rs && rs.attributes && Array.isArray(rs.attributes.rappels))
+                ? rs.attributes.rappels
+                : (variables.rappels || []).filter(r => {
+                    const jours = Array.isArray(r.jours) ? r.jours : [r.jours];
+                    const de = (r.de !== undefined) ? r.de : 0, a = (r.a !== undefined) ? r.a : 24;
+                    return jours.indexOf(dow) !== -1 && hr >= de && hr < a;
+                  });
+              // Vigilance Météo-France (capteur « <département> Weather alert », détecté seul)
+              const vigS = (variables.vigilance && states[variables.vigilance]) || Object.keys(states).filter(k => /^sensor\.(\d{2}|2a|2b)_weather_alert$/.test(k)).map(k => states[k])[0];
+              const vigLv = { vert: 1, jaune: 2, orange: 3, rouge: 4 };
+              const vigRgb = { 1: '74,222,128', 2: '250,204,21', 3: '251,146,60', 4: '239,68,68' };
+              // Si l'intégration est installée, son capteur de vigilance (réglé dans Configurer > Vigilance) prime
+              const vi = states['sensor.maison_nspanel_vigilance'];
+              const viOk = !!(vi && vi.attributes && vi.attributes.niveau !== undefined);
+              let vigHtml = '';
+              if (vigS || viOk) {
+                const lv = viOk ? vi.attributes.niveau : (vigLv[String(vigS.state || '').toLowerCase()] || 1);
+                const mini = (variables.vigilance_min !== undefined) ? variables.vigilance_min : 2;
+                if (viOk ? vi.attributes.afficher : lv >= mini) {
+                  const c = viOk ? vi.attributes.couleur : vigRgb[lv];
+                  const nom = ['', 'vert', 'jaune', 'orange', 'rouge'][lv].toUpperCase();
+                  const ph = viOk ? (vi.attributes.phenomenes || []).map(x => x.nom).join(' · ') : Object.keys(vigS.attributes || {}).filter(k => vigLv[String(vigS.attributes[k]).toLowerCase()] >= 2)
+                    .sort((a, b) => vigLv[String(vigS.attributes[b]).toLowerCase()] - vigLv[String(vigS.attributes[a]).toLowerCase()])
+                    .map(k => k.replace(/-/g, ' / ')).join(' · ');
+                  vigHtml = '<div style="max-width:100%"><div style="display:inline-flex;align-items:center;gap:10px;padding:6px 13px 6px 6px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.16') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%);border:1px solid rgba(' + c + ',.60);max-width:100%;box-sizing:border-box;text-align:left">'
+                    + '<span style="display:flex;flex:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(' + c + ',.20);border:1px solid rgba(' + c + ',.45);box-shadow:0 0 14px rgba(' + c + ',.40)">'
+                    + '<ha-icon icon="mdi:weather-cloudy-alert" style="--mdc-icon-size:20px;color:rgb(' + c + ')"></ha-icon></span>'
+                    + '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgb(' + c + ')">Vigilance ' + nom + '</span>'
+                    + (ph ? '<span style="font-size:11px;font-weight:600;color:#E2E8F0;margin-top:1px">' + ph + '</span>' : '') + '</span></div></div>';
+                }
+              }
+              const pills = actifs.map(r => {
+                const c = r.couleur || '250,204,21';
+                // Même style que l'alerte « FILTRE À NETTOYER » : bordure ambre, puce teintée, texte en capitales espacées
+                return '<div style="max-width:100%"><div style="display:inline-flex;align-items:center;gap:10px;padding:6px 13px 6px 6px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%);border:1px solid rgba(' + c + ',.55)">'
+                  + '<span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(' + c + ',.20);border:1px solid rgba(' + c + ',.45);box-shadow:0 0 14px rgba(' + c + ',.40)">'
+                  + '<ha-icon icon="' + (r.icone || 'mdi:bell-outline') + '" style="--mdc-icon-size:20px;color:rgb(' + c + ')"></ha-icon></span>'
+                  + '<span style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgb(' + c + ')">' + (r.texte || '') + '</span></div></div>';
+              }).join('');
+              return '<div style="text-align:center">'
+                + '<div style="font-size:21vh;font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;color:#FFFFFF;text-shadow:0 2px 24px rgba(0,0,0,.65)">' + time + '</div>'
+                + '<div style="margin-top:1.2vh;font-size:19px;font-weight:600;letter-spacing:.5px;color:#E2E8F0;text-shadow:0 1px 10px rgba(0,0,0,.7)">' + date + '</div>'
+                + ((pills || vigHtml) ? '<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:1.4vh">' + pills + vigHtml + '</div>' : '')
+                + '</div>';
+            ]]]
+          weather:
+            card:
+              type: custom:button-card
+              triggers_update:
+                - weather.forecast_maison
+                - sensor.maison_nspanel_previsions
+                - sun.sun
+              show_icon: true
+              show_name: true
+              show_label: true
+              size: 26px
+              label: EXTÉRIEUR
+              icon: >
+                [[[
+                  const m = { 'clear-night': 'mdi:weather-night', cloudy: 'mdi:weather-cloudy', exceptional: 'mdi:alert-circle-outline', fog: 'mdi:weather-fog', hail: 'mdi:weather-hail', lightning: 'mdi:weather-lightning', 'lightning-rainy': 'mdi:weather-lightning-rainy', partlycloudy: 'mdi:weather-partly-cloudy', pouring: 'mdi:weather-pouring', rainy: 'mdi:weather-rainy', snowy: 'mdi:weather-snowy', 'snowy-rainy': 'mdi:weather-snowy-rainy', sunny: 'mdi:weather-sunny', windy: 'mdi:weather-windy', 'windy-variant': 'mdi:weather-windy-variant' };
+                  const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                  const s = (() => { const w0 = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')]; const sn = states['sun.sun']; let x = w0 ? w0.state : 'unknown'; if (sn && sn.state === 'above_horizon' && x === 'clear-night') x = 'sunny'; if (sn && sn.state === 'below_horizon' && x === 'sunny') x = 'clear-night'; return x; })();
+                  return (w && m[s]) || 'mdi:weather-cloudy';
+                ]]]
+              name: >
+                [[[
+                  const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                  const t = w ? w.attributes.temperature : undefined;
+                  return (t !== undefined && t !== null) ? (Math.round(Number(t) * 10) / 10) + ' °C' : '-- °C';
+                ]]]
+              tap_action:
+                action: navigate
+                navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/previsions'; ]]]"
+              styles:
+                grid:
+                  - grid-template-areas: '"i l" "i n"'
+                  - grid-template-columns: min-content 1fr
+                  - grid-template-rows: min-content min-content
+                  - column-gap: 10px
+                  - row-gap: 1px
+                  - align-content: center
+                  - align-items: center
+                card:
+                  - padding: 8px 12px
+                  - min-height: 9vh
+                  - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                  - background: >
+                      [[[
+                        if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) return 'rgba(16,23,40,.62)';
+                        const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                        const st = w ? w.state : '';
+                        const tint = ({ sunny: '251,191,36', partlycloudy: '251,191,36', rainy: '96,165,250', pouring: '96,165,250', lightning: '96,165,250', 'lightning-rainy': '96,165,250', snowy: '186,230,253' })[st] || '148,163,184';
+                        return 'linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%)';
+                      ]]]
+                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)') ]]]"
+                  - box-shadow: none
+                img_cell:
+                  - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
+                  - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
+                  - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '50%' : '0' ]]]"
+                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.04)' : 'transparent' ]]]"
+                  - justify-self: center
+                icon:
+                  - width: 26px
+                  - color: >
+                      [[[
+                        const c = { sunny: '#FBBF24', 'clear-night': '#E2E8F0', partlycloudy: '#FCD34D', cloudy: '#CBD5E1', fog: '#CBD5E1', windy: '#CBD5E1', 'windy-variant': '#CBD5E1', rainy: '#7DD3FC', pouring: '#60A5FA', snowy: '#E0F2FE', 'snowy-rainy': '#BAE6FD', hail: '#BAE6FD', lightning: '#FACC15', 'lightning-rainy': '#FACC15', exceptional: '#FB923C' };
+                        const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                        const s = (() => { const w0 = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')]; const sn = states['sun.sun']; let x = w0 ? w0.state : 'unknown'; if (sn && sn.state === 'above_horizon' && x === 'clear-night') x = 'sunny'; if (sn && sn.state === 'below_horizon' && x === 'sunny') x = 'clear-night'; return x; })();
+                        return (w && c[s]) || '#E2E8F0';
+                      ]]]
+                label:
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '8px' : '10px' ]]]"
+                  - font-weight: 800
+                  - letter-spacing: 1px
+                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#94A3B8') ]]]"
+                  - justify-self: start
+                  - white-space: nowrap
+                  - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                name:
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '18px' ]]]"
+                  - font-weight: 700
+                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
+                  - justify-self: start
+                  - white-space: nowrap
+          indoor: >
+            [[[
+              const c = states['climate.sejour_climatisation'];
+              const t = c ? c.attributes.current_temperature : undefined;
+              const h = c ? c.attributes.current_humidity : undefined;
+              const temp = (t !== undefined && t !== null) ? (Math.round(Number(t) * 10) / 10) + ' °C' : '-- °C';
+              const hum = (h !== undefined && h !== null) ? ' · ' + Math.round(Number(h)) + ' %' : '';
+              const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
+              if (ar) {
+                // Style ardoise (d'après la carte « Salon » de la démo) : dégradé teinté sur l'icône, fond sombre
+                const tint = (t === undefined || t === null) ? '148,163,184' : Number(t) < 19 ? '56,189,248' : Number(t) < 24 ? '16,185,129' : Number(t) < 27 ? '249,115,22' : '239,68,68';
+                return '<div style="display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:9vh;padding:8px 10px;border-radius:16px;background:linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%);text-align:left">'
+                  + '<div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:20px;color:rgb(' + tint + ')"></ha-icon></div>'
+                  + '<div style="min-width:0"><div style="font-size:8px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">INTÉRIEUR' + hum + '</div>'
+                  + '<div style="font-size:15px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap">' + temp + '</div></div></div>';
+              }
+              return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
+                + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:#7DD3FC;flex:none"></ha-icon>'
+                + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">INTÉRIEUR' + hum + '</div>'
+                + '<div style="font-size:18px;font-weight:700;color:#FFFFFF;white-space:nowrap">' + temp + '</div></div></div>';
+            ]]]
+          air: >
+            [[[
+              // Qualité de l'air : détection automatique des capteurs CO2 / TVOC du Sensibo
+              const ids = Object.keys(states).filter(k => k.indexOf('sensor.sejour_climatisation') === 0);
+              const idCo2 = ids.find(k => /co2/.test(k));
+              const idTvoc = ids.find(k => /tvoc/.test(k));
+              const num = id => { const s = id ? states[id] : null; const v = s ? parseFloat(s.state) : NaN; return isNaN(v) ? null : v; };
+              const co2 = num(idCo2), tvoc = num(idTvoc);
+              let q = null, val = '';
+              if (co2 !== null) {
+                q = co2 < 800 ? 0 : co2 < 1000 ? 1 : co2 < 1500 ? 2 : 3;
+                val = Math.round(co2) + ' ppm';
+              } else if (tvoc !== null) {
+                q = tvoc < 220 ? 0 : tvoc < 660 ? 1 : tvoc < 2200 ? 2 : 3;
+                val = Math.round(tvoc) + ' ppb';
+              }
+              const labels = ['Excellente', 'Bonne', 'Moyenne', 'Mauvaise'];
+              const cols = ['#4ADE80', '#A3E635', '#FACC15', '#FB923C'];
+              const qLabel = q === null ? 'n/d' : labels[q];
+              const qCol = q === null ? '#94A3B8' : cols[q];
+              const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
+              if (ar) {
+                const tints = ['74,222,128', '163,230,53', '250,204,21', '251,146,60'];   // mêmes couleurs que le style verre sombre
+                const tint = q === null ? '148,163,184' : tints[q];
+                return '<div style="display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:9vh;padding:8px 10px;border-radius:16px;background:linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%);text-align:left">'
+                  + '<div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:air-filter" style="--mdc-icon-size:20px;color:rgb(' + tint + ')"></ha-icon></div>'
+                  + '<div style="min-width:0"><div style="font-size:8px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
+                  + '<div style="font-size:15px;font-weight:800;color:rgb(' + tint + ');white-space:nowrap">' + qLabel + '</div></div></div>';
+              }
+              return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
+                + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none"></ha-icon>'
+                + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
+                + '<div style="font-size:18px;font-weight:700;color:' + qCol + ';white-space:nowrap">' + qLabel + '</div></div></div>';
+            ]]]
+          nav:
+            card:
+              type: grid
+              columns: 2
+              square: false
+              cards:
+                - show_icon: true
+                  show_name: true
+                  show_label: true
+                  size: 24px
+                  tap_action:
+                    action: navigate
+                    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''lumieres''; ]]]'
+                  styles:
+                    grid:
+                    - grid-template-areas: '"i" "n" "l"'
+                    - grid-template-rows: 1fr min-content min-content
+                    - grid-template-columns: 1fr
+                    - row-gap: 3px
+                    card:
+                    - position: relative
+                    - overflow: hidden
+                    - height: 100%
+                    - min-height: '[[[ return ''16vh'' ]]]'
+                    - padding: 8px 6px
+                    - border-radius: '[[[ return (states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''14px'' : ''18px'' ]]]'
+                    - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''250,204,21'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.00'' : ''.12'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.72) 62%)'' ]]]'
+                    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+                    - box-shadow: none
+                    - transition: all .3s ease
+                    img_cell:
+                    - width: 42px
+                    - height: 42px
+                    - justify-self: center
+                    - align-self: center
+                    - border-radius: '[[[ return (states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''10px'' : ''13px'' ]]]'
+                    - background: '[[[ return ''rgba('' + ''250,204,21'' + '',.16)'' ]]]'
+                    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '250,204,21' + ',.30)') ]]]"
+                    - transition: all .3s ease
+                    icon:
+                    - width: 24px
+                    - color: '[[[ return ''rgb('' + ''250,204,21'' + '')'' ]]]'
+                    name:
+                    - font-family: '''Inter'',''Segoe UI'',Roboto,sans-serif'
+                    - font-size: 12px
+                    - font-weight: 800
+                    - letter-spacing: 1px
+                    - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('uppercase') ]]]"
+                    - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#E2E8F0') ]]]"
+                    - margin-top: 2px
+                    label:
+                    - font-family: '''Inter'',''Segoe UI'',Roboto,sans-serif'
+                    - font-size: 12px
+                    - font-weight: 600
+                    - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#94A3B8') ]]]"
+                    - padding-bottom: 2px
+                    - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                    - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                  state:
+                  - operator: template
+                    value: '[[[ return [''switch.outlet_1'', ''light.sejour_cuisine'', ''light.sejour_mur_tv'', ''light.sejour_mur_sdb'', ''light.jardin_jardin''].some(i => states[i] && [''on'',''cool'',''heat'',''dry'',''fan_only'',''heat_cool'',''auto''].includes(states[i].state)); ]]]'
+                    styles:
+                      card:
+                      - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''250,204,21'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.16'' : ''.28'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.78) 68%)'' ]]]'
+                      - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '250,204,21' + ',.55)') ]]]"
+                      img_cell:
+                      - background: '[[[ return ''rgba('' + ''250,204,21'' + '',.30)'' ]]]'
+                      - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '250,204,21' + ',.55)') ]]]"
+                      - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('0 0 14px rgba(' + '250,204,21' + ',.45)') ]]]"
+                      name:
+                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('rgb(' + '250,204,21' + ')') ]]]"
+                      label:
+                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#E2E8F0') ]]]"
+                      - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                      - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                  type: custom:button-card
+                  name: Éclairage
+                  icon: mdi:lightbulb-group
+                  triggers_update:
+                  - switch.outlet_1
+                  - light.sejour_cuisine
+                  - light.sejour_mur_tv
+                  - light.sejour_mur_sdb
+                  - light.jardin_jardin
+                  label: "[[[\n  const n = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'].filter(i => states[i] && states[i].state === 'on').length;\n  return n === 0 ? 'Tout éteint' : n + (n > 1 ? ' allumés' : ' allumé');\n]]]\n"
+                - show_icon: true
+                  show_name: true
+                  show_label: true
+                  size: 24px
+                  tap_action:
+                    action: navigate
+                    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''climat''; ]]]'
+                  styles:
+                    grid:
+                    - grid-template-areas: '"i" "n" "l"'
+                    - grid-template-rows: 1fr min-content min-content
+                    - grid-template-columns: 1fr
+                    - row-gap: 3px
+                    card:
+                    - position: relative
+                    - overflow: hidden
+                    - height: 100%
+                    - min-height: '[[[ return ''16vh'' ]]]'
+                    - padding: 8px 6px
+                    - border-radius: '[[[ return (states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''14px'' : ''18px'' ]]]'
+                    - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''56,189,248'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.00'' : ''.12'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.72) 62%)'' ]]]'
+                    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+                    - box-shadow: none
+                    - transition: all .3s ease
+                    img_cell:
+                    - width: 42px
+                    - height: 42px
+                    - justify-self: center
+                    - align-self: center
+                    - border-radius: '[[[ return (states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''10px'' : ''13px'' ]]]'
+                    - background: '[[[ return ''rgba('' + ''56,189,248'' + '',.16)'' ]]]'
+                    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '56,189,248' + ',.30)') ]]]"
+                    - transition: all .3s ease
+                    icon:
+                    - width: 24px
+                    - color: '[[[ return ''rgb('' + ''56,189,248'' + '')'' ]]]'
+                    name:
+                    - font-family: '''Inter'',''Segoe UI'',Roboto,sans-serif'
+                    - font-size: 12px
+                    - font-weight: 800
+                    - letter-spacing: 1px
+                    - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('uppercase') ]]]"
+                    - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#E2E8F0') ]]]"
+                    - margin-top: 2px
+                    label:
+                    - font-family: '''Inter'',''Segoe UI'',Roboto,sans-serif'
+                    - font-size: 12px
+                    - font-weight: 600
+                    - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#94A3B8') ]]]"
+                    - padding-bottom: 2px
+                    - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                    - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                  state:
+                  - operator: template
+                    value: '[[[ return [''climate.sejour_climatisation''].some(i => states[i] && [''on'',''cool'',''heat'',''dry'',''fan_only'',''heat_cool'',''auto''].includes(states[i].state)); ]]]'
+                    styles:
+                      card:
+                      - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''56,189,248'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.16'' : ''.28'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.78) 68%)'' ]]]'
+                      - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '56,189,248' + ',.55)') ]]]"
+                      img_cell:
+                      - background: '[[[ return ''rgba('' + ''56,189,248'' + '',.30)'' ]]]'
+                      - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '56,189,248' + ',.55)') ]]]"
+                      - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('0 0 14px rgba(' + '56,189,248' + ',.45)') ]]]"
+                      name:
+                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('rgb(' + '56,189,248' + ')') ]]]"
+                      label:
+                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#E2E8F0') ]]]"
+                      - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                      - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                  type: custom:button-card
+                  name: Climatisation
+                  # Icône = mode en cours du Sensibo (froid, chaud, sec, ventilation, auto), thermostat si arrêt
+                  icon: >
+                    [[[
+                      const c = states['climate.sejour_climatisation'];
+                      const m = { cool: 'mdi:snowflake', heat: 'mdi:fire', dry: 'mdi:water-percent', fan_only: 'mdi:fan', heat_cool: 'mdi:autorenew', auto: 'mdi:autorenew' };
+                      return (c && m[c.state]) || 'mdi:thermostat';
+                    ]]]
+                  triggers_update:
+                  - climate.sejour_climatisation
+                  label: "[[[\n  const c = states['climate.sejour_climatisation'];\n  if (!c) return '—';\n  if (c.state === 'off') return 'Arrêt';\n  const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventil.', heat_cool: 'Auto', auto: 'Auto' };\n  const t = c.attributes.temperature;\n  return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : '');\n]]]\n"
+          navb:
+            card:
+              type: grid
+              columns: 1
+              square: false
+              cards:
+                - type: custom:button-card
+                  show_icon: false
+                  show_name: false
+                  show_label: false
+                  triggers_update:
+                  - switch.outlet_1
+                  - light.sejour_cuisine
+                  - light.sejour_mur_tv
+                  - light.sejour_mur_sdb
+                  - light.jardin_jardin
+                  tap_action:
+                    action: navigate
+                    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''lumieres''; ]]]'
+                  custom_fields:
+                    c: >
+                      [[[
+                        const rgb = '255,193,7';
+                        const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                        const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
+                        const icon = 'mdi:lightbulb-group';
+                        const c1 = rgb;
+                        const sub = '';
+                        const n0 = ids.filter(i => states[i] && states[i].state === 'on').length;
+                        const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;background:' + (n0 > 0 ? 'rgba(255,193,7,.10)' : 'rgba(255,255,255,.04)') + ';color:' + (n0 > 0 ? '#ffd54a' : 'rgba(255,255,255,.35)') + '">' + n0 + ' ALLUMÉE' + (n0 > 1 ? 'S' : '') + '</div>';
+                        return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
+                          + '<div style="flex:none;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#ffd54a"></ha-icon></div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:8px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">ÉCLAIRAGE</div>'
+                          + '<div style="font-size:14px;font-weight:900;color:rgba(255,255,255,.95);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Toutes les lumières</div>'
+                          + (sub ? '<div style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgb(' + rgb + ');text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
+                          + right + '</div>';
+                      ]]]
+                  styles:
+                    grid:
+                      - grid-template-areas: '"c"'
+                      - grid-template-columns: 1fr
+                    card:
+                      - padding: 0 16px
+                      - height: 68px
+                      - overflow: hidden
+                      - border-radius: 18px
+                      - border: none
+                      - box-shadow: none
+                      - background: >
+                          [[[
+                            const rgb = '255,193,7';
+                            const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                            const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
+                            // Démo « Éclairage » : dégradé 100° + halo d'angle
+                            return on
+                              ? 'radial-gradient(circle 80px at -10px -20px, rgba(' + rgb + ',.15), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.96) 24%, rgba(5,12,22,.94) 100%)'
+                              : 'radial-gradient(circle 80px at -10px -20px, rgba(' + rgb + ',.15), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.12) 0%, rgba(5,12,22,.95) 24%, rgba(5,12,22,.93) 100%)';
+                          ]]]
+                    custom_fields:
+                      c:
+                        - width: 100%
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - type: custom:button-card
+                  show_icon: false
+                  show_name: false
+                  show_label: false
+                  triggers_update:
+                  - climate.sejour_climatisation
+                  tap_action:
+                    action: navigate
+                    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''climat''; ]]]'
+                  custom_fields:
+                    c: >
+                      [[[
+                        const rgb = '34,211,238';
+                        const ids = ['climate.sejour_climatisation'];
+                        const on = (() => { const c = states['climate.sejour_climatisation']; return !!(c && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(c.state)); })();
+                        const icon = (() => { const c = states['climate.sejour_climatisation']; const m = { cool: 'mdi:snowflake', heat: 'mdi:fire', dry: 'mdi:water-percent', fan_only: 'mdi:fan', heat_cool: 'mdi:autorenew', auto: 'mdi:autorenew' }; return (c && m[c.state]) || 'mdi:thermostat'; })();
+                        const c1 = rgb;
+                        const sub = (() => { const c = states['climate.sejour_climatisation']; if (!c) return '—'; if (c.state === 'off') return 'Arrêt'; const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventilation', heat_cool: 'Auto', auto: 'Auto' }; const t = c.attributes.temperature; return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : ''); })();
+                        const cs = states['climate.sejour_climatisation'];
+                        const mrgb = ({ cool: '56,189,248', heat: '251,146,60', dry: '250,204,21', fan_only: '74,222,128', auto: '236,72,153', heat_cool: '236,72,153' })[cs ? cs.state : ''];
+                        const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:' + (mrgb ? 'rgba(' + mrgb + ',.14)' : 'rgba(255,255,255,.04)') + ';color:' + (mrgb ? 'rgb(' + mrgb + ')' : 'rgba(255,255,255,.35)') + '">' + sub + '</div>';
+                        return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
+                          + '<div style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#22d3ee"></ha-icon></div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:8px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">CLIMATISATION</div>'
+                          + '<div style="font-size:14px;font-weight:800;color:rgba(255,255,255,.94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Séjour</div>'
+                          + '' + '</div>'
+                          + right + '</div>';
+                      ]]]
+                  styles:
+                    grid:
+                      - grid-template-areas: '"c"'
+                      - grid-template-columns: 1fr
+                    card:
+                      - padding: 0 16px
+                      - height: 64px
+                      - overflow: hidden
+                      - border-radius: 16px
+                      - border: none
+                      - box-shadow: none
+                      - background: >
+                          [[[
+                            const rgb = '34,211,238';
+                            const ids = ['climate.sejour_climatisation'];
+                            const on = (() => { const c = states['climate.sejour_climatisation']; return !!(c && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(c.state)); })();
+                            // Démo « Famille » : dégradé 100° + halo d'angle
+                            return on
+                              ? 'radial-gradient(circle 75px at -5px -15px, rgba(' + rgb + ',.13), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.96) 24%, rgba(5,12,22,.94) 100%)'
+                              : 'radial-gradient(circle 75px at -5px -15px, rgba(' + rgb + ',.13), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.10) 0%, rgba(5,12,22,.95) 24%, rgba(5,12,22,.93) 100%)';
+                          ]]]
+                    custom_fields:
+                      c:
+                        - width: 100%
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        styles:
+          grid:
+            - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\"' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\"' ]]]"
+            - grid-template-columns: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
+            - grid-template-rows: 1fr min-content min-content min-content
+            - column-gap: 8px
+            - row-gap: 8px
+          card:
+            - min-height: 100vh
+            - padding: 6vh 14px 3vh 14px
+            - border-radius: 0
+            - border: none
+            - box-shadow: none
+            - background: >
+                [[[
+                  const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                  const sun = states['sun.sun'];
+                  const night = sun ? sun.state === 'below_horizon' : false;
+                  // Le jour/la nuit vient du soleil (sun.sun), pas du fournisseur météo qui peut être en retard
+                  let c = w ? w.state : 'unknown';
+                  if (sun && !night && c === 'clear-night') c = 'sunny';
+                  if (night && c === 'sunny') c = 'clear-night';
+                  const imgs = variables.images || {};
+                  const key = (c === 'lightning-rainy') ? 'lightning' : (c === 'snowy-rainy' || c === 'hail') ? 'snowy' : (c === 'windy-variant') ? 'windy' : c;
+                  const nk = (night && c !== 'clear-night') ? key + '-night' : key;
+                  // Dossier des images : fourni par l'intégration si présente, sinon /local/meteo
+                  const base = states['sensor.maison_nspanel_rappels'] ? '/maison_nspanel/meteo' : (variables.images_dossier || '/local/meteo');
+                  const img = imgs[nk] || imgs[key] || (base + '/' + nk + '.jpg?v=3');
+                  const photo = img ? 'linear-gradient(180deg, rgba(7,11,20,.25), rgba(7,11,20,.70)), url(' + img + ') center / cover no-repeat, ' : '';
+                  const shade = 'linear-gradient(180deg, rgba(7,11,20,.05) 0%, rgba(7,11,20,.60) 100%)';
+                  const sky = night ? 'linear-gradient(180deg, #0a1226 0%, #05080f 100%)' : 'linear-gradient(180deg, #17335c 0%, #0b1120 100%)';
+                  const grey = 'linear-gradient(180deg, #1a2438 0%, #0b1120 100%)';
+                  const sunDisc = 'radial-gradient(circle at 82% 22%, #fbbf24 0, #fb923c 8.5vh, rgba(251,146,60,.35) 9vh, rgba(251,146,60,0) 26vh)';
+                  const moon = 'radial-gradient(circle at 82% 22%, #e2e8f0 0, #cbd5e1 6.5vh, rgba(148,163,184,.30) 7vh, rgba(148,163,184,0) 22vh)';
+                  const disc = night ? moon : sunDisc;
+                  const clouds = 'radial-gradient(ellipse 34vh 12vh at 66% 30%, rgba(203,213,225,.30), transparent 70%), radial-gradient(ellipse 30vh 10vh at 28% 20%, rgba(203,213,225,.22), transparent 70%), radial-gradient(ellipse 40vh 14vh at 55% 46%, rgba(148,163,184,.22), transparent 70%)';
+                  const rain = 'repeating-linear-gradient(105deg, rgba(147,197,253,.12) 0 2px, transparent 2px 16px)';
+                  const heavy = 'repeating-linear-gradient(105deg, rgba(147,197,253,.22) 0 2px, transparent 2px 9px)';
+                  const snow = 'radial-gradient(circle, rgba(255,255,255,.80) 0 1.5px, transparent 2.5px) 0 0 / 34px 34px, radial-gradient(circle, rgba(255,255,255,.50) 0 1px, transparent 2px) 17px 17px / 34px 34px';
+                  const stars = 'radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 2px), radial-gradient(circle at 30% 8%, #fff 0 1px, transparent 2px), radial-gradient(circle at 46% 26%, #fff 0 1px, transparent 2px), radial-gradient(circle at 64% 10%, #fff 0 1px, transparent 2px), radial-gradient(circle at 20% 38%, #fff 0 1px, transparent 2px), radial-gradient(circle at 92% 44%, #fff 0 1px, transparent 2px)';
+                  const fog = 'linear-gradient(180deg, rgba(203,213,225,.24) 0%, rgba(203,213,225,.06) 35%, rgba(203,213,225,.22) 70%, rgba(203,213,225,.08) 100%)';
+                  const flash = 'radial-gradient(circle at 68% 18%, rgba(250,204,21,.40) 0, transparent 38vh)';
+                  const wind = 'repeating-linear-gradient(180deg, rgba(203,213,225,.10) 0 2px, transparent 2px 22px)';
+                  const layers = {
+                    sunny: [shade, disc, sky],
+                    'clear-night': [shade, moon, stars, sky],
+                    partlycloudy: [shade, clouds, disc, sky],
+                    cloudy: [shade, clouds, clouds, grey],
+                    rainy: [shade, rain, clouds, grey],
+                    pouring: [shade, heavy, clouds, grey],
+                    snowy: [shade, snow, clouds, grey],
+                    'snowy-rainy': [shade, snow, rain, clouds, grey],
+                    hail: [shade, snow, heavy, clouds, grey],
+                    fog: [shade, fog, grey],
+                    lightning: [shade, flash, clouds, grey],
+                    'lightning-rainy': [shade, flash, rain, clouds, grey],
+                    windy: [shade, wind, clouds, grey],
+                    'windy-variant': [shade, wind, clouds, grey]
+                  };
+                  return photo + (layers[c] || [shade, sky]).join(', ');
+                ]]]
+          custom_fields:
+            clock:
+              - align-self: center
+              - justify-self: stretch
+              - width: 100%
+              - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+            weather:
+              - align-self: stretch
+              - justify-self: stretch
+              - min-width: 0
+            indoor:
+              - align-self: stretch
+              - justify-self: stretch
+              - min-width: 0
+            air:
+              - align-self: stretch
+              - justify-self: stretch
+              - min-width: 0
+              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? 'none' : 'block' ]]]"
+            nav:
+              - width: 100%
+              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'block' ]]]"
+            navb:
+              - width: 100%
+              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'block' : 'none' ]]]"
+
+  # ==========================================================
+  #  PAGE 2 : LUMIÈRES
+  # ==========================================================
+  - title: Éclairage
+    path: lumieres
+    type: panel
+    background: "radial-gradient(120% 80% at 85% 0%, #15233f 0%, #0b1120 55%, #070b14 100%) fixed"
+    cards:
+      - type: vertical-stack
+        cards:
+
+          # ---------- EN-TÊTE : titre + nombre de lumières allumées ----------
+          - type: custom:button-card
+            show_icon: true
+            show_name: true
+            show_label: true
+            name: Éclairage
+            size: 22px
+            triggers_update:
+              - switch.outlet_1
+              - light.sejour_cuisine
+              - light.sejour_mur_tv
+              - light.sejour_mur_sdb
+              - light.jardin_jardin
+            variables:
+              ids:
+                - switch.outlet_1
+                - light.sejour_cuisine
+                - light.sejour_mur_tv
+                - light.sejour_mur_sdb
+                - light.jardin_jardin
+            icon: >
+              [[[
+                const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                return n > 0 ? 'mdi:lightbulb-group' : 'mdi:lightbulb-group-off';
+              ]]]
+            label: >
+              [[[
+                // Retour automatique à l'accueil après inactivité (installé une seule fois)
+                const IDLE_SECONDS = 15;
+                if (!window._jvIdle) {
+                  const st = { t: Date.now(), p: '' };
+                  const bump = () => { st.t = Date.now(); };
+                  ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(e => window.addEventListener(e, bump, true));
+                  window._jvIdle = setInterval(() => {
+                    const parts = window.location.pathname.split('/');
+                    const page = parts[2];
+                    if (page !== st.p) { st.p = page; st.t = Date.now(); }
+                    if ((page === 'lumieres' || page === 'climat') && Date.now() - st.t > IDLE_SECONDS * 1000) {
+                      history.pushState(null, '', '/' + parts[1] + '/accueil');
+                      window.dispatchEvent(new CustomEvent('location-changed'));
+                      st.t = Date.now();
+                    }
+                  }, 1000);
+                }
+                const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                if (n === 0) return 'TOUT EST ÉTEINT';
+                return n + (n > 1 ? ' ALLUMÉS' : ' ALLUMÉ') + ' SUR ' + variables.ids.length;
+              ]]]
+            tap_action:
+              action: navigate
+              # Si la navigation ne marche pas, remplacez la ligne suivante par :
+              # navigation_path: /VOTRE-DASHBOARD/accueil
+              navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/accueil'; ]]]"
+            custom_fields:
+              nav: >
+                <ha-icon icon="mdi:home" style="--mdc-icon-size:16px"></ha-icon><span>Accueil</span>
+            styles:
+              grid:
+                - grid-template-areas: '"i n nav" "i l nav"'
+                - grid-template-columns: min-content 1fr min-content
+                - grid-template-rows: min-content min-content
+                - align-content: center
+                - column-gap: 12px
+                - row-gap: 2px
+              card:
+                - min-height: 14vh
+                - padding: 3.5vh 14px 1vh 14px
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+                - background: >
+                    [[[
+                      const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                      const c = n > 0 ? '250,204,21' : '148,163,184';
+                      return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%)';
+                    ]]]
+                - box-shadow: none
+              img_cell:
+                - width: 40px
+                - height: 40px
+                - align-self: center
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
+                - background: >
+                    [[[
+                      const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                      return n > 0 ? 'rgba(250,204,21,.20)' : 'rgba(148,163,184,.14)';
+                    ]]]
+                - border: >
+                    [[[
+                      const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                      return n > 0 ? '1px solid rgba(250,204,21,.45)' : '1px solid rgba(148,163,184,.28)';
+                    ]]]
+                - box-shadow: >
+                    [[[
+                      const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                      return n > 0 ? '0 0 14px rgba(250,204,21,.40)' : 'none';
+                    ]]]
+              icon:
+                - width: 22px
+                - color: >
+                    [[[
+                      const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                      return n > 0 ? '#FACC15' : '#94A3B8';
+                    ]]]
+              label:
+                - justify-self: start
+                - align-self: start
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: 10px
+                - font-weight: 800
+                - letter-spacing: 2px
+                - color: >
+                    [[[
+                      const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                      return n > 0 ? '#FACC15' : '#8A96A8';
+                    ]]]
+                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+              name:
+                - justify-self: start
+                - align-self: end
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '17px' : ('20px') ]]]"
+                - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '900' ]]]"
+                - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
+                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '-0.5px' ]]]"
+                - line-height: 1.15
+                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
+              custom_fields:
+                nav:
+                  - align-self: center
+                  - display: flex
+                  - align-items: center
+                  - gap: 6px
+                  - padding: 6px 12px
+                  - border-radius: 999px
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                  - font-size: 11px
+                  - font-weight: 800
+                  - letter-spacing: 1px
+                  - text-transform: uppercase
+                  - color: rgb(203,213,225)
+                  - background: rgba(203,213,225,.14)
+                  - border: 1px solid rgba(203,213,225,.35)
+
+          # ---------- SECTION 1 : SÉJOUR ----------
+          - type: custom:button-card
+            template: section_title
+            variables:
+              text: SÉJOUR
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: tile_light
+                entity: switch.outlet_1
+                name: Interrupteur Cuisine
+                icon: >
+                  [[[ return entity.state === 'on' ? 'mdi:light-switch' : 'mdi:light-switch-off' ]]]
+                label: >
+                  [[[
+                    if (entity.state === 'unavailable') return 'Indisponible';
+                    return entity.state === 'on' ? 'Allumé' : 'Éteint';
+                  ]]]
+                variables:
+                  rgb: "45,212,191"
+
+              - type: custom:button-card
+                template: tile_light
+                entity: light.sejour_cuisine
+                name: Lampe Cuisine
+                icon: mdi:ceiling-light
+
+              - type: custom:button-card
+                template: tile_light
+                entity: light.sejour_mur_tv
+                name: Mur TV
+                icon: mdi:ceiling-light
+
+              - type: custom:button-card
+                template: tile_light
+                entity: light.sejour_mur_sdb
+                name: Mur Salle de bain
+                icon: mdi:ceiling-light
+
+          # ---------- SECTION 2 : JARDIN ----------
+          - type: custom:button-card
+            template: section_title
+            variables:
+              text: JARDIN
+
+          - type: grid
+            columns: 1
+            square: false
+            cards:
+              - type: custom:button-card
+                template: tile_light
+                entity: light.jardin_jardin
+                name: Lampes Jardin
+                icon: mdi:outdoor-lamp
+                variables:
+                  rgb: "74,222,128"
+  # ==========================================================
+  #  PAGE 3 : CLIMAT (Sensibo Air Pro)
+  # ==========================================================
+  - title: Climatisation
+    path: climat
+    type: panel
+    background: "radial-gradient(120% 80% at 85% 0%, #15233f 0%, #0b1120 55%, #070b14 100%) fixed"
+    cards:
+      - type: vertical-stack
+        cards:
+
+          # ---------- EN-TÊTE : pastille d'icône + petit libellé + titre gras ----------
+          - type: custom:button-card
+            entity: climate.sejour_climatisation
+            show_icon: true
+            show_name: true
+            show_label: true
+            name: Climatisation
+            size: 22px
+            icon: >
+              [[[
+                const m = { cool: 'mdi:snowflake', heat: 'mdi:fire', dry: 'mdi:water-percent', fan_only: 'mdi:fan', heat_cool: 'mdi:autorenew', auto: 'mdi:autorenew' };
+                return m[entity.state] || 'mdi:power-sleep';
+              ]]]
+            triggers_update:
+              - binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis
+            label: >
+              [[[
+                // Retour automatique à l'accueil après inactivité (installé une seule fois)
+                const IDLE_SECONDS = 15;
+                if (!window._jvIdle) {
+                  const st = { t: Date.now(), p: '' };
+                  const bump = () => { st.t = Date.now(); };
+                  ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(e => window.addEventListener(e, bump, true));
+                  window._jvIdle = setInterval(() => {
+                    const parts = window.location.pathname.split('/');
+                    const page = parts[2];
+                    if (page !== st.p) { st.p = page; st.t = Date.now(); }
+                    if ((page === 'lumieres' || page === 'climat') && Date.now() - st.t > IDLE_SECONDS * 1000) {
+                      history.pushState(null, '', '/' + parts[1] + '/accueil');
+                      window.dispatchEvent(new CustomEvent('location-changed'));
+                      st.t = Date.now();
+                    }
+                  }, 1000);
+                }
+                const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis'];
+                if (f && f.state === 'on') return 'FILTRE À NETTOYER';
+                const on = entity.state !== 'off' && entity.state !== 'unavailable';
+                return 'SENSIBO AIR PRO · ' + (on ? 'EN LIGNE' : 'EN VEILLE');
+              ]]]
+            tap_action:
+              action: navigate
+              # Si la navigation ne marche pas, remplacez la ligne suivante par :
+              # navigation_path: /VOTRE-DASHBOARD/accueil
+              navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/accueil'; ]]]"
+            custom_fields:
+              nav: >
+                <ha-icon icon="mdi:home" style="--mdc-icon-size:16px"></ha-icon><span>Accueil</span>
+            variables:
+              mode_rgb:
+                cool: "56,189,248"
+                heat: "251,146,60"
+                dry: "250,204,21"
+                fan_only: "74,222,128"
+                auto: "236,72,153"
+                heat_cool: "236,72,153"
+            styles:
+              grid:
+                - grid-template-areas: '"i n nav" "i l nav"'
+                - grid-template-columns: min-content 1fr min-content
+                - grid-template-rows: min-content min-content
+                - align-content: center
+                - column-gap: 12px
+                - row-gap: 2px
+              card:
+                - min-height: 14vh
+                - padding: 3.5vh 14px 1vh 14px
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                - border: "[[[ const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; return (f && f.state === 'on') ? '1px solid rgba(250,204,21,.55)' : '1px solid rgba(255,255,255,.08)' ]]]"
+                - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%)' ]]]"
+                - box-shadow: none
+              img_cell:
+                - width: 40px
+                - height: 40px
+                - align-self: center
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
+                - background: "[[[ return 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.20)' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.45)') ]]]"
+                - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : (entity.state === 'off' ? 'none' : '0 0 14px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.40)') ]]]"
+              icon:
+                - width: 22px
+                - color: "[[[ return 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')' ]]]"
+              label:
+                - justify-self: start
+                - align-self: start
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: 10px
+                - font-weight: 800
+                - letter-spacing: 2px
+                - color: "[[[ const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; return (f && f.state === 'on') ? '#FACC15' : 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')' ]]]"
+                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+              name:
+                - justify-self: start
+                - align-self: end
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '17px' : ('20px') ]]]"
+                - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '900' ]]]"
+                - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
+                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '-0.5px' ]]]"
+                - line-height: 1.15
+                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
+              custom_fields:
+                nav:
+                  - align-self: center
+                  - display: flex
+                  - align-items: center
+                  - gap: 6px
+                  - padding: 6px 12px
+                  - border-radius: 999px
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                  - font-size: 11px
+                  - font-weight: 800
+                  - letter-spacing: 1px
+                  - text-transform: uppercase
+                  - color: rgb(203,213,225)
+                  - background: rgba(203,213,225,.14)
+                  - border: 1px solid rgba(203,213,225,.35)
+
+          # ---------- CONSIGNE : [ - ] [ 22.0° ] [ + ] ----------
+          - type: horizontal-stack
+            cards:
+              - type: custom:button-card
+                template: tile_step
+                entity: climate.sejour_climatisation
+                icon: mdi:minus
+                variables:
+                  step: -1
+
+              - type: custom:button-card
+                entity: climate.sejour_climatisation
+                show_icon: false
+                show_name: false
+                tap_action:
+                  action: toggle
+                variables:
+                  mode_rgb:
+                    cool: "56,189,248"
+                    heat: "251,146,60"
+                    dry: "250,204,21"
+                    fan_only: "74,222,128"
+                    auto: "236,72,153"
+                    heat_cool: "236,72,153"
+                extra_styles: |
+                  @keyframes jv-border-fade {
+                    0%, 100% { border-color: rgba(255,255,255,.08); }
+                    50%      { border-color: currentColor; }
+                  }
+                custom_fields:
+                  label: CONSIGNE
+                  temp: >
+                    [[[
+                      if (entity.state === 'off') return 'OFF';
+                      const t = entity.attributes.temperature;
+                      return (t !== undefined && t !== null) ? Number(t).toFixed(1) + '°' : '--';
+                    ]]]
+                  info: >
+                    [[[
+                      const c = entity.attributes.current_temperature;
+                      const h = entity.attributes.current_humidity;
+                      const a = (c !== undefined && c !== null) ? 'INT ' + Number(c).toFixed(1) + '°' : 'INT --';
+                      const b = (h !== undefined && h !== null) ? ' · ' + Math.round(h) + ' %' : '';
+                      return a + b;
+                    ]]]
+                styles:
+                  grid:
+                    - grid-template-areas: '"label" "temp" "info"'
+                    - grid-template-rows: min-content 1fr min-content
+                    - grid-template-columns: 1fr
+                  card:
+                    - position: relative
+                    - overflow: hidden
+                    - height: 100%
+                    - min-height: 22vh
+                    - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                    - background: "[[[ const c = variables.mode_rgb[entity.state]; return c ? 'radial-gradient(circle at 50% 42%, rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.28') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.88) 72%)' : 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(148,163,184,.10) 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 62%)' ]]]"
+                    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + (variables.mode_rgb[entity.state] || '255,255,255') + ',' + (variables.mode_rgb[entity.state] ? '.50' : '.07') + ')') ]]]"
+                    - box-shadow: none
+                    - color: "[[[ return variables.mode_rgb[entity.state] ? 'rgb(' + variables.mode_rgb[entity.state] + ')' : '#8A96A8' ]]]"
+                    - animation: "[[[ return variables.mode_rgb[entity.state] ? 'jv-border-fade 2.6s ease-in-out infinite' : 'none' ]]]"
+                  custom_fields:
+                    label:
+                      - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                      - font-size: 10px
+                      - font-weight: 800
+                      - letter-spacing: 2px
+                      - padding-top: 10px
+                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : (variables.mode_rgb[entity.state] ? 'rgb(' + variables.mode_rgb[entity.state] + ')' : '#8A96A8') ]]]"
+                      - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                      - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                    temp:
+                      - align-self: center
+                      - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                      - font-size: 42px
+                      - font-weight: 800
+                      - letter-spacing: -1px
+                      - color: "#FFFFFF"
+                    info:
+                      - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                      - font-size: 11px
+                      - font-weight: 600
+                      - letter-spacing: 1px
+                      - padding-bottom: 10px
+                      - color: "#8A96A8"
+
+              - type: custom:button-card
+                template: tile_step
+                entity: climate.sejour_climatisation
+                icon: mdi:plus
+                variables:
+                  step: 1
+
+          # ---------- MODES ----------
+          - type: grid
+            columns: 5
+            square: false
+            cards:
+              - type: custom:button-card
+                template: tile_mode
+                entity: climate.sejour_climatisation
+                name: Froid
+                icon: mdi:snowflake
+                variables: { value: cool, rgb: "56,189,248" }
+              - type: custom:button-card
+                template: tile_mode
+                entity: climate.sejour_climatisation
+                name: Chaud
+                icon: mdi:fire
+                variables: { value: heat, rgb: "251,146,60" }
+              - type: custom:button-card
+                template: tile_mode
+                entity: climate.sejour_climatisation
+                name: Sec
+                icon: mdi:water-percent
+                variables: { value: dry, rgb: "250,204,21" }
+              - type: custom:button-card
+                template: tile_mode
+                entity: climate.sejour_climatisation
+                name: Vent
+                icon: mdi:fan
+                variables: { value: fan_only, rgb: "74,222,128" }
+              - type: custom:button-card
+                template: tile_mode
+                entity: climate.sejour_climatisation
+                name: Auto
+                icon: mdi:autorenew
+                variables: { value: heat_cool, rgb: "236,72,153" }
+
+          # ---------- TITRE DE SECTION ----------
+          - type: custom:button-card
+            show_icon: false
+            show_name: false
+            show_label: false
+            tap_action:
+              action: none
+            custom_fields:
+              sep: >
+                <div style="display:flex;align-items:center;gap:10px;width:100%">
+                  <span>VENTILATION</span>
+                  <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.14),transparent)"></span>
+                </div>
+            styles:
+              grid:
+                - grid-template-areas: '"sep"'
+                - grid-template-columns: 1fr
+              card:
+                - background: transparent
+                - border: none
+                - box-shadow: none
+                - min-height: 4.5vh
+                - padding: 4px 6px
+              custom_fields:
+                sep:
+                  - width: 100%
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                  - font-size: 11px
+                  - font-weight: 800
+                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1.5px' : '3px' ]]]"
+                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.34)' : '#6B7A99' ]]]"
+
+          # ---------- VENTILATION : Auto + vitesse défilante ----------
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: tile_fan
+                entity: climate.sejour_climatisation
+                name: Auto
+                icon: mdi:fan-auto
+                variables: { value: auto }
+              - type: custom:button-card
+                template: tile_fan_cycle
+                entity: climate.sejour_climatisation
+
+          # ---------- OSCILLATION : swing + position défilante + React ----------
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:button-card
+                template: tile_base
+                entity: climate.sejour_climatisation
+                name: Swing
+                icon: mdi:swap-vertical
+                show_label: true
+                label: "[[[ return String(entity.attributes.swing_mode || '').toLowerCase().startsWith('range') ? 'Oscille' : 'Off' ]]]"
+                variables: { kind: swing, rgb: "34,211,238", min_h: 16vh }
+                tap_action:
+                  action: perform-action
+                  perform_action: climate.set_swing_mode
+                  target:
+                    entity_id: climate.sejour_climatisation
+                  data:
+                    swing_mode: >
+                      [[[
+                        const modes = entity.attributes.swing_modes || [];
+                        const cur = String(entity.attributes.swing_mode || '').toLowerCase();
+                        const want = cur.startsWith('range') ? 'stopped' : 'rangefull';
+                        return modes.find(m => String(m).toLowerCase() === want) || want;
+                      ]]]
+
+              - type: custom:button-card
+                template: tile_pos_cycle
+                entity: climate.sejour_climatisation
+
+              - type: custom:button-card
+                template: tile_base
+                entity: switch.sejour_climatisation_climate_react
+                name: React
+                icon: mdi:brain
+                show_label: true
+                label: "[[[ return entity.state === 'on' ? 'Actif' : 'Off' ]]]"
+                variables: { kind: "on", rgb: "167,139,250", min_h: 16vh }
+                tap_action:
+                  action: toggle
+
+  # ==========================================================
+  #  PRÉVISIONS MÉTÉO À 7 JOURS (ouverte depuis l'accueil)
+  # ==========================================================
+  - title: Prévisions
+    path: previsions
+    subview: true
+    type: panel
+    background: "radial-gradient(120% 80% at 85% 0%, #15233f 0%, #0b1120 55%, #070b14 100%) fixed"
+    cards:
+      - type: vertical-stack
+        cards:
+
+          - type: custom:button-card
+            show_icon: true
+            show_name: true
+            show_label: true
+            name: Prévision à 7 jours
+            size: 22px
+            triggers_update:
+              - weather.forecast_maison
+              - sensor.maison_nspanel_previsions
+              - sun.sun
+            icon: >
+              [[[
+                const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                const s = (() => { const w0 = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')]; const sn = states['sun.sun']; let x = w0 ? w0.state : 'unknown'; if (sn && sn.state === 'above_horizon' && x === 'clear-night') x = 'sunny'; if (sn && sn.state === 'below_horizon' && x === 'sunny') x = 'clear-night'; return x; })();
+                const m = { 'clear-night': 'mdi:weather-night', cloudy: 'mdi:weather-cloudy', exceptional: 'mdi:alert-circle-outline', fog: 'mdi:weather-fog', hail: 'mdi:weather-hail', lightning: 'mdi:weather-lightning', 'lightning-rainy': 'mdi:weather-lightning-rainy', partlycloudy: 'mdi:weather-partly-cloudy', pouring: 'mdi:weather-pouring', rainy: 'mdi:weather-rainy', snowy: 'mdi:weather-snowy', 'snowy-rainy': 'mdi:weather-snowy-rainy', sunny: 'mdi:weather-sunny', windy: 'mdi:weather-windy', 'windy-variant': 'mdi:weather-windy-variant' };
+                return (w && m[s]) || 'mdi:weather-cloudy';
+              ]]]
+            label: >
+              [[[
+                const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                const s = (() => { const w0 = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')]; const sn = states['sun.sun']; let x = w0 ? w0.state : 'unknown'; if (sn && sn.state === 'above_horizon' && x === 'clear-night') x = 'sunny'; if (sn && sn.state === 'below_horizon' && x === 'sunny') x = 'clear-night'; return x; })();
+                if (!w) return 'MÉTÉO INDISPONIBLE';
+                const l = { 'clear-night': 'Nuit dégagée', cloudy: 'Nuageux', exceptional: 'Exceptionnel', fog: 'Brouillard', hail: 'Grêle', lightning: 'Orageux', 'lightning-rainy': 'Orage et pluie', partlycloudy: 'Partiellement nuageux', pouring: 'Averses', rainy: 'Pluvieux', snowy: 'Neigeux', 'snowy-rainy': 'Neige et pluie', sunny: 'Ensoleillé', windy: 'Venteux', 'windy-variant': 'Venteux' };
+                const t = w.attributes.temperature;
+                return (l[s] || s).toUpperCase() + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + ' °C' : '');
+              ]]]
+            tap_action:
+              action: navigate
+              # Si la navigation ne marche pas, remplacez la ligne suivante par :
+              # navigation_path: /VOTRE-DASHBOARD/accueil
+              navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/accueil'; ]]]"
+            custom_fields:
+              nav: >
+                <ha-icon icon="mdi:close" style="--mdc-icon-size:16px"></ha-icon><span>Fermer</span>
+            styles:
+              grid:
+                - grid-template-areas: '"i n nav" "i l nav"'
+                - grid-template-columns: min-content 1fr min-content
+                - grid-template-rows: min-content min-content
+                - align-content: center
+                - column-gap: 12px
+                - row-gap: 2px
+              card:
+                - min-height: 14vh
+                - padding: 3.5vh 14px 1vh 14px
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+                - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(56,189,248,' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(5,12,22,.82) 60%)' : 'linear-gradient(145deg, rgba(56,189,248,.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
+                - box-shadow: none
+              img_cell:
+                - width: 40px
+                - height: 40px
+                - align-self: center
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
+                - background: rgba(56,189,248,.20)
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(56,189,248,.45)') ]]]"
+              icon:
+                - width: 22px
+                - color: "#38BDF8"
+              label:
+                - justify-self: start
+                - align-self: start
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: 10px
+                - font-weight: 800
+                - letter-spacing: 2px
+                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#38BDF8') ]]]"
+                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+              name:
+                - justify-self: start
+                - align-self: end
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '17px' : ('20px') ]]]"
+                - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '900' ]]]"
+                - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
+                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '-0.5px' ]]]"
+                - line-height: 1.15
+                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
+              custom_fields:
+                nav:
+                  - align-self: center
+                  - display: flex
+                  - align-items: center
+                  - gap: 6px
+                  - padding: 6px 12px
+                  - border-radius: 999px
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                  - font-size: 11px
+                  - font-weight: 800
+                  - letter-spacing: 1px
+                  - text-transform: uppercase
+                  - color: rgb(203,213,225)
+                  - background: rgba(203,213,225,.14)
+                  - border: 1px solid rgba(203,213,225,.35)
+
+          - type: custom:button-card
+            show_icon: false
+            show_name: false
+            show_label: false
+            triggers_update:
+              - sensor.previsions_meteo_7_jours
+              - sensor.maison_nspanel_previsions
+              - sensor.maison_nspanel_vigilance
+            tap_action:
+              action: none
+            custom_fields:
+              rows: >
+                [[[
+                  const s = states['sensor.maison_nspanel_previsions'] || states['sensor.previsions_meteo_7_jours'];
+                  const f = (s && s.attributes && Array.isArray(s.attributes.forecast)) ? s.attributes.forecast.slice(0, 7) : [];
+                  if (f.length === 0) {
+                    return '<div style="text-align:center;color:#8A96A8;padding:8vh 12px;font-size:13px;line-height:1.6">Prévisions indisponibles.<br>Vérifiez le capteur sensor.previsions_meteo_7_jours<br>(voir previsions_meteo_sensor.yaml).</div>';
+                  }
+                  // Vigilance Météo-France (capteur « <département> Weather alert », détecté seul)
+                  const vigS = (variables.vigilance && states[variables.vigilance]) || Object.keys(states).filter(k => /^sensor\.(\d{2}|2a|2b)_weather_alert$/.test(k)).map(k => states[k])[0];
+                  const vigLv = { vert: 1, jaune: 2, orange: 3, rouge: 4 };
+                  const vigRgb = { 1: '74,222,128', 2: '250,204,21', 3: '251,146,60', 4: '239,68,68' };
+                  // Si l'intégration est installée, son capteur de vigilance (réglé dans Configurer > Vigilance) prime
+                  const vi = states['sensor.maison_nspanel_vigilance'];
+                  const viOk = !!(vi && vi.attributes && vi.attributes.niveau !== undefined);
+                  let vigHtml = '';
+                  if (vigS || viOk) {
+                    const lv = viOk ? vi.attributes.niveau : (vigLv[String(vigS.state || '').toLowerCase()] || 1);
+                    const mini = (variables.vigilance_min !== undefined) ? variables.vigilance_min : 2;
+                    if (viOk ? vi.attributes.afficher : lv >= mini) {
+                      const c = viOk ? vi.attributes.couleur : vigRgb[lv];
+                      const nom = ['', 'vert', 'jaune', 'orange', 'rouge'][lv].toUpperCase();
+                      const ph = viOk ? (vi.attributes.phenomenes || []).map(x => x.nom).join(' · ') : Object.keys(vigS.attributes || {}).filter(k => vigLv[String(vigS.attributes[k]).toLowerCase()] >= 2)
+                        .sort((a, b) => vigLv[String(vigS.attributes[b]).toLowerCase()] - vigLv[String(vigS.attributes[a]).toLowerCase()])
+                        .map(k => k.replace(/-/g, ' / ')).join(' · ');
+                      vigHtml = '<div style="margin-bottom:1vh;text-align:center"><div style="display:inline-flex;align-items:center;gap:10px;padding:7px 18px 7px 7px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.16') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%);border:1px solid rgba(' + c + ',.60);max-width:92%;box-sizing:border-box;text-align:left">'
+                        + '<span style="display:flex;flex:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(' + c + ',.20);border:1px solid rgba(' + c + ',.45);box-shadow:0 0 14px rgba(' + c + ',.40)">'
+                        + '<ha-icon icon="mdi:weather-cloudy-alert" style="--mdc-icon-size:20px;color:rgb(' + c + ')"></ha-icon></span>'
+                        + '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgb(' + c + ')">Vigilance ' + nom + '</span>'
+                        + (ph ? '<span style="font-size:11px;font-weight:600;color:#E2E8F0;margin-top:1px">' + ph + '</span>' : '') + '</span></div></div>';
+                    }
+                  }
+                  const tz = hass.config.time_zone;
+                  const lows = f.map(d => Number(d.templow !== undefined && d.templow !== null ? d.templow : d.temperature));
+                  const highs = f.map(d => Number(d.temperature));
+                  const lo = Math.min.apply(null, lows), hi = Math.max.apply(null, highs), span = Math.max(hi - lo, 1);
+                  const col = t => t < 5 ? '#60A5FA' : t < 12 ? '#38BDF8' : t < 18 ? '#4ADE80' : t < 24 ? '#FACC15' : '#FB923C';
+                  const icons = { 'clear-night': 'mdi:weather-night', cloudy: 'mdi:weather-cloudy', exceptional: 'mdi:alert-circle-outline', fog: 'mdi:weather-fog', hail: 'mdi:weather-hail', lightning: 'mdi:weather-lightning', 'lightning-rainy': 'mdi:weather-lightning-rainy', partlycloudy: 'mdi:weather-partly-cloudy', pouring: 'mdi:weather-pouring', rainy: 'mdi:weather-rainy', snowy: 'mdi:weather-snowy', 'snowy-rainy': 'mdi:weather-snowy-rainy', sunny: 'mdi:weather-sunny', windy: 'mdi:weather-windy', 'windy-variant': 'mdi:weather-windy-variant' };
+                  const colors = { sunny: '#FBBF24', 'clear-night': '#E2E8F0', partlycloudy: '#FCD34D', cloudy: '#CBD5E1', fog: '#CBD5E1', windy: '#CBD5E1', 'windy-variant': '#CBD5E1', rainy: '#7DD3FC', pouring: '#60A5FA', snowy: '#E0F2FE', 'snowy-rainy': '#BAE6FD', hail: '#BAE6FD', lightning: '#FACC15', 'lightning-rainy': '#FACC15', exceptional: '#FB923C' };
+                  const fmt = t => (Math.round(t * 10) / 10) + '°C';
+                  const todayKey = new Date().toLocaleDateString('fr-FR', { timeZone: tz });
+                  return vigHtml + f.map((d, i) => {
+                    const dt = new Date(d.datetime);
+                    const isToday = dt.toLocaleDateString('fr-FR', { timeZone: tz }) === todayKey;
+                    let day = dt.toLocaleDateString('fr-FR', { weekday: 'long', timeZone: tz });
+                    day = isToday ? "Aujourd'hui" : day.charAt(0).toUpperCase() + day.slice(1);
+                    const l = lows[i], h = highs[i];
+                    const left = ((l - lo) / span) * 100, width = Math.max(((h - l) / span) * 100, 6);
+                    const bar = 'linear-gradient(90deg,' + col(l) + ',' + col(h) + ')';
+                    return '<div style="display:grid;grid-template-columns:minmax(0,1.5fr) 30px 56px minmax(0,2fr) 56px;align-items:center;column-gap:8px;flex:1;' + (i > 0 ? 'border-top:1px solid rgba(255,255,255,.08);' : '') + '">'
+                      + '<span style="font-size:15px;font-weight:700;color:#FFFFFF;white-space:nowrap">' + day + '</span>'
+                      + '<ha-icon icon="' + (icons[d.condition] || 'mdi:weather-cloudy') + '" style="--mdc-icon-size:24px;color:' + (colors[d.condition] || '#E2E8F0') + '"></ha-icon>'
+                      + '<span style="font-size:14px;font-weight:600;color:#7DD3FC;text-align:right">' + fmt(l) + '</span>'
+                      + '<div style="position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.12)"><div style="position:absolute;top:0;bottom:0;left:' + left + '%;width:' + width + '%;border-radius:3px;background:' + bar + '"></div></div>'
+                      + '<span style="font-size:14px;font-weight:600;color:#FFFFFF">' + fmt(h) + '</span>'
+                      + '</div>';
+                  }).join('');
+                ]]]
+            styles:
+              grid:
+                - grid-template-areas: '"rows"'
+                - grid-template-columns: 1fr
+              card:
+                - min-height: 70vh
+                - padding: 1vh 16px
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+                - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(56,189,248,' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.08') + ') 0%, rgba(5,12,22,.80) 60%)' : 'linear-gradient(145deg, rgba(56,189,248,.08) 0%, rgba(16,23,40,.80) 60%)' ]]]"
+                - box-shadow: none
+              custom_fields:
+                rows:
+                  - display: flex
+                  - flex-direction: column
+                  - justify-content: space-between
+                  - width: 100%
+                  - min-height: 66vh
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"

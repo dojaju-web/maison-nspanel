@@ -20,6 +20,8 @@ from homeassistant.helpers.event import (
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CONF_AIR,
+    CONF_CLIMATE,
     CONF_STYLE,
     DEFAULT_STYLE,
     CONF_RAPPELS,
@@ -97,6 +99,8 @@ class MaisonRappelsSensor(SensorEntity):
         return {
             "rappels": self._active,
             "style": self._entry.options.get(CONF_STYLE) or DEFAULT_STYLE,
+            "air_enabled": self._entry.options.get(CONF_AIR, True),
+            "climate_entity": self._entry.options.get(CONF_CLIMATE),
             "tous": [normalize(r) for r in self._entry.options.get(CONF_RAPPELS, [])],
         }
 

@@ -7,6 +7,8 @@ CONF_RAPPELS = "rappels"
 CONF_VIGILANCE_ENTITY = "vigilance_entity"  # vide = détection automatique
 CONF_VIGILANCE_MIN = "vigilance_min"
 CONF_STYLE = "style"
+CONF_CLIMATE = "climate_entity"
+CONF_AIR = "air_enabled"
 
 # Styles du dashboard : "verre" (verre sombre, défaut) ou "ardoise" (cartes sobres, titres en minuscules)
 STYLES = ["verre", "ardoise"]

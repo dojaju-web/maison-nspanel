@@ -7,6 +7,9 @@
 #    - button-card (custom:button-card) v7.0+
 #    - kiosk-mode (masque l'en-tête et le menu)
 #
+#  Climatisation / qualité de l'air : avec l'intégration, Configurer > Climatisation
+#    (choix de l'entité Sensibo, qualité de l'air activable ou non).
+#
 #  Style : « verre » (défaut) ou « ardoise » (cartes sobres, titres en minuscules,
 #    météo en fond conservée). Avec l'intégration Maison NSPanel : Configurer > Apparence.
 #    Sans l'intégration, le style reste « verre ».
@@ -1034,7 +1037,9 @@ views:
                         const icon = (() => { const c = states['climate.sejour_climatisation']; const m = { cool: 'mdi:snowflake', heat: 'mdi:fire', dry: 'mdi:water-percent', fan_only: 'mdi:fan', heat_cool: 'mdi:autorenew', auto: 'mdi:autorenew' }; return (c && m[c.state]) || 'mdi:thermostat'; })();
                         const c1 = rgb;
                         const sub = (() => { const c = states['climate.sejour_climatisation']; if (!c) return '—'; if (c.state === 'off') return 'Arrêt'; const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventilation', heat_cool: 'Auto', auto: 'Auto' }; const t = c.attributes.temperature; return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : ''); })();
-                        const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:' + (on ? 'rgba(34,211,238,.10)' : 'rgba(255,255,255,.04)') + ';color:' + (on ? '#22d3ee' : 'rgba(255,255,255,.35)') + '">' + sub + '</div>';
+                        const cs = states['climate.sejour_climatisation'];
+                        const mrgb = ({ cool: '56,189,248', heat: '251,146,60', dry: '250,204,21', fan_only: '74,222,128', auto: '236,72,153', heat_cool: '236,72,153' })[cs ? cs.state : ''];
+                        const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:' + (mrgb ? 'rgba(' + mrgb + ',.14)' : 'rgba(255,255,255,.04)') + ';color:' + (mrgb ? 'rgb(' + mrgb + ')' : 'rgba(255,255,255,.35)') + '">' + sub + '</div>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
                           + '<div style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#22d3ee"></ha-icon></div>'
                           + '<div style="min-width:0;flex:1"><div style="font-size:8px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">CLIMATISATION</div>'
@@ -1069,8 +1074,8 @@ views:
                         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
         styles:
           grid:
-            - grid-template-areas: '"clock clock clock" "weather indoor air" "nav nav nav" "navb navb navb"'
-            - grid-template-columns: 1fr 1fr 1fr
+            - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\"' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\"' ]]]"
+            - grid-template-columns: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
             - grid-template-rows: 1fr min-content min-content min-content
             - column-gap: 8px
             - row-gap: 8px
@@ -1146,6 +1151,7 @@ views:
               - align-self: stretch
               - justify-self: stretch
               - min-width: 0
+              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? 'none' : 'block' ]]]"
             nav:
               - width: 100%
               - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'block' ]]]"
