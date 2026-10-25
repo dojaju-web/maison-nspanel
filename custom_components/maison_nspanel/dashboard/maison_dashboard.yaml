@@ -721,7 +721,7 @@ views:
                       ]]]
                 label:
                   - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '8px' : '10px' ]]]"
+                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px' ]]]"
                   - font-weight: 800
                   - letter-spacing: 1px
                   - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#94A3B8') ]]]"
@@ -731,7 +731,7 @@ views:
                   - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
                 name:
                   - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '18px' ]]]"
+                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '18px' : '18px' ]]]"
                   - font-weight: 700
                   - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
                   - justify-self: start
@@ -749,8 +749,8 @@ views:
                 const tint = (t === undefined || t === null) ? '148,163,184' : Number(t) < 19 ? '56,189,248' : Number(t) < 24 ? '16,185,129' : Number(t) < 27 ? '249,115,22' : '239,68,68';
                 return '<div style="display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:9vh;padding:8px 10px;border-radius:16px;background:linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%);text-align:left">'
                   + '<div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:20px;color:rgb(' + tint + ')"></ha-icon></div>'
-                  + '<div style="min-width:0"><div style="font-size:8px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">INTÉRIEUR' + hum + '</div>'
-                  + '<div style="font-size:15px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap">' + temp + '</div></div></div>';
+                  + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">INTÉRIEUR' + hum + '</div>'
+                  + '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap">' + temp + '</div></div></div>';
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
                 + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:#7DD3FC;flex:none"></ha-icon>'
@@ -783,8 +783,8 @@ views:
                 const tint = q === null ? '148,163,184' : tints[q];
                 return '<div style="display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:9vh;padding:8px 10px;border-radius:16px;background:linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%);text-align:left">'
                   + '<div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:air-filter" style="--mdc-icon-size:20px;color:rgb(' + tint + ')"></ha-icon></div>'
-                  + '<div style="min-width:0"><div style="font-size:8px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
-                  + '<div style="font-size:15px;font-weight:800;color:rgb(' + tint + ');white-space:nowrap">' + qLabel + '</div></div></div>';
+                  + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
+                  + '<div style="font-size:18px;font-weight:800;color:rgb(' + tint + ');white-space:nowrap">' + qLabel + '</div></div></div>';
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
                 + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none"></ha-icon>'
@@ -989,8 +989,8 @@ views:
                         const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;background:' + (n0 > 0 ? 'rgba(255,193,7,.10)' : 'rgba(255,255,255,.04)') + ';color:' + (n0 > 0 ? '#ffd54a' : 'rgba(255,255,255,.35)') + '">' + n0 + ' ALLUMÉE' + (n0 > 1 ? 'S' : '') + '</div>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
                           + '<div style="flex:none;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#ffd54a"></ha-icon></div>'
-                          + '<div style="min-width:0;flex:1"><div style="font-size:8px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">ÉCLAIRAGE</div>'
-                          + '<div style="font-size:14px;font-weight:900;color:rgba(255,255,255,.95);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Toutes les lumières</div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.95)">ÉCLAIRAGE</div>'
+                          + '<div style="font-size:9px;font-weight:800;letter-spacing:.5px;color:rgba(255,255,255,.50);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">Toutes les lumières</div>'
                           + (sub ? '<div style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgb(' + rgb + ');text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
                           + right + '</div>';
                       ]]]
@@ -1042,8 +1042,8 @@ views:
                         const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:' + (mrgb ? 'rgba(' + mrgb + ',.14)' : 'rgba(255,255,255,.04)') + ';color:' + (mrgb ? 'rgb(' + mrgb + ')' : 'rgba(255,255,255,.35)') + '">' + sub + '</div>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
                           + '<div style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#22d3ee"></ha-icon></div>'
-                          + '<div style="min-width:0;flex:1"><div style="font-size:8px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">CLIMATISATION</div>'
-                          + '<div style="font-size:14px;font-weight:800;color:rgba(255,255,255,.94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Séjour</div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.95)">CLIMATISATION</div>'
+                          + '<div style="font-size:9px;font-weight:800;letter-spacing:.5px;color:rgba(255,255,255,.50);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">Séjour</div>'
                           + '' + '</div>'
                           + right + '</div>';
                       ]]]
