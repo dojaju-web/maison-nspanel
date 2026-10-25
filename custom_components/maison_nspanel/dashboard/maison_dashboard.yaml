@@ -691,12 +691,21 @@ views:
                   - padding: 8px 12px
                   - min-height: 9vh
                   - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-                  - background: rgba(16,23,40,.62)
+                  - background: >
+                      [[[
+                        if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) return 'rgba(16,23,40,.62)';
+                        const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                        const st = w ? w.state : '';
+                        const tint = ({ sunny: '251,191,36', partlycloudy: '251,191,36', rainy: '96,165,250', pouring: '96,165,250', lightning: '96,165,250', 'lightning-rainy': '96,165,250', snowy: '186,230,253' })[st] || '148,163,184';
+                        return 'linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.84) 27%, rgba(6,12,22,.82) 100%)';
+                      ]]]
                   - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)') ]]]"
                   - box-shadow: none
                 img_cell:
-                  - width: 28px
-                  - height: 28px
+                  - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '28px' ]]]"
+                  - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '28px' ]]]"
+                  - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '50%' : '0' ]]]"
+                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.04)' : 'transparent' ]]]"
                   - justify-self: center
                 icon:
                   - width: 26px
@@ -731,6 +740,15 @@ views:
               const h = c ? c.attributes.current_humidity : undefined;
               const temp = (t !== undefined && t !== null) ? (Math.round(Number(t) * 10) / 10) + ' °C' : '-- °C';
               const hum = (h !== undefined && h !== null) ? ' · ' + Math.round(Number(h)) + ' %' : '';
+              const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
+              if (ar) {
+                // Style ardoise (d'après la carte « Salon » de la démo) : dégradé teinté sur l'icône, fond sombre
+                const tint = (t === undefined || t === null) ? '148,163,184' : Number(t) < 19 ? '56,189,248' : Number(t) < 24 ? '16,185,129' : Number(t) < 27 ? '249,115,22' : '239,68,68';
+                return '<div style="display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:9vh;padding:8px 10px;border-radius:16px;background:linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.84) 27%, rgba(6,12,22,.82) 100%);text-align:left">'
+                  + '<div style="flex:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:22px;color:rgb(' + tint + ')"></ha-icon></div>'
+                  + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">INTÉRIEUR' + hum + '</div>'
+                  + '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap">' + temp + '</div></div></div>';
+              }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
                 + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:#7DD3FC;flex:none"></ha-icon>'
                 + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">INTÉRIEUR' + hum + '</div>'
@@ -756,6 +774,15 @@ views:
               const cols = ['#4ADE80', '#A3E635', '#FACC15', '#FB923C'];
               const qLabel = q === null ? 'n/d' : labels[q];
               const qCol = q === null ? '#94A3B8' : cols[q];
+              const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
+              if (ar) {
+                const tints = ['16,185,129', '132,204,22', '249,115,22', '239,68,68'];
+                const tint = q === null ? '148,163,184' : tints[q];
+                return '<div style="display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:9vh;padding:8px 10px;border-radius:16px;background:linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.84) 27%, rgba(6,12,22,.82) 100%);text-align:left">'
+                  + '<div style="flex:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:air-filter" style="--mdc-icon-size:22px;color:rgb(' + tint + ')"></ha-icon></div>'
+                  + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
+                  + '<div style="font-size:18px;font-weight:800;color:rgb(' + tint + ');white-space:nowrap">' + qLabel + '</div></div></div>';
+              }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
                 + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none"></ha-icon>'
                 + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
@@ -949,18 +976,18 @@ views:
                   custom_fields:
                     c: >
                       [[[
-                        const rgb = '250,204,21';
+                        const rgb = '255,193,7';
                         const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
                         const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
                         const icon = 'mdi:lightbulb-group';
                         const c1 = rgb;
                         const sub = '';
                         const n0 = ids.filter(i => states[i] && states[i].state === 'on').length;
-                        const right = '<div style="flex:none;padding:6px 10px;border-radius:10px;font-size:9px;font-weight:900;letter-spacing:.7px;white-space:nowrap;background:' + (n0 > 0 ? 'rgba(250,204,21,.12)' : 'rgba(255,255,255,.05)') + ';color:' + (n0 > 0 ? '#facc15' : 'rgba(255,255,255,.38)') + '">' + n0 + ' ALLUMÉE' + (n0 > 1 ? 'S' : '') + '</div>';
+                        const right = '<div style="flex:none;padding:6px 10px;border-radius:10px;font-size:9px;font-weight:900;letter-spacing:.7px;white-space:nowrap;background:' + (n0 > 0 ? 'rgba(255,193,7,.10)' : 'rgba(255,255,255,.04)') + ';color:' + (n0 > 0 ? '#ffd54a' : 'rgba(255,255,255,.35)') + '">' + n0 + ' ALLUMÉE' + (n0 > 1 ? 'S' : '') + '</div>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
-                          + '<div style="flex:none;width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:rgb(' + c1 + ')"></ha-icon></div>'
-                          + '<div style="min-width:0;flex:1"><div style="font-size:9px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.40)">ÉCLAIRAGE</div>'
-                          + '<div style="font-size:16px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Toutes les lumières</div>'
+                          + '<div style="flex:none;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#ffd54a"></ha-icon></div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:9px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">ÉCLAIRAGE</div>'
+                          + '<div style="font-size:16px;font-weight:900;color:rgba(255,255,255,.95);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Toutes les lumières</div>'
                           + (sub ? '<div style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgb(' + rgb + ');text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
                           + right + '</div>';
                       ]]]
@@ -969,19 +996,21 @@ views:
                       - grid-template-areas: '"c"'
                       - grid-template-columns: 1fr
                     card:
-                      - padding: 9px 12px
-                      - border-radius: 16px
+                      - padding: 0 16px
+                      - height: 68px
+                      - overflow: hidden
+                      - border-radius: 18px
                       - border: none
                       - box-shadow: none
                       - background: >
                           [[[
-                            const rgb = '250,204,21';
+                            const rgb = '255,193,7';
                             const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
                             const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
-                            // Éteint : halo circulaire autour de l'icône ; actif : dégradé 100° teinté
+                            // Démo « Éclairage » : dégradé 100° + halo d'angle
                             return on
-                              ? 'linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.64) 24%, rgba(5,12,22,.59) 100%)'
-                              : 'radial-gradient(circle 100px at 34px 50%, rgba(' + rgb + ',.13), transparent 70%), rgba(5,12,22,.58)';
+                              ? 'radial-gradient(circle 80px at -10px -20px, rgba(' + rgb + ',.15), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.66) 24%, rgba(5,12,22,.58) 100%)'
+                              : 'radial-gradient(circle 80px at -10px -20px, rgba(' + rgb + ',.15), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.12) 0%, rgba(5,12,22,.62) 24%, rgba(5,12,22,.56) 100%)';
                           ]]]
                     custom_fields:
                       c:
@@ -1007,10 +1036,10 @@ views:
                         const sub = (() => { const c = states['climate.sejour_climatisation']; if (!c) return '—'; if (c.state === 'off') return 'Arrêt'; const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventilation', heat_cool: 'Auto', auto: 'Auto' }; const t = c.attributes.temperature; return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : ''); })();
                         const right = '<ha-icon icon="mdi:chevron-right" style="--mdc-icon-size:20px;color:rgba(255,255,255,.35);flex:none"></ha-icon>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
-                          + '<div style="flex:none;width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:rgb(' + c1 + ')"></ha-icon></div>'
-                          + '<div style="min-width:0;flex:1"><div style="font-size:9px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.40)">CLIMATISATION</div>'
-                          + '<div style="font-size:16px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Climatisation du séjour</div>'
-                          + (sub ? '<div style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgb(' + rgb + ');text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
+                          + '<div style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#22d3ee"></ha-icon></div>'
+                          + '<div style="min-width:0;flex:1"><div style="font-size:9px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">CLIMATISATION</div>'
+                          + '<div style="font-size:15px;font-weight:800;color:rgba(255,255,255,.94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Climatisation du séjour</div>'
+                          + (sub ? '<div style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgba(' + rgb + ',.70);text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
                           + right + '</div>';
                       ]]]
                   styles:
@@ -1018,7 +1047,9 @@ views:
                       - grid-template-areas: '"c"'
                       - grid-template-columns: 1fr
                     card:
-                      - padding: 9px 12px
+                      - padding: 0 16px
+                      - height: 64px
+                      - overflow: hidden
                       - border-radius: 16px
                       - border: none
                       - box-shadow: none
@@ -1027,10 +1058,10 @@ views:
                             const rgb = '34,211,238';
                             const ids = ['climate.sejour_climatisation'];
                             const on = (() => { const c = states['climate.sejour_climatisation']; return !!(c && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(c.state)); })();
-                            // Éteint : halo circulaire autour de l'icône ; actif : dégradé 100° teinté
+                            // Démo « Famille » : dégradé 100° + halo d'angle
                             return on
-                              ? 'linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.64) 24%, rgba(5,12,22,.59) 100%)'
-                              : 'radial-gradient(circle 100px at 34px 50%, rgba(' + rgb + ',.13), transparent 70%), rgba(5,12,22,.58)';
+                              ? 'radial-gradient(circle 75px at -5px -15px, rgba(' + rgb + ',.13), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.64) 24%, rgba(5,12,22,.59) 100%)'
+                              : 'radial-gradient(circle 75px at -5px -15px, rgba(' + rgb + ',.13), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.10) 0%, rgba(5,12,22,.60) 24%, rgba(5,12,22,.55) 100%)';
                           ]]]
                     custom_fields:
                       c:
