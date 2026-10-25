@@ -776,7 +776,7 @@ views:
               const qCol = q === null ? '#94A3B8' : cols[q];
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
               if (ar) {
-                const tints = ['16,185,129', '132,204,22', '249,115,22', '239,68,68'];
+                const tints = ['74,222,128', '163,230,53', '250,204,21', '251,146,60'];   // mêmes couleurs que le style verre sombre
                 const tint = q === null ? '148,163,184' : tints[q];
                 return '<div style="display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:9vh;padding:8px 10px;border-radius:16px;background:linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%);text-align:left">'
                   + '<div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:air-filter" style="--mdc-icon-size:20px;color:rgb(' + tint + ')"></ha-icon></div>'
@@ -1034,12 +1034,12 @@ views:
                         const icon = (() => { const c = states['climate.sejour_climatisation']; const m = { cool: 'mdi:snowflake', heat: 'mdi:fire', dry: 'mdi:water-percent', fan_only: 'mdi:fan', heat_cool: 'mdi:autorenew', auto: 'mdi:autorenew' }; return (c && m[c.state]) || 'mdi:thermostat'; })();
                         const c1 = rgb;
                         const sub = (() => { const c = states['climate.sejour_climatisation']; if (!c) return '—'; if (c.state === 'off') return 'Arrêt'; const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventilation', heat_cool: 'Auto', auto: 'Auto' }; const t = c.attributes.temperature; return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : ''); })();
-                        const right = '';
+                        const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:' + (on ? 'rgba(34,211,238,.10)' : 'rgba(255,255,255,.04)') + ';color:' + (on ? '#22d3ee' : 'rgba(255,255,255,.35)') + '">' + sub + '</div>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
                           + '<div style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#22d3ee"></ha-icon></div>'
                           + '<div style="min-width:0;flex:1"><div style="font-size:8px;font-weight:900;letter-spacing:1.5px;color:rgba(255,255,255,.34)">CLIMATISATION</div>'
                           + '<div style="font-size:14px;font-weight:800;color:rgba(255,255,255,.94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Séjour</div>'
-                          + (sub ? '<div style="font-size:9px;font-weight:800;letter-spacing:1px;color:rgba(' + rgb + ',.70);text-transform:uppercase;margin-top:1px">' + sub + '</div>' : '') + '</div>'
+                          + '' + '</div>'
                           + right + '</div>';
                       ]]]
                   styles:
