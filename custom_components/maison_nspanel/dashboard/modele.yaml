@@ -986,7 +986,7 @@ views:
                         const c1 = rgb;
                         const sub = '';
                         const n0 = ids.filter(i => states[i] && states[i].state === 'on').length;
-                        const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;background:' + (n0 > 0 ? 'rgba(255,193,7,.10)' : 'rgba(255,255,255,.04)') + ';color:' + (n0 > 0 ? '#ffd54a' : 'rgba(255,255,255,.35)') + '">' + n0 + ' ALLUMÉE' + (n0 > 1 ? 'S' : '') + '</div>';
+                        const right = '<div style="flex:none;padding:7px 12px;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.7px;white-space:nowrap;background:' + (n0 > 0 ? 'rgba(255,193,7,.10)' : 'rgba(255,255,255,.04)') + ';color:' + (n0 > 0 ? '#ffd54a' : 'rgba(255,255,255,.35)') + '">' + n0 + ' ALLUMÉE' + (n0 > 1 ? 'S' : '') + '</div>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
                           + '<div style="flex:none;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#ffd54a"></ha-icon></div>'
                           + '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.95)">ÉCLAIRAGE</div>'
@@ -1039,7 +1039,7 @@ views:
                         const sub = (() => { const c = states['climate.sejour_climatisation']; if (!c) return '—'; if (c.state === 'off') return 'Arrêt'; const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventilation', heat_cool: 'Auto', auto: 'Auto' }; const t = c.attributes.temperature; return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : ''); })();
                         const cs = states['climate.sejour_climatisation'];
                         const mrgb = ({ cool: '56,189,248', heat: '251,146,60', dry: '250,204,21', fan_only: '74,222,128', auto: '236,72,153', heat_cool: '236,72,153' })[cs ? cs.state : ''];
-                        const right = '<div style="flex:none;padding:5px 9px;border-radius:10px;font-size:8px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:' + (mrgb ? 'rgba(' + mrgb + ',.14)' : 'rgba(255,255,255,.04)') + ';color:' + (mrgb ? 'rgb(' + mrgb + ')' : 'rgba(255,255,255,.35)') + '">' + sub + '</div>';
+                        const right = '<div style="flex:none;padding:7px 12px;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:' + (mrgb ? 'rgba(' + mrgb + ',.14)' : 'rgba(255,255,255,.04)') + ';color:' + (mrgb ? 'rgb(' + mrgb + ')' : 'rgba(255,255,255,.35)') + '">' + sub + '</div>';
                         return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
                           + '<div style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(' + c1 + ',' + '.20' + ')"><ha-icon icon="' + icon + '" style="--mdc-icon-size:24px;color:#22d3ee"></ha-icon></div>'
                           + '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.95)">CLIMATISATION</div>'
