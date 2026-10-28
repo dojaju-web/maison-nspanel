@@ -851,7 +851,7 @@ views:
                     - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
                   state:
                   - operator: template
-                    value: '[[[ return [''switch.outlet_1'', ''light.sejour_cuisine'', ''light.sejour_mur_tv'', ''light.sejour_mur_sdb'', ''light.jardin_jardin''].some(i => states[i] && [''on'',''cool'',''heat'',''dry'',''fan_only'',''heat_cool'',''auto''].includes(states[i].state)); ]]]'
+                    value: '[[[ return [''light.sejour_cuisine'', ''light.sejour_mur_tv'', ''light.sejour_mur_sdb'', ''light.jardin_jardin''].some(i => states[i] && [''on'',''cool'',''heat'',''dry'',''fan_only'',''heat_cool'',''auto''].includes(states[i].state)); ]]]'
                     styles:
                       card:
                       - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''250,204,21'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.16'' : ''.28'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.78) 68%)'' ]]]'
@@ -875,7 +875,7 @@ views:
                   - light.sejour_mur_tv
                   - light.sejour_mur_sdb
                   - light.jardin_jardin
-                  label: "[[[\n  const n = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'].filter(i => states[i] && states[i].state === 'on').length;\n  return n === 0 ? 'Tout éteint' : n + (n > 1 ? ' allumés' : ' allumé');\n]]]\n"
+                  label: "[[[\n  const n = ['light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'].filter(i => states[i] && states[i].state === 'on').length;\n  return n === 0 ? 'Tout éteint' : n + (n > 1 ? ' allumés' : ' allumé');\n]]]\n"
                 - show_icon: true
                   show_name: true
                   show_label: true
@@ -980,7 +980,7 @@ views:
                     c: >
                       [[[
                         const rgb = '255,193,7';
-                        const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                        const ids = ['light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
                         const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
                         const icon = 'mdi:lightbulb-group';
                         const c1 = rgb;
@@ -1008,7 +1008,7 @@ views:
                       - background: >
                           [[[
                             const rgb = '255,193,7';
-                            const ids = ['switch.outlet_1', 'light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                            const ids = ['light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
                             const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
                             // Démo « Éclairage » : dégradé 100° + halo d'angle
                             return on
@@ -1185,7 +1185,6 @@ views:
               - light.jardin_jardin
             variables:
               ids:
-                - switch.outlet_1
                 - light.sejour_cuisine
                 - light.sejour_mur_tv
                 - light.sejour_mur_sdb
