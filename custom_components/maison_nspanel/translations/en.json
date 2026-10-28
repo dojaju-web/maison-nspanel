@@ -20,6 +20,7 @@
         "description": "What do you want to set up?",
         "menu_options": {
           "categorie_rappels": "Reminders",
+          "categorie_eclairage": "Lighting (sections and lights)",
           "categorie_meteo": "Weather and alert",
           "climatisation": "Air conditioning and air quality",
           "apparence": "Appearance"
@@ -107,11 +108,52 @@
           "climate_entity": "Climate entity",
           "air_enabled": "Show air quality"
         }
+      },
+      "categorie_eclairage": {
+        "title": "Lighting",
+        "description": "Sections and lights of the lighting page. Then reload the panel page.",
+        "menu_options": {
+          "section_ajouter": "Add a section",
+          "section_choisir": "Edit a section (rename, add or remove lights)",
+          "section_supprimer": "Delete sections",
+          "init": "← Back"
+        }
+      },
+      "section_ajouter": {
+        "title": "New section",
+        "data": {
+          "nom": "Section name",
+          "lumieres": "Lights"
+        },
+        "description": "Choose the section name and its lights or switches."
+      },
+      "section_choisir": {
+        "title": "Edit a section",
+        "data": {
+          "section": "Section"
+        }
+      },
+      "section_modifier": {
+        "title": "Edit section",
+        "data": {
+          "nom": "Section name",
+          "lumieres": "Lights"
+        },
+        "description": "Change the name, add or remove lights."
+      },
+      "section_supprimer": {
+        "title": "Delete sections",
+        "data": {
+          "sections": "Sections to delete"
+        },
+        "description": "Tick the sections to delete."
       }
     },
     "error": {
       "texte_requis": "Text is required.",
-      "jours_requis": "Pick at least one day."
+      "jours_requis": "Pick at least one day.",
+      "nom_requis": "The name is required.",
+      "lumieres_requises": "Choose at least one light."
     }
   },
   "selector": {

@@ -27,5 +27,34 @@ class T(unittest.TestCase):
             self.assertEqual((f / d.CIBLE).read_text(encoding="utf-8"), "climate.sejour_climatisation")
 
 
+class Sections(unittest.TestCase):
+    def test_defaults_sans_interrupteur_dans_le_compte(self):
+        secs = d.normalize_sections(None)
+        self.assertIn("switch.outlet_1", d.all_entities(secs))
+        self.assertNotIn("switch.outlet_1", d.light_entities(secs))
+        self.assertEqual(len(d.light_entities(secs)), 4)
+
+    def test_normalize(self):
+        secs = d.normalize_sections([{"nom": " Salon ", "lumieres": ["light.a", "light.a", "x", {"entity": "light.b", "nom": "B"}]}])
+        self.assertEqual(secs[0]["nom"], "Salon")
+        self.assertEqual([l["entity"] for l in secs[0]["lumieres"]], ["light.a", "light.b"])
+
+    def test_render_sections(self):
+        src = "ids: __LIGHTS_IDS__\ntrig: __LIGHTS_TRIG__\njs: [__LIGHTS_JS__]\nq: [__LIGHTS_JSQ__]\n__SECTIONS__\n"
+        out = d.render(src, None, [{"nom": "Salon", "lumieres": ["light.a", "switch.b"]}])
+        self.assertIn('ids: ["light.a"]', out)
+        self.assertIn('trig: ["light.a", "switch.b"]', out)
+        self.assertIn("js: ['light.a']", out)
+        self.assertIn("q: [''light.a'']", out)
+        self.assertIn('text: "SALON"', out)
+        self.assertIn("columns: 2", out)
+        self.assertNotIn("__", out)
+
+    def test_vide(self):
+        out = d.render("t: __LIGHTS_TRIG__\nids: __LIGHTS_IDS__\n__SECTIONS__", None, [])
+        self.assertIn('t: ["sun.sun"]', out)
+        self.assertIn("ids: []", out)
+
+
 if __name__ == "__main__":
     unittest.main()

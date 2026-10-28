@@ -20,6 +20,7 @@
         "description": "Que voulez-vous régler ?",
         "menu_options": {
           "categorie_rappels": "Rappels",
+          "categorie_eclairage": "Éclairage (sections et lumières)",
           "categorie_meteo": "Météo et vigilance",
           "climatisation": "Climatisation et qualité de l'air",
           "apparence": "Apparence"
@@ -109,11 +110,52 @@
           "climate_entity": "Entité de climatisation",
           "air_enabled": "Afficher la qualité de l'air"
         }
+      },
+      "categorie_eclairage": {
+        "title": "Éclairage",
+        "description": "Les sections et les lumières de la page Éclairage. Rechargez ensuite la page du panneau.",
+        "menu_options": {
+          "section_ajouter": "Ajouter une section",
+          "section_choisir": "Modifier une section (renommer, ajouter ou retirer des lumières)",
+          "section_supprimer": "Supprimer des sections",
+          "init": "← Retour"
+        }
+      },
+      "section_ajouter": {
+        "title": "Nouvelle section",
+        "data": {
+          "nom": "Nom de la section",
+          "lumieres": "Lumières"
+        },
+        "description": "Choisissez le nom de la section et ses lumières ou interrupteurs."
+      },
+      "section_choisir": {
+        "title": "Modifier une section",
+        "data": {
+          "section": "Section"
+        }
+      },
+      "section_modifier": {
+        "title": "Modifier la section",
+        "data": {
+          "nom": "Nom de la section",
+          "lumieres": "Lumières"
+        },
+        "description": "Changez le nom, ajoutez ou retirez des lumières."
+      },
+      "section_supprimer": {
+        "title": "Supprimer des sections",
+        "data": {
+          "sections": "Sections à supprimer"
+        },
+        "description": "Cochez les sections à supprimer."
       }
     },
     "error": {
       "texte_requis": "Le texte est obligatoire.",
-      "jours_requis": "Choisissez au moins un jour."
+      "jours_requis": "Choisissez au moins un jour.",
+      "nom_requis": "Le nom est obligatoire.",
+      "lumieres_requises": "Choisissez au moins une lumière."
     }
   },
   "entity": {},

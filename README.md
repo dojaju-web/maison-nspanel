@@ -80,3 +80,12 @@ l'action *Release* crée seule la release `vX.Y.Z`, ce qui permet à HACS de pro
 - **Apparence** : verre sombre ou ardoise.
 
 Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entité de climatisation change : **rechargez ensuite la page du panneau** (un redémarrage de Home Assistant peut être nécessaire la première fois).
+
+## Page Éclairage personnalisable
+
+Dans **Configurer → Éclairage**, vous pouvez :
+- **Ajouter une section** (nom + lumières ou interrupteurs) ;
+- **Modifier une section** : renommer, ajouter ou retirer des lumières ;
+- **Supprimer des sections**.
+
+Seules les entités `light.*` sont comptées dans « allumées » sur l'accueil ; les interrupteurs (`switch.*`) s'affichent mais ne sont pas comptés. Après modification, rechargez la page du panneau (un redémarrage de Home Assistant peut être nécessaire la première fois).

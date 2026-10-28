@@ -851,7 +851,7 @@ views:
                     - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
                   state:
                   - operator: template
-                    value: '[[[ return [''light.sejour_cuisine'', ''light.sejour_mur_tv'', ''light.sejour_mur_sdb'', ''light.jardin_jardin''].some(i => states[i] && [''on'',''cool'',''heat'',''dry'',''fan_only'',''heat_cool'',''auto''].includes(states[i].state)); ]]]'
+                    value: '[[[ return [__LIGHTS_JSQ__].some(i => states[i] && [''on'',''cool'',''heat'',''dry'',''fan_only'',''heat_cool'',''auto''].includes(states[i].state)); ]]]'
                     styles:
                       card:
                       - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''250,204,21'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.16'' : ''.28'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.78) 68%)'' ]]]'
@@ -869,13 +869,8 @@ views:
                   type: custom:button-card
                   name: Éclairage
                   icon: mdi:lightbulb-group
-                  triggers_update:
-                  - switch.outlet_1
-                  - light.sejour_cuisine
-                  - light.sejour_mur_tv
-                  - light.sejour_mur_sdb
-                  - light.jardin_jardin
-                  label: "[[[\n  const n = ['light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'].filter(i => states[i] && states[i].state === 'on').length;\n  return n === 0 ? 'Tout éteint' : n + (n > 1 ? ' allumés' : ' allumé');\n]]]\n"
+                  triggers_update: __LIGHTS_TRIG__
+                  label: "[[[\n  const n = [__LIGHTS_JS__].filter(i => states[i] && states[i].state === 'on').length;\n  return n === 0 ? 'Tout éteint' : n + (n > 1 ? ' allumés' : ' allumé');\n]]]\n"
                 - show_icon: true
                   show_name: true
                   show_label: true
@@ -967,12 +962,7 @@ views:
                   show_icon: false
                   show_name: false
                   show_label: false
-                  triggers_update:
-                  - switch.outlet_1
-                  - light.sejour_cuisine
-                  - light.sejour_mur_tv
-                  - light.sejour_mur_sdb
-                  - light.jardin_jardin
+                  triggers_update: __LIGHTS_TRIG__
                   tap_action:
                     action: navigate
                     navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''lumieres''; ]]]'
@@ -980,7 +970,7 @@ views:
                     c: >
                       [[[
                         const rgb = '255,193,7';
-                        const ids = ['light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                        const ids = [__LIGHTS_JS__];
                         const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
                         const icon = 'mdi:lightbulb-group';
                         const c1 = rgb;
@@ -1008,7 +998,7 @@ views:
                       - background: >
                           [[[
                             const rgb = '255,193,7';
-                            const ids = ['light.sejour_cuisine', 'light.sejour_mur_tv', 'light.sejour_mur_sdb', 'light.jardin_jardin'];
+                            const ids = [__LIGHTS_JS__];
                             const on = ids.filter(i => states[i] && states[i].state === 'on').length > 0;
                             // Démo « Éclairage » : dégradé 100° + halo d'angle
                             return on
@@ -1177,18 +1167,9 @@ views:
             show_label: true
             name: Éclairage
             size: 22px
-            triggers_update:
-              - switch.outlet_1
-              - light.sejour_cuisine
-              - light.sejour_mur_tv
-              - light.sejour_mur_sdb
-              - light.jardin_jardin
+            triggers_update: __LIGHTS_TRIG__
             variables:
-              ids:
-                - light.sejour_cuisine
-                - light.sejour_mur_tv
-                - light.sejour_mur_sdb
-                - light.jardin_jardin
+              ids: __LIGHTS_IDS__
             icon: >
               [[[
                 const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
@@ -1314,65 +1295,8 @@ views:
                   - background: rgba(203,213,225,.14)
                   - border: 1px solid rgba(203,213,225,.35)
 
-          # ---------- SECTION 1 : SÉJOUR ----------
-          - type: custom:button-card
-            template: section_title
-            variables:
-              text: SÉJOUR
+          __SECTIONS__
 
-          - type: grid
-            columns: 2
-            square: false
-            cards:
-              - type: custom:button-card
-                template: tile_light
-                entity: switch.outlet_1
-                name: Interrupteur Cuisine
-                icon: >
-                  [[[ return entity.state === 'on' ? 'mdi:light-switch' : 'mdi:light-switch-off' ]]]
-                label: >
-                  [[[
-                    if (entity.state === 'unavailable') return 'Indisponible';
-                    return entity.state === 'on' ? 'Allumé' : 'Éteint';
-                  ]]]
-                variables:
-                  rgb: "45,212,191"
-
-              - type: custom:button-card
-                template: tile_light
-                entity: light.sejour_cuisine
-                name: Lampe Cuisine
-                icon: mdi:ceiling-light
-
-              - type: custom:button-card
-                template: tile_light
-                entity: light.sejour_mur_tv
-                name: Mur TV
-                icon: mdi:ceiling-light
-
-              - type: custom:button-card
-                template: tile_light
-                entity: light.sejour_mur_sdb
-                name: Mur Salle de bain
-                icon: mdi:ceiling-light
-
-          # ---------- SECTION 2 : JARDIN ----------
-          - type: custom:button-card
-            template: section_title
-            variables:
-              text: JARDIN
-
-          - type: grid
-            columns: 1
-            square: false
-            cards:
-              - type: custom:button-card
-                template: tile_light
-                entity: light.jardin_jardin
-                name: Lampes Jardin
-                icon: mdi:outdoor-lamp
-                variables:
-                  rgb: "74,222,128"
   # ==========================================================
   #  PAGE 3 : CLIMAT (Sensibo Air Pro)
   # ==========================================================

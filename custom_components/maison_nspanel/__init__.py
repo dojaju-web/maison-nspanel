@@ -8,7 +8,7 @@ from pathlib import Path
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_CLIMATE, DOMAIN, STATIC_URL
+from .const import CONF_CLIMATE, CONF_SECTIONS, DOMAIN, STATIC_URL
 from .dashboard import sync
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,7 +39,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Régénère le dashboard avec l'entité de climatisation choisie (dossier « dashboard »)
     try:
         changed = await hass.async_add_executor_job(
-            sync, Path(__file__).parent / "dashboard", entry.options.get(CONF_CLIMATE)
+            sync,
+            Path(__file__).parent / "dashboard",
+            entry.options.get(CONF_CLIMATE),
+            entry.options.get(CONF_SECTIONS),
         )
         if changed:
             _LOGGER.info("Dashboard régénéré pour %s", entry.options.get(CONF_CLIMATE))

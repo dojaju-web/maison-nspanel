@@ -13,6 +13,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector as sel
 
 from .const import (
+    CONF_SECTIONS,
     CONF_AIR,
     CONF_CLIMATE,
     DEFAULT_STYLE,
@@ -25,7 +26,7 @@ from .const import (
     DOMAIN,
 )
 from .rappels import DAY_LABELS, DAYS, DEFAULT_REMINDER, describe, normalize
-from .dashboard import DEFAULT_CLIMATE
+from .dashboard import DEFAULT_CLIMATE, normalize_sections
 from .vigilance import DEFAULT_MIN, MIN_CHOICES
 
 DAY_OPTIONS = [{"value": d, "label": DAY_LABELS[d]} for d in DAYS]
@@ -137,7 +138,7 @@ class MaisonOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         return self.async_show_menu(
             step_id="init",
-            menu_options=["categorie_rappels", "categorie_meteo", "climatisation", "apparence"],
+            menu_options=["categorie_rappels", "categorie_eclairage", "categorie_meteo", "climatisation", "apparence"],
         )
 
     async def async_step_categorie_rappels(self, user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -146,6 +147,109 @@ class MaisonOptionsFlow(OptionsFlow):
             menu += ["choisir", "supprimer"]
         menu += ["init"]  # retour
         return self.async_show_menu(step_id="categorie_rappels", menu_options=menu)
+
+    # -- éclairage : sections et lumières ----------------------------------------
+    def _sections(self) -> list[dict[str, Any]]:
+        return normalize_sections(self._entry.options.get(CONF_SECTIONS))
+
+    async def async_step_categorie_eclairage(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        menu = ["section_ajouter"]
+        if self._sections():
+            menu += ["section_choisir", "section_supprimer"]
+        menu += ["init"]
+        return self.async_show_menu(step_id="categorie_eclairage", menu_options=menu)
+
+    def _section_schema(self, nom: str, entities: list[str]) -> vol.Schema:
+        return vol.Schema(
+            {
+                vol.Required("nom", default=nom): sel.TextSelector(),
+                vol.Required("lumieres", default=entities): sel.EntitySelector(
+                    sel.EntitySelectorConfig(domain=["light", "switch"], multiple=True)
+                ),
+            }
+        )
+
+    async def async_step_section_ajouter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        errors: dict[str, str] = {}
+        nom, lumieres = "", []
+        if user_input is not None:
+            nom = str(user_input.get("nom", "")).strip()
+            lumieres = list(user_input.get("lumieres", []))
+            if not nom:
+                errors["nom"] = "nom_requis"
+            elif not lumieres:
+                errors["lumieres"] = "lumieres_requises"
+            else:
+                secs = self._sections() + [{"nom": nom, "lumieres": [{"entity": e} for e in lumieres]}]
+                return self._save(**{CONF_SECTIONS: secs})
+        return self.async_show_form(
+            step_id="section_ajouter", data_schema=self._section_schema(nom, lumieres), errors=errors
+        )
+
+    async def async_step_section_choisir(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        secs = self._sections()
+        if user_input is not None:
+            self._edit_index = int(user_input["section"])
+            return await self.async_step_section_modifier()
+        schema = vol.Schema(
+            {
+                vol.Required("section"): sel.SelectSelector(
+                    sel.SelectSelectorConfig(
+                        options=[
+                            sel.SelectOptionDict(value=str(i), label=f"{s['nom']} ({len(s['lumieres'])})")
+                            for i, s in enumerate(secs)
+                        ],
+                        mode=sel.SelectSelectorMode.LIST,
+                    )
+                )
+            }
+        )
+        return self.async_show_form(step_id="section_choisir", data_schema=schema)
+
+    async def async_step_section_modifier(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        secs = self._sections()
+        idx = self._edit_index or 0
+        if idx >= len(secs):
+            return await self.async_step_init()
+        current = secs[idx]
+        errors: dict[str, str] = {}
+        nom = current["nom"]
+        lumieres = [lum["entity"] for lum in current["lumieres"]]
+        if user_input is not None and "nom" in user_input:
+            nom = str(user_input.get("nom", "")).strip()
+            lumieres = list(user_input.get("lumieres", []))
+            if not nom:
+                errors["nom"] = "nom_requis"
+            elif not lumieres:
+                errors["lumieres"] = "lumieres_requises"
+            else:
+                # garde le nom, l'icône et la couleur des lumières conservées
+                old = {lum["entity"]: lum for lum in current["lumieres"]}
+                secs[idx] = {"nom": nom, "lumieres": [old.get(e, {"entity": e}) for e in lumieres]}
+                return self._save(**{CONF_SECTIONS: secs})
+        return self.async_show_form(
+            step_id="section_modifier", data_schema=self._section_schema(nom, lumieres), errors=errors
+        )
+
+    async def async_step_section_supprimer(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        secs = self._sections()
+        if user_input is not None:
+            drop = {int(i) for i in user_input.get("sections", [])}
+            return self._save(**{CONF_SECTIONS: [s for i, s in enumerate(secs) if i not in drop]})
+        schema = vol.Schema(
+            {
+                vol.Optional("sections", default=[]): sel.SelectSelector(
+                    sel.SelectSelectorConfig(
+                        options=[
+                            sel.SelectOptionDict(value=str(i), label=s["nom"]) for i, s in enumerate(secs)
+                        ],
+                        multiple=True,
+                        mode=sel.SelectSelectorMode.LIST,
+                    )
+                )
+            }
+        )
+        return self.async_show_form(step_id="section_supprimer", data_schema=schema)
 
     async def async_step_categorie_meteo(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         return self.async_show_menu(
