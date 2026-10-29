@@ -109,3 +109,26 @@ def async_unregister_panel(hass: HomeAssistant) -> None:
         except Exception:  # noqa: BLE001
             _LOGGER.debug("Panneau déjà retiré")
         store["panel_registered"] = False
+
+
+async def async_refresh_lovelace(hass: HomeAssistant) -> int:
+    """Force Home Assistant à relire maison_dashboard.yaml et prévient les pages ouvertes.
+
+    Sans cela, un tableau de bord YAML garde son ancienne version en cache jusqu'au
+    redémarrage. Meilleur effort : s'appuie sur des détails internes de Home Assistant.
+    """
+    data = hass.data.get("lovelace")
+    dashboards = data.get("dashboards") if isinstance(data, dict) else getattr(data, "dashboards", None)
+    done = 0
+    for url_path, dash in list((dashboards or {}).items()):
+        cfg = getattr(dash, "config", None)
+        filename = str(cfg.get("filename", "")) if isinstance(cfg, dict) else ""
+        if not filename.endswith("maison_dashboard.yaml") or not hasattr(dash, "async_load"):
+            continue
+        try:
+            await dash.async_load(True)
+            hass.bus.async_fire("lovelace_updated", {"url_path": url_path})
+            done += 1
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.debug("Actualisation du dashboard %s impossible : %s", url_path, err)
+    return done

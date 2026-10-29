@@ -252,7 +252,7 @@ class MaisonNspanelEditeur extends HTMLElement {
       <div class="bar">
         <button class="menu" data-act="menu">☰</button>
         <h1>Éclairage du NSPanel</h1>
-        <span class="status ${this._msg === "ok" ? "ok" : this._msg ? "err" : ""}">${this._saving ? "Enregistrement…" : this._msg === "ok" ? "✓ Enregistré – rechargez la page du panneau" : this._esc(this._msg)}</span>
+        <span class="status ${this._msg === "ok" ? "ok" : this._msg ? "err" : ""}">${this._saving ? "Enregistrement…" : this._msg === "ok" ? "✓ Enregistré – dashboard actualisé (rechargez la page du panneau si besoin)" : this._esc(this._msg)}</span>
         <button class="save" data-act="save" ${dirty && !this._saving ? "" : "disabled"}>Enregistrer</button>
       </div>
       <div class="wrap">

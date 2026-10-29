@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import CONF_CLIMATE, CONF_SECTIONS, DOMAIN, STATIC_URL
 from .dashboard import sync
-from .panel import async_register_panel, async_unregister_panel
+from .panel import async_refresh_lovelace, async_register_panel, async_unregister_panel
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,6 +51,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
         if changed:
             _LOGGER.info("Dashboard régénéré pour %s", entry.options.get(CONF_CLIMATE))
+            if await async_refresh_lovelace(hass):
+                _LOGGER.info("Dashboard actualisé sans redémarrage")
     except OSError as err:
         _LOGGER.warning("Impossible de régénérer le dashboard : %s", err)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

@@ -79,7 +79,7 @@ l'action *Release* crée seule la release `vX.Y.Z`, ce qui permet à HACS de pro
 - **Climatisation et qualité de l'air** : entité de climatisation (les entités liées — ventilation, alerte de filtre, capteurs d'air — sont déduites de son nom, comme `switch.<nom>_climate_react`) et affichage de la qualité de l'air. Désactivée, la tuile « Air » disparaît et les deux tuiles de température prennent toute la largeur.
 - **Apparence** : verre sombre ou ardoise.
 
-Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entité de climatisation change : **rechargez ensuite la page du panneau** (un redémarrage de Home Assistant peut être nécessaire la première fois).
+Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entité de climatisation change : **rechargez ensuite la page du panneau** (Home Assistant relit désormais le fichier tout seul ; si rien ne change, utilisez ⋮ > *Actualiser* sur le tableau de bord, sans redémarrage).
 
 ## Page Éclairage personnalisable
 
@@ -90,4 +90,4 @@ Dans **Configurer → Éclairage**, vous pouvez :
 - **Modifier une section** : renommer, ajouter ou retirer des lumières ;
 - **Supprimer des sections**.
 
-Seules les entités `light.*` sont comptées dans « allumées » sur l'accueil ; les interrupteurs (`switch.*`) s'affichent mais ne sont pas comptés. Après modification, rechargez la page du panneau (un redémarrage de Home Assistant peut être nécessaire la première fois).
+Seules les entités `light.*` sont comptées dans « allumées » sur l'accueil ; les interrupteurs (`switch.*`) s'affichent mais ne sont pas comptés. Après modification, rechargez la page du panneau (Home Assistant relit désormais le fichier tout seul ; si rien ne change, utilisez ⋮ > *Actualiser* sur le tableau de bord, sans redémarrage).
