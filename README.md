@@ -83,6 +83,8 @@ Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entit
 
 ## Page Éclairage personnalisable
 
+**Éditeur visuel** : un panneau « Éclairage NSPanel » apparaît dans la barre latérale de Home Assistant (administrateurs). Glissez-déposez les sections et les lumières, renommez-les, ajoutez-en depuis la liste des lumières disponibles, puis cliquez sur **Enregistrer**. Les menus de Configurer → Éclairage restent disponibles en alternative.
+
 Dans **Configurer → Éclairage**, vous pouvez :
 - **Ajouter une section** (nom + lumières ou interrupteurs) ;
 - **Modifier une section** : renommer, ajouter ou retirer des lumières ;

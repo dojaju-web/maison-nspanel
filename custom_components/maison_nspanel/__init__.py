@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import CONF_CLIMATE, CONF_SECTIONS, DOMAIN, STATIC_URL
 from .dashboard import sync
+from .panel import async_register_panel, async_unregister_panel
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +37,10 @@ async def _async_register_images(hass: HomeAssistant) -> None:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Démarre l'intégration."""
     await _async_register_images(hass)
+    try:
+        await async_register_panel(hass)
+    except Exception as err:  # noqa: BLE001 - le panneau est facultatif
+        _LOGGER.warning("Panneau Éclairage indisponible : %s", err)
     # Régénère le dashboard avec l'entité de climatisation choisie (dossier « dashboard »)
     try:
         changed = await hass.async_add_executor_job(
@@ -55,6 +60,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Arrête l'intégration."""
+    async_unregister_panel(hass)
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
