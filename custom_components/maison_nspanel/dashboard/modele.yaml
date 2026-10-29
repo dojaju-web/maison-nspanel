@@ -308,8 +308,8 @@ button_card_templates:
         - min-height: "[[[ return variables.min_h ]]]"
         - padding: 6px 2px
         - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-        - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.10') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 62%)' ]]]"
-        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)' ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)' ]]]"
         - box-shadow: none
         - transition: all .3s ease
       img_cell:
@@ -327,20 +327,20 @@ button_card_templates:
       name:
         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
         - font-size: 11px
-        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '800' ]]]"
-        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '1px' ]]]"
+        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '800' : '800' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px' ]]]"
         - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#B4BED0') ]]]"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0' ]]]"
         - margin-top: 2px
         - transition: color .3s ease
       label:
         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-        - font-size: 12px
-        - font-weight: 600
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#8A96A8') ]]]"
+        - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
+        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '600' ]]]"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(214,238,245,.5)' : '#8A96A8' ]]]"
         - padding-bottom: 2px
         - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.6px' : 'normal' ]]]"
     state:
       - operator: template
         value: >
@@ -358,14 +358,16 @@ button_card_templates:
           ]]]
         styles:
           card:
-            - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.26') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.86) 68%)' ]]]"
-            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.50)') ]]]"
+            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)' ]]]"
           img_cell:
-            - background: "[[[ return 'rgba(' + variables.rgb + ',.30)' ]]]"
-            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.55)') ]]]"
-            - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('0 0 14px rgba(' + variables.rgb + ',.45)') ]]]"
+            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : 'rgba(' + variables.rgb + ',.30)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + variables.rgb + ',.55)' ]]]"
+            - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '0 0 14px rgba(' + variables.rgb + ',.45)' ]]]"
           name:
-            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('rgb(' + variables.rgb + ')') ]]]"
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '#FFFFFF' : 'rgb(' + variables.rgb + ')' ]]]"
+          label:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgb(' + variables.rgb + ')' : '#8A96A8' ]]]"
 
   # ----------------------------------------------------------
   # Mode HVAC
@@ -501,6 +503,9 @@ button_card_templates:
       step: 1
       rgb: "148,163,184"
     styles:
+      card:
+        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + ({cool:'56,189,248',heat:'251,146,60',dry:'250,204,21',fan_only:'74,222,128',auto:'236,72,153',heat_cool:'236,72,153'}[entity.state] || '159,207,227') + ',.10)' : 'linear-gradient(145deg, rgba(148,163,184,.10) 0%, rgba(16,23,40,.82) 62%)' ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + ({cool:'56,189,248',heat:'251,146,60',dry:'250,204,21',fan_only:'74,222,128',auto:'236,72,153',heat_cool:'236,72,153'}[entity.state] || '184,226,239') + ',.17)' : '1px solid rgba(255,255,255,.08)' ]]]"
       img_cell:
         - width: 54px
         - height: 54px
@@ -509,7 +514,7 @@ button_card_templates:
         - box-shadow: none
       icon:
         - width: 30px
-        - color: "#E6ECF7"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgb(' + ({cool:'56,189,248',heat:'251,146,60',dry:'250,204,21',fan_only:'74,222,128',auto:'236,72,153',heat_cool:'236,72,153'}[entity.state] || '209,232,243') + ')' : '#E6ECF7' ]]]"
     tap_action:
       action: perform-action
       perform_action: climate.set_temperature
@@ -1374,18 +1379,18 @@ views:
               card:
                 - min-height: 14vh
                 - padding: 3.5vh 14px 1vh 14px
-                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
                 - border: "[[[ const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; return (f && f.state === 'on') ? '1px solid rgba(250,204,21,.55)' : '1px solid rgba(255,255,255,.08)' ]]]"
-                - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%)' ]]]"
+                - background: "[[[ const c = variables.mode_rgb[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba('+c+',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
                 - box-shadow: none
               img_cell:
-                - width: 40px
-                - height: 40px
+                - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
+                - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
                 - align-self: center
                 - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
-                - background: "[[[ return 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.20)' ]]]"
-                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.45)') ]]]"
-                - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : (entity.state === 'off' ? 'none' : '0 0 14px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.40)') ]]]"
+                - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.14)' : 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.20)' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.45)' ]]]"
+                - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'inset 0 0 0 1px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.16)' : (entity.state === 'off' ? 'none' : '0 0 14px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.40)') ]]]"
               icon:
                 - width: 22px
                 - color: "[[[ return 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')' ]]]"
@@ -1393,23 +1398,22 @@ views:
                 - justify-self: start
                 - align-self: start
                 - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: 10px
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px' ]]]"
                 - font-weight: 800
-                - letter-spacing: 2px
-                - color: "[[[ const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; return (f && f.state === 'on') ? '#FACC15' : 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')' ]]]"
+                - color: "[[[ const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; if (f && f.state === 'on') return '#FACC15'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(232,246,255,.45)' : 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')' ]]]"
                 - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.9px' : '2px' ]]]"
               name:
                 - justify-self: start
                 - align-self: end
                 - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '17px' : ('20px') ]]]"
-                - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '900' ]]]"
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '20px' ]]]"
+                - font-weight: 900
                 - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
                 - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '-0.5px' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '-0.5px' ]]]"
                 - line-height: 1.15
-                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
+                - color: '#FFFFFF'
               custom_fields:
                 nav:
                   - align-self: center
@@ -1419,13 +1423,13 @@ views:
                   - padding: 6px 12px
                   - border-radius: 999px
                   - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                  - font-size: 11px
+                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '11px' ]]]"
                   - font-weight: 800
-                  - letter-spacing: 1px
+                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.7px' : '1px' ]]]"
                   - text-transform: uppercase
-                  - color: rgb(203,213,225)
-                  - background: rgba(203,213,225,.14)
-                  - border: 1px solid rgba(203,213,225,.35)
+                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(220,247,255,.72)' : 'rgb(203,213,225)' ]]]"
+                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(70,168,188,.09)' : 'rgba(203,213,225,.14)' ]]]"
+                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(203,213,225,.35)' ]]]"
 
           # ---------- CONSIGNE : [ - ] [ 22.0° ] [ + ] ----------
           - type: horizontal-stack
@@ -1482,36 +1486,36 @@ views:
                     - overflow: hidden
                     - height: 100%
                     - min-height: 22vh
-                    - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-                    - background: "[[[ const c = variables.mode_rgb[entity.state]; return c ? 'radial-gradient(circle at 50% 42%, rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.28') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.88) 72%)' : 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(148,163,184,.10) 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 62%)' ]]]"
-                    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + (variables.mode_rgb[entity.state] || '255,255,255') + ',' + (variables.mode_rgb[entity.state] ? '.50' : '.07') + ')') ]]]"
+                    - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
+                    - background: "[[[ const c = variables.mode_rgb[entity.state]; if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) return 'radial-gradient(ellipse at 50% 35%, rgba(' + (c || '148,163,184') + ',' + (c ? '.20' : '.08') + '), transparent 62%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))'; return c ? 'radial-gradient(circle at 50% 42%, rgba(' + c + ',.28) 0%, rgba(16,23,40,.88) 72%)' : 'linear-gradient(145deg, rgba(148,163,184,.10) 0%, rgba(16,23,40,.82) 62%)' ]]]"
+                    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + (variables.mode_rgb[entity.state] || '255,255,255') + ',' + (variables.mode_rgb[entity.state] ? '.50' : '.07') + ')' ]]]"
                     - box-shadow: none
                     - color: "[[[ return variables.mode_rgb[entity.state] ? 'rgb(' + variables.mode_rgb[entity.state] + ')' : '#8A96A8' ]]]"
                     - animation: "[[[ return variables.mode_rgb[entity.state] ? 'jv-border-fade 2.6s ease-in-out infinite' : 'none' ]]]"
                   custom_fields:
                     label:
                       - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                      - font-size: 10px
+                      - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px' ]]]"
                       - font-weight: 800
-                      - letter-spacing: 2px
                       - padding-top: 10px
-                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : (variables.mode_rgb[entity.state] ? 'rgb(' + variables.mode_rgb[entity.state] + ')' : '#8A96A8') ]]]"
+                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(194,222,235,.55)' : (variables.mode_rgb[entity.state] ? 'rgb(' + variables.mode_rgb[entity.state] + ')' : '#8A96A8') ]]]"
                       - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-                      - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                      - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1.4px' : '2px' ]]]"
                     temp:
                       - align-self: center
                       - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
                       - font-size: 42px
-                      - font-weight: 800
+                      - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '900' : '800' ]]]"
                       - letter-spacing: -1px
                       - color: "#FFFFFF"
+                      - text-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0 2px 10px rgba(0,0,0,.25)' : 'none' ]]]"
                     info:
                       - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
                       - font-size: 11px
                       - font-weight: 600
                       - letter-spacing: 1px
                       - padding-bottom: 10px
-                      - color: "#8A96A8"
+                      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(215,238,247,.62)' : '#8A96A8' ]]]"
 
               - type: custom:button-card
                 template: tile_step
@@ -1585,8 +1589,8 @@ views:
                   - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
                   - font-size: 11px
                   - font-weight: 800
-                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1.5px' : '3px' ]]]"
-                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.34)' : '#6B7A99' ]]]"
+                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1.4px' : '3px' ]]]"
+                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(194,222,235,.55)' : '#6B7A99' ]]]"
 
           # ---------- VENTILATION : Auto + vitesse défilante ----------
           - type: grid
