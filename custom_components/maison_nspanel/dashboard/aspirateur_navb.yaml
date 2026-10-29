@@ -1,0 +1,52 @@
+- type: custom:button-card
+  show_icon: false
+  show_name: false
+  show_label: false
+  entity: __VACUUM__
+  triggers_update:
+  - __VACUUM__
+  tap_action:
+    action: navigate
+    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''aspirateur''; ]]]'
+  custom_fields:
+    c: >
+      [[[
+        const s = states['__VACUUM__'];
+        const rgb = '167,139,250';
+        const st = s ? s.state : 'unavailable';
+        const col = ({ cleaning: '56,189,248', returning: '45,212,191', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[st] || '148,163,184';
+        const names = { cleaning: 'Nettoyage en cours', docked: 'Sur sa base', returning: 'Retour à la base', paused: 'En pause', idle: 'Prêt à nettoyer', error: 'Attention requise', unavailable: 'Hors ligne', unknown: 'État inconnu' };
+        const raw = s && s.attributes ? s.attributes.battery_level : undefined;
+        const lv = Number(raw);
+        const bat = (raw !== undefined && raw !== null && raw !== '' && Number.isFinite(lv)) ? Math.round(lv) + ' %' : '';
+        const right = '<div style="flex:none;padding:7px 12px;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.7px;white-space:nowrap;text-transform:uppercase;background:rgba(' + col + ',.14);color:rgb(' + col + ')">' + (bat || (st === 'cleaning' ? 'EN ACTION' : 'OK')) + '</div>';
+        return '<div style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;text-align:left">'
+          + '<div style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(' + rgb + ',.20)"><ha-icon icon="mdi:robot-vacuum" style="--mdc-icon-size:24px;color:#a78bfa"></ha-icon></div>'
+          + '<div style="min-width:0;flex:1"><div style="font-size:12px;font-weight:900;letter-spacing:1px;color:#CBD5E1">ASPIRATEUR</div>'
+          + '<div style="font-size:10px;font-weight:800;letter-spacing:.5px;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">' + (names[st] || st) + '</div></div>'
+          + right + '</div>';
+      ]]]
+  styles:
+    grid:
+      - grid-template-areas: '"c"'
+      - grid-template-columns: 1fr
+    card:
+      - padding: 0 16px
+      - height: 64px
+      - overflow: hidden
+      - border-radius: 16px
+      - border: none
+      - box-shadow: none
+      - background: >
+          [[[
+            const rgb = '167,139,250';
+            const on = !!(states['__VACUUM__'] && ['cleaning','returning'].includes(states['__VACUUM__'].state));
+            // : dégradé 100° + halo d'angle
+            return on
+              ? 'radial-gradient(circle 75px at -5px -15px, rgba(' + rgb + ',.13), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.14) 0%, rgba(5,12,22,.96) 24%, rgba(5,12,22,.94) 100%)'
+              : 'radial-gradient(circle 75px at -5px -15px, rgba(' + rgb + ',.13), transparent 70%), linear-gradient(100deg, rgba(' + rgb + ',.10) 0%, rgba(5,12,22,.95) 24%, rgba(5,12,22,.93) 100%)';
+          ]]]
+    custom_fields:
+      c:
+        - width: 100%
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"

@@ -9,6 +9,7 @@ CONF_VIGILANCE_MIN = "vigilance_min"
 CONF_STYLE = "style"
 CONF_CLIMATE = "climate_entity"
 CONF_AIR = "air_enabled"
+CONF_VACUUM = "vacuum_entity"
 CONF_SECTIONS = "sections"
 
 # Styles du dashboard : "verre" (verre sombre, défaut) ou "ardoise" (cartes sobres, titres en minuscules)

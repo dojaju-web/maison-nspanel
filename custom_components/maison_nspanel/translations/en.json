@@ -23,6 +23,7 @@
           "categorie_eclairage": "Lighting (sections and lights)",
           "categorie_meteo": "Weather and alert",
           "climatisation": "Air conditioning and air quality",
+          "aspirateur": "Robot vacuum",
           "apparence": "Appearance"
         }
       },
@@ -147,6 +148,13 @@
           "sections": "Sections to delete"
         },
         "description": "Tick the sections to delete."
+      },
+      "aspirateur": {
+        "title": "Robot vacuum",
+        "description": "Choose the vacuum to show. Leave empty to use the first vacuum found; the page and button only appear when a vacuum exists. Then reload the panel page.",
+        "data": {
+          "vacuum_entity": "Vacuum entity"
+        }
       }
     },
     "error": {

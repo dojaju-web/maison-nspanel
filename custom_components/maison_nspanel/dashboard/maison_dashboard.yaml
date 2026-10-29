@@ -1190,7 +1190,7 @@ views:
                     const parts = window.location.pathname.split('/');
                     const page = parts[2];
                     if (page !== st.p) { st.p = page; st.t = Date.now(); }
-                    if ((page === 'lumieres' || page === 'climat') && Date.now() - st.t > IDLE_SECONDS * 1000) {
+                    if ((page === 'lumieres' || page === 'climat' || page === 'aspirateur') && Date.now() - st.t > IDLE_SECONDS * 1000) {
                       history.pushState(null, '', '/' + parts[1] + '/accueil');
                       window.dispatchEvent(new CustomEvent('location-changed'));
                       st.t = Date.now();
@@ -1363,7 +1363,7 @@ views:
                     const parts = window.location.pathname.split('/');
                     const page = parts[2];
                     if (page !== st.p) { st.p = page; st.t = Date.now(); }
-                    if ((page === 'lumieres' || page === 'climat') && Date.now() - st.t > IDLE_SECONDS * 1000) {
+                    if ((page === 'lumieres' || page === 'climat' || page === 'aspirateur') && Date.now() - st.t > IDLE_SECONDS * 1000) {
                       history.pushState(null, '', '/' + parts[1] + '/accueil');
                       window.dispatchEvent(new CustomEvent('location-changed'));
                       st.t = Date.now();

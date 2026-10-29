@@ -91,3 +91,7 @@ Dans **Configurer → Éclairage**, vous pouvez :
 - **Supprimer des sections**.
 
 Seules les entités `light.*` sont comptées dans « allumées » sur l'accueil ; les interrupteurs (`switch.*`) s'affichent mais ne sont pas comptés. Après modification, rechargez la page du panneau (Home Assistant relit désormais le fichier tout seul ; si rien ne change, utilisez ⋮ > *Actualiser* sur le tableau de bord, sans redémarrage).
+
+## Page Aspirateur robot
+
+Si un aspirateur (`vacuum.*`) est trouvé, une page **Aspirateur** et un bouton sur l'accueil apparaissent automatiquement : état, batterie, puissance d'aspiration, alerte, et commandes (démarrer, pause, base, puissance, localiser, stop). Pour choisir un autre aspirateur : **Configurer → Aspirateur robot**. Sans aspirateur, la page et le bouton sont masqués.

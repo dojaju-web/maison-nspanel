@@ -1,0 +1,76 @@
+- show_icon: true
+  show_name: true
+  show_label: true
+  size: 24px
+  tap_action:
+    action: navigate
+    navigation_path: '[[[ return ''/'' + window.location.pathname.split(''/'')[1] + ''/'' + ''aspirateur''; ]]]'
+  styles:
+    grid:
+    - grid-template-areas: '"i" "n" "l"'
+    - grid-template-rows: 1fr min-content min-content
+    - grid-template-columns: 1fr
+    - row-gap: 3px
+    card:
+    - position: relative
+    - overflow: hidden
+    - height: 100%
+    - min-height: '[[[ return ''16vh'' ]]]'
+    - padding: 8px 6px
+    - border-radius: '[[[ return (states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''14px'' : ''18px'' ]]]'
+    - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''167,139,250'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.00'' : ''.12'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.72) 62%)'' ]]]'
+    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
+    - box-shadow: none
+    - transition: all .3s ease
+    img_cell:
+    - width: 42px
+    - height: 42px
+    - justify-self: center
+    - align-self: center
+    - border-radius: '[[[ return (states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''10px'' : ''13px'' ]]]'
+    - background: '[[[ return ''rgba('' + ''167,139,250'' + '',.16)'' ]]]'
+    - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '167,139,250' + ',.30)') ]]]"
+    - transition: all .3s ease
+    icon:
+    - width: 24px
+    - color: '[[[ return ''rgb('' + ''167,139,250'' + '')'' ]]]'
+    name:
+    - font-family: '''Inter'',''Segoe UI'',Roboto,sans-serif'
+    - font-size: 12px
+    - font-weight: 800
+    - letter-spacing: 1px
+    - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('uppercase') ]]]"
+    - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#E2E8F0') ]]]"
+    - margin-top: 2px
+    label:
+    - font-family: '''Inter'',''Segoe UI'',Roboto,sans-serif'
+    - font-size: 12px
+    - font-weight: 600
+    - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#94A3B8') ]]]"
+    - padding-bottom: 2px
+    - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+    - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+  state:
+  - operator: template
+    value: '[[[ const s = states[''__VACUUM__'']; return !!(s && [''cleaning'',''returning''].includes(s.state)); ]]]'
+    styles:
+      card:
+      - background: '[[[ return ''linear-gradient('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''100deg'' : ''145deg'') + '', rgba('' + ''167,139,250'' + '','' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''.16'' : ''.28'') + '') 0%, rgba('' + ((states[''sensor.maison_nspanel_rappels''] && states[''sensor.maison_nspanel_rappels''].attributes.style === ''ardoise'') ? ''5,12,22'' : ''16,23,40'') + '',.78) 68%)'' ]]]'
+      - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '167,139,250' + ',.55)') ]]]"
+      img_cell:
+      - background: '[[[ return ''rgba('' + ''167,139,250'' + '',.30)'' ]]]'
+      - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + '167,139,250' + ',.55)') ]]]"
+      - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('0 0 14px rgba(' + '167,139,250' + ',.45)') ]]]"
+      name:
+      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('rgb(' + '167,139,250' + ')') ]]]"
+      label:
+      - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#E2E8F0') ]]]"
+      - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
+      - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+  type: custom:button-card
+  name: Aspirateur
+  entity: __VACUUM__
+  icon: mdi:robot-vacuum
+  triggers_update:
+  - __VACUUM__
+  label: "[[[\n  const s = states['__VACUUM__'];\n  if (!s || s.state === 'unavailable') return 'Hors ligne';\n  const n = { cleaning: 'Nettoyage', docked: 'Sur sa base', returning: 'Retour base', paused: 'En pause', idle: 'Prêt', error: 'Erreur', unknown: '—' };\n  return n[s.state] || s.state;\n]]]\n"

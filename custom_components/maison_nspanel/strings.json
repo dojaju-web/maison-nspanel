@@ -23,6 +23,7 @@
           "categorie_eclairage": "Éclairage (sections et lumières)",
           "categorie_meteo": "Météo et vigilance",
           "climatisation": "Climatisation et qualité de l'air",
+          "aspirateur": "Aspirateur robot",
           "apparence": "Apparence"
         }
       },
@@ -149,6 +150,13 @@
           "sections": "Sections à supprimer"
         },
         "description": "Cochez les sections à supprimer."
+      },
+      "aspirateur": {
+        "title": "Aspirateur robot",
+        "description": "Choisissez l'aspirateur à afficher. Laissez vide pour utiliser le premier aspirateur détecté ; la page et le bouton n'apparaissent que si un aspirateur existe. Rechargez ensuite la page du panneau.",
+        "data": {
+          "vacuum_entity": "Entité aspirateur"
+        }
       }
     },
     "error": {

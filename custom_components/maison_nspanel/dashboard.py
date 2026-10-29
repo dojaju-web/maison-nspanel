@@ -8,11 +8,16 @@ Le modèle contient des repères (__SECTIONS__, __LIGHTS_JS__ …) remplacés pa
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
 DEFAULT_CLIMATE = "climate.sejour_climatisation"
 DEFAULT_PREFIX = "sejour_climatisation"  # préfixe commun aux entités Sensibo du modèle
+
+VAC_BEGIN = "  # ==========================================================\n  #  PAGE : ASPIRATEUR ROBOT"
+VAC_END = "  # ==========================================================\n  #  PRÉVISIONS MÉTÉO"
+FRAGMENTS = {"__VAC_NAV__": "aspirateur_nav.yaml", "__VAC_NAVB__": "aspirateur_navb.yaml"}
 
 MODELE = "modele.yaml"
 CIBLE = "maison_dashboard.yaml"
@@ -115,11 +120,41 @@ def gen_sections(sections: list[dict[str, Any]], indent: int = 10) -> str:
     return "\n".join(out).lstrip(" ").rstrip("\n")
 
 
-def render(text: str, climate_entity: str | None = None, sections: Any = None) -> str:
+def _inject(text: str, token: str, block: str) -> str:
+    """Remplace la ligne du repère par le bloc, indenté comme le repère (ou la supprime)."""
+
+    def repl(m: re.Match) -> str:
+        if not block.strip():
+            return ""
+        pad = m.group("pad")
+        return "\n".join(pad + ln if ln.strip() else ln for ln in block.rstrip("\n").split("\n")) + "\n"
+
+    return re.sub(rf"^(?P<pad>[ ]*){re.escape(token)}[ ]*\n", repl, text, flags=re.M)
+
+
+def render(
+    text: str,
+    climate_entity: str | None = None,
+    sections: Any = None,
+    vacuum: str | None = None,
+    fragments: dict[str, str] | None = None,
+) -> str:
     """Remplace les repères du modèle, puis le préfixe d'entités de climatisation."""
     secs = normalize_sections(sections)
     lights = light_entities(secs)
     trig = all_entities(secs) or ["sun.sun"]
+    if vacuum:
+        for token, block in (fragments or {}).items():
+            text = _inject(text, token, block)
+        text = text.replace("__VACUUM__", vacuum).replace("__NAVCOLS__", "3")
+    else:
+        i = text.find(VAC_BEGIN)
+        j = text.find(VAC_END)
+        if i != -1 and j > i:
+            text = text[:i] + text[j:]
+        for token in FRAGMENTS:
+            text = _inject(text, token, "")
+        text = text.replace("__NAVCOLS__", "2")
     text = text.replace("__SECTIONS__", gen_sections(secs))
     text = text.replace("__LIGHTS_IDS__", json.dumps(lights))
     text = text.replace("__LIGHTS_TRIG__", json.dumps(trig))
@@ -128,13 +163,18 @@ def render(text: str, climate_entity: str | None = None, sections: Any = None) -
     return text.replace(DEFAULT_PREFIX, prefix_of(climate_entity))
 
 
-def sync(folder: Path, climate_entity: str | None, sections: Any = None) -> bool:
+def sync(folder: Path, climate_entity: str | None, sections: Any = None, vacuum: str | None = None) -> bool:
     """Écrit maison_dashboard.yaml si son contenu doit changer. True si réécrit."""
     modele = folder / MODELE
     cible = folder / CIBLE
     if not modele.exists():
         return False
-    new = render(modele.read_text(encoding="utf-8"), climate_entity, sections)
+    fragments = {}
+    if vacuum:
+        for token, name in FRAGMENTS.items():
+            f = folder / name
+            fragments[token] = f.read_text(encoding="utf-8") if f.exists() else ""
+    new = render(modele.read_text(encoding="utf-8"), climate_entity, sections, vacuum, fragments)
     if cible.exists() and cible.read_text(encoding="utf-8") == new:
         return False
     cible.write_text(new, encoding="utf-8")

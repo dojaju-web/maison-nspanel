@@ -797,7 +797,7 @@ views:
           nav:
             card:
               type: grid
-              columns: 2
+              columns: __NAVCOLS__
               square: false
               cards:
                 - show_icon: true
@@ -955,6 +955,7 @@ views:
                   triggers_update:
                   - climate.sejour_climatisation
                   label: "[[[\n  const c = states['climate.sejour_climatisation'];\n  if (!c) return '—';\n  if (c.state === 'off') return 'Arrêt';\n  const n = { cool: 'Froid', heat: 'Chaud', dry: 'Sec', fan_only: 'Ventil.', heat_cool: 'Auto', auto: 'Auto' };\n  const t = c.attributes.temperature;\n  return (n[c.state] || c.state) + ((t !== undefined && t !== null) ? ' · ' + Number(t).toFixed(1) + '°' : '');\n]]]\n"
+                __VAC_NAV__
           navb:
             card:
               type: grid
@@ -1065,6 +1066,7 @@ views:
                       c:
                         - width: 100%
                         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                __VAC_NAVB__
         styles:
           grid:
             - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\"' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\"' ]]]"
@@ -1190,7 +1192,7 @@ views:
                     const parts = window.location.pathname.split('/');
                     const page = parts[2];
                     if (page !== st.p) { st.p = page; st.t = Date.now(); }
-                    if ((page === 'lumieres' || page === 'climat') && Date.now() - st.t > IDLE_SECONDS * 1000) {
+                    if ((page === 'lumieres' || page === 'climat' || page === 'aspirateur') && Date.now() - st.t > IDLE_SECONDS * 1000) {
                       history.pushState(null, '', '/' + parts[1] + '/accueil');
                       window.dispatchEvent(new CustomEvent('location-changed'));
                       st.t = Date.now();
@@ -1316,7 +1318,7 @@ views:
                     const parts = window.location.pathname.split('/');
                     const page = parts[2];
                     if (page !== st.p) { st.p = page; st.t = Date.now(); }
-                    if ((page === 'lumieres' || page === 'climat') && Date.now() - st.t > IDLE_SECONDS * 1000) {
+                    if ((page === 'lumieres' || page === 'climat' || page === 'aspirateur') && Date.now() - st.t > IDLE_SECONDS * 1000) {
                       history.pushState(null, '', '/' + parts[1] + '/accueil');
                       window.dispatchEvent(new CustomEvent('location-changed'));
                       st.t = Date.now();
@@ -1624,6 +1626,448 @@ views:
                 variables: { kind: "on", rgb: "167,139,250", min_h: 16vh }
                 tap_action:
                   action: toggle
+
+  # ==========================================================
+  #  PAGE : ASPIRATEUR ROBOT (entité choisie dans Configurer > Aspirateur)
+  # ==========================================================
+  - title: Aspirateur
+    path: aspirateur
+    type: panel
+    background: "radial-gradient(120% 80% at 85% 0%, #15233f 0%, #0b1120 55%, #070b14 100%) fixed"
+    cards:
+      - type: vertical-stack
+        cards:
+
+          # ---------- EN-TÊTE ----------
+          - type: custom:button-card
+            entity: __VACUUM__
+            show_icon: true
+            show_name: true
+            show_label: true
+            name: Aspirateur
+            icon: mdi:robot-vacuum
+            size: 22px
+            label: >
+              [[[
+                // Retour automatique à l'accueil après inactivité (installé une seule fois)
+                const IDLE_SECONDS = 15;
+                if (!window._jvIdle) {
+                  const st = { t: Date.now(), p: '' };
+                  const bump = () => { st.t = Date.now(); };
+                  ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(e => window.addEventListener(e, bump, true));
+                  window._jvIdle = setInterval(() => {
+                    const parts = window.location.pathname.split('/');
+                    const page = parts[2];
+                    if (page !== st.p) { st.p = page; st.t = Date.now(); }
+                    if ((page === 'lumieres' || page === 'climat' || page === 'aspirateur') && Date.now() - st.t > IDLE_SECONDS * 1000) {
+                      history.pushState(null, '', '/' + parts[1] + '/accueil');
+                      window.dispatchEvent(new CustomEvent('location-changed'));
+                      st.t = Date.now();
+                    }
+                  }, 1000);
+                }
+                const fr = { cleaning: 'EN NETTOYAGE', docked: 'SUR SA BASE', returning: 'RETOUR À LA BASE', paused: 'EN PAUSE', idle: 'PRÊT', error: 'ATTENTION REQUISE', unavailable: 'HORS LIGNE', unknown: 'ÉTAT INCONNU' };
+                return fr[entity.state] || String(entity.state).toUpperCase();
+              ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/accueil'; ]]]"
+            custom_fields:
+              nav: >
+                <ha-icon icon="mdi:home" style="--mdc-icon-size:16px"></ha-icon><span>Accueil</span>
+            styles:
+              grid:
+                - grid-template-areas: '"i n nav" "i l nav"'
+                - grid-template-columns: min-content 1fr min-content
+                - grid-template-rows: min-content min-content
+                - align-content: center
+                - column-gap: 12px
+                - row-gap: 2px
+              card:
+                - min-height: 14vh
+                - padding: 3.5vh 14px 1vh 14px
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(255,255,255,.08)' ]]]"
+                - background: "[[[ const c = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba(' + c + ',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
+                - box-shadow: none
+              img_cell:
+                - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
+                - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
+                - align-self: center
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
+                - background: "[[[ const c = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184'; return 'rgba(' + c + ',.16)' ]]]"
+                - box-shadow: "[[[ const c = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'inset 0 0 0 1px rgba(' + c + ',.16)' : 'none' ]]]"
+              icon:
+                - width: 22px
+                - color: "[[[ const c = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184'; return 'rgb(' + c + ')' ]]]"
+              label:
+                - justify-self: start
+                - align-self: start
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px' ]]]"
+                - font-weight: 800
+                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(232,246,255,.45)' : '#8A96A8' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.9px' : '2px' ]]]"
+              name:
+                - justify-self: start
+                - align-self: end
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '20px' ]]]"
+                - font-weight: 900
+                - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
+                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '-0.5px' ]]]"
+                - line-height: 1.15
+                - color: '#FFFFFF'
+              custom_fields:
+                nav:
+                  - align-self: center
+                  - display: flex
+                  - align-items: center
+                  - gap: 6px
+                  - padding: 6px 12px
+                  - border-radius: 999px
+                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '11px' ]]]"
+                  - font-weight: 800
+                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.7px' : '1px' ]]]"
+                  - text-transform: uppercase
+                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(220,247,255,.72)' : 'rgb(203,213,225)' ]]]"
+                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(70,168,188,.09)' : 'rgba(203,213,225,.14)' ]]]"
+                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(203,213,225,.35)' ]]]"
+
+          # ---------- ÉTAT + COMMANDES ----------
+          - type: custom:button-card
+            entity: __VACUUM__
+            show_icon: false
+            show_name: false
+            show_state: false
+            tap_action:
+              action: more-info
+            hold_action:
+              action: more-info
+            styles:
+              card:
+                - height: 336px
+                - padding: 0
+                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(255,255,255,.08)' ]]]"
+                - box-shadow: none
+                - overflow: hidden
+                - background: "[[[ const c = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba(' + c + ',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.12) 0%, rgba(16,23,40,.82) 62%)' ]]]"
+              grid:
+                - grid-template-areas: '"dashboard" "controls"'
+                - grid-template-columns: 100%
+                - grid-template-rows: 214px 122px
+              custom_fields:
+                dashboard:
+                  - grid-area: dashboard
+                  - width: 100%
+                  - height: 100%
+                  - min-width: 0
+                  - overflow: hidden
+                controls:
+                  - grid-area: controls
+                  - width: 100%
+                  - padding: 0 12px 11px
+                  - box-sizing: border-box
+                  - align-self: stretch
+                  - z-index: 3
+            custom_fields:
+              dashboard: |
+                [[[
+                  const s = String(entity.state || 'unknown').toLowerCase();
+                  const at = entity.attributes || {};
+                  const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                  const known = (v) => v !== undefined && v !== null && !['unknown', 'unavailable', 'none', ''].includes(String(v).trim().toLowerCase());
+                  const FR = { cleaning: 'Nettoyage en cours', docked: 'Sur sa base', returning: 'Retour à la base', paused: 'En pause', idle: 'Prêt à nettoyer', error: 'Attention requise', unavailable: 'Hors ligne', unknown: 'État inconnu' };
+                  const RGB = { cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' };
+                  const rgb = RGB[s] || '148,163,184';
+                  const offline = s === 'unavailable' || s === 'unknown';
+                  const moving = s === 'cleaning' || s === 'returning';
+                  const lvl = known(at.battery_level) ? Number(at.battery_level) : NaN;
+                  const has = Number.isFinite(lvl);
+                  const pct = has ? Math.min(100, Math.max(0, Math.round(lvl))) : 0;
+                  const bat = has ? pct + ' %' : '--';
+                  const charge = s === 'docked' ? (has && pct >= 100 ? 'Charge terminée' : 'En charge')
+                    : s === 'returning' ? 'Regagne sa base' : s === 'cleaning' ? 'Nettoyage en cours'
+                    : s === 'paused' ? 'Prêt à reprendre' : offline ? 'Aucune donnée' : 'À l\'arrêt';
+                  let fan = known(at.fan_speed) ? String(at.fan_speed).replace(/[_-]/g, ' ') : '--';
+                  if (fan !== '--') fan = fan.charAt(0).toUpperCase() + fan.slice(1);
+                  let since = '--';
+                  if (entity.last_changed) {
+                    const m = Math.max(0, Math.round((Date.now() - new Date(entity.last_changed).getTime()) / 60000));
+                    since = m < 1 ? 'À l\'instant' : m < 60 ? m + ' min' : m < 1440 ? Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') : Math.floor(m / 1440) + ' j';
+                  }
+                  const chip = offline ? 'HORS LIGNE' : moving ? 'EN ACTION' : s === 'error' ? 'ALERTE' : s === 'paused' ? 'EN PAUSE' : 'CONNECTÉ';
+                  const name = esc(at.friendly_name || 'Aspirateur');
+                  const cls = moving ? 'av-moving' : offline ? 'av-offline' : 'av-ready';
+                  return `
+                    <div class="av-shell ${cls}" style="--c:${rgb}">
+                      <div class="av-top">
+                        <div class="av-head">
+                          <span class="av-symbol"><ha-icon icon="mdi:robot-vacuum" style="--mdc-icon-size:18px"></ha-icon></span>
+                          <div>
+                            <div class="av-brand">${name}</div>
+                            <div class="av-label">ROBOT ASPIRATEUR</div>
+                          </div>
+                        </div>
+                        <span class="av-chip"><i></i>${chip}</span>
+                      </div>
+                      <div class="av-hero">
+                        <div class="av-statusblock">
+                          <div class="av-kicker">ÉTAT DU ROBOT</div>
+                          <div class="av-status">${FR[s] || esc(s)}</div>
+                          <div class="av-charge"><span class="av-dot"></span>${charge}</div>
+                        </div>
+                        <div class="av-machine">
+                          <div class="av-radar"></div>
+                          <div class="av-robot">
+                            <svg viewBox="0 0 180 180" aria-hidden="true">
+                              <defs>
+                                <radialGradient id="av-metal" cx="34%" cy="26%" r="80%">
+                                  <stop offset="0" stop-color="#3b4650"/>
+                                  <stop offset=".48" stop-color="#1c252f"/>
+                                  <stop offset="1" stop-color="#080e16"/>
+                                </radialGradient>
+                              </defs>
+                              <circle cx="90" cy="90" r="76" fill="#070b11" stroke="#52606b" stroke-opacity=".55" stroke-width="3"/>
+                              <circle cx="90" cy="90" r="69" fill="url(#av-metal)" stroke="#a0b1bd" stroke-opacity=".12" stroke-width="1"/>
+                              <path d="M35 70 A58 58 0 0 1 145 70" fill="none" stroke="#8bc9df" stroke-opacity=".28" stroke-width="2"/>
+                              <circle cx="90" cy="74" r="20" fill="#121c27" stroke="#718594" stroke-opacity=".7" stroke-width="2"/>
+                              <circle cx="90" cy="74" r="12" fill="#273745"/>
+                              <rect x="58" y="112" width="64" height="15" rx="7" fill="#0d1620" stroke="#607681" stroke-opacity=".45"/>
+                              <circle cx="78" cy="119.5" r="2" fill="#607681"/><circle cx="90" cy="119.5" r="2" fill="#607681"/><circle cx="102" cy="119.5" r="2" fill="#607681"/>
+                              <rect x="75" y="141" width="30" height="3" rx="2" style="fill:rgb(${rgb})" opacity=".9"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="av-metrics">
+                        <div class="av-metric">
+                          <span class="av-metric-label">BATTERIE</span>
+                          <strong>${bat}</strong>
+                          <div class="av-meter"><div style="width:${pct}%"></div></div>
+                        </div>
+                        <div class="av-metric">
+                          <span class="av-metric-label">ASPIRATION</span>
+                          <strong>${esc(fan)}</strong>
+                          <span class="av-metric-foot">Puissance</span>
+                        </div>
+                        <div class="av-metric">
+                          <span class="av-metric-label">DEPUIS</span>
+                          <strong>${since}</strong>
+                          <span class="av-metric-foot">Dernier changement</span>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                ]]]
+              controls:
+                card:
+                  type: vertical-stack
+                  cards:
+                    - type: horizontal-stack
+                      cards:
+                        - type: custom:button-card
+                          name: DÉMARRER
+                          icon: mdi:play
+                          show_state: false
+                          tap_action:
+                            action: call-service
+                            service: vacuum.start
+                            target:
+                              entity_id: __VACUUM__
+                          styles:
+                            card:
+                              - height: 42px
+                              - border-radius: 12px
+                              - border: 1px solid rgba(77,224,181,.17)
+                              - background: rgba(51,194,150,.13)
+                              - box-shadow: none
+                              - padding: 0 4px
+                            grid:
+                              - grid-template-areas: '"i n"'
+                              - grid-template-columns: 18px 1fr
+                              - align-items: center
+                              - column-gap: 5px
+                            icon:
+                              - width: 17px
+                              - color: '#49e4b0'
+                            name:
+                              - font-size: 10px
+                              - font-weight: 800
+                              - color: '#d9fff1'
+                        - type: custom:button-card
+                          name: PAUSE
+                          icon: mdi:pause
+                          show_state: false
+                          tap_action:
+                            action: call-service
+                            service: vacuum.pause
+                            target:
+                              entity_id: __VACUUM__
+                          styles:
+                            card:
+                              - height: 42px
+                              - border-radius: 12px
+                              - border: 1px solid rgba(255,255,255,.09)
+                              - background: rgba(255,255,255,.065)
+                              - box-shadow: none
+                              - padding: 0 4px
+                            grid:
+                              - grid-template-areas: '"i n"'
+                              - grid-template-columns: 18px 1fr
+                              - align-items: center
+                              - column-gap: 5px
+                            icon:
+                              - width: 17px
+                              - color: '#d1e8f3'
+                            name:
+                              - font-size: 10px
+                              - font-weight: 800
+                              - color: '#d1e8f3'
+                        - type: custom:button-card
+                          name: BASE
+                          icon: mdi:home-import-outline
+                          show_state: false
+                          tap_action:
+                            action: call-service
+                            service: vacuum.return_to_base
+                            target:
+                              entity_id: __VACUUM__
+                          styles:
+                            card:
+                              - height: 42px
+                              - border-radius: 12px
+                              - border: 1px solid rgba(103,205,249,.15)
+                              - background: rgba(41,148,206,.10)
+                              - box-shadow: none
+                              - padding: 0 4px
+                            grid:
+                              - grid-template-areas: '"i n"'
+                              - grid-template-columns: 18px 1fr
+                              - align-items: center
+                              - column-gap: 5px
+                            icon:
+                              - width: 17px
+                              - color: '#6bdbff'
+                            name:
+                              - font-size: 10px
+                              - font-weight: 800
+                              - color: '#caefff'
+                    - type: horizontal-stack
+                      cards:
+                        - type: custom:button-card
+                          icon: mdi:fan
+                          show_state: false
+                          name: >
+                            [[[
+                              const v = states['__VACUUM__'];
+                              const f = v && v.attributes && v.attributes.fan_speed;
+                              return 'ASPIRATION · ' + (f ? String(f).replace(/[_-]/g, ' ').toUpperCase() : '--');
+                            ]]]
+                          triggers_update:
+                            - __VACUUM__
+                          tap_action:
+                            action: call-service
+                            service: vacuum.set_fan_speed
+                            target:
+                              entity_id: __VACUUM__
+                            data:
+                              fan_speed: >
+                                [[[
+                                  const v = states['__VACUUM__'];
+                                  const list = (v && v.attributes && v.attributes.fan_speed_list) || [];
+                                  const cur = v && v.attributes && v.attributes.fan_speed;
+                                  if (!list.length) return cur;
+                                  const i = list.indexOf(cur);
+                                  return list[(i + 1) % list.length];
+                                ]]]
+                          styles:
+                            card:
+                              - height: 42px
+                              - border-radius: 12px
+                              - border: 1px solid rgba(34,211,238,.17)
+                              - background: rgba(34,211,238,.09)
+                              - box-shadow: none
+                              - padding: 0 8px
+                            grid:
+                              - grid-template-areas: '"i n"'
+                              - grid-template-columns: 18px 1fr
+                              - align-items: center
+                              - column-gap: 6px
+                            icon:
+                              - width: 17px
+                              - color: '#22d3ee'
+                            name:
+                              - font-size: 10px
+                              - font-weight: 800
+                              - color: '#cffafe'
+                              - justify-self: start
+                        - type: custom:button-card
+                          name: LOCALISER
+                          icon: mdi:map-marker-radius
+                          show_state: false
+                          tap_action:
+                            action: call-service
+                            service: vacuum.locate
+                            target:
+                              entity_id: __VACUUM__
+                          styles:
+                            card:
+                              - height: 42px
+                              - border-radius: 12px
+                              - border: 1px solid rgba(250,204,21,.16)
+                              - background: rgba(250,204,21,.08)
+                              - box-shadow: none
+                              - padding: 0 4px
+                            grid:
+                              - grid-template-areas: '"i n"'
+                              - grid-template-columns: 18px 1fr
+                              - align-items: center
+                              - column-gap: 5px
+                            icon:
+                              - width: 17px
+                              - color: '#facc15'
+                            name:
+                              - font-size: 10px
+                              - font-weight: 800
+                              - color: '#fef3c7'
+            extra_styles: >
+              .av-shell {box-sizing:border-box;height:100%;width:100%;padding:14px 17px 5px;display:flex;flex-direction:column;color:#f5fbff;text-align:left;overflow:hidden;font-family:inherit;position:relative}
+              .av-top {display:flex;align-items:center;justify-content:space-between;gap:6px;z-index:2}
+              .av-head {display:flex;align-items:center;gap:9px;min-width:0}
+              .av-symbol {width:28px;height:28px;flex:0 0 28px;display:grid;place-items:center;border-radius:9px;background:rgba(var(--c),.13);color:rgb(var(--c));box-shadow:inset 0 0 0 1px rgba(var(--c),.16)}
+              .av-brand {font-size:12px;font-weight:900;letter-spacing:.45px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+              .av-label {font-size:8px;font-weight:800;letter-spacing:.9px;margin-top:4px;color:rgba(232,246,255,.42)}
+              .av-chip {display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:8px;font-weight:900;letter-spacing:.7px;color:rgba(220,247,255,.72);background:rgba(70,168,188,.09);border-radius:50px;padding:7px 8px}
+              .av-chip i,.av-dot {width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:rgb(var(--c));box-shadow:0 0 9px rgba(var(--c),.65)}
+              .av-offline .av-chip i {background:#9ca5b1;box-shadow:none}
+              .av-moving .av-chip i {animation:avPulse 1.7s ease-in-out infinite}
+              .av-hero {min-height:0;flex:1;display:flex;align-items:center;justify-content:space-between;gap:2px}
+              .av-statusblock {min-width:0;max-width:65%;position:relative;z-index:2}
+              .av-kicker {font-size:8px;font-weight:800;letter-spacing:1.4px;color:rgba(194,222,235,.5);margin-bottom:5px}
+              .av-status {font-size:clamp(17px,3vw,23px);line-height:1.1;font-weight:900;letter-spacing:-.6px;white-space:normal;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.2)}
+              .av-moving .av-status {color:rgb(var(--c))}
+              .av-charge {margin-top:9px;display:flex;align-items:center;gap:7px;font-size:10px;font-weight:650;color:rgba(215,238,247,.58)}
+              .av-dot {width:5px;height:5px;flex-basis:5px}
+              .av-machine {width:112px;height:112px;flex:0 0 112px;position:relative;display:grid;place-items:center;margin-right:-8px}
+              .av-machine::before {content:"";position:absolute;inset:2px;border-radius:50%;background:radial-gradient(circle,rgba(var(--c),.13),transparent 70%)}
+              .av-radar {position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(var(--c),.14);background:conic-gradient(from 90deg, transparent 0deg,rgba(var(--c),.16) 45deg,transparent 115deg);opacity:.4}
+              .av-moving .av-radar {opacity:1;animation:avSpin 5s linear infinite}
+              .av-robot {width:100px;height:100px;position:relative;filter:drop-shadow(0 12px 12px rgba(0,0,0,.50))}
+              .av-robot svg {width:100%;height:100%;display:block}
+              .av-metrics {display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:7px;z-index:2}
+              .av-metric {display:flex;flex-direction:column;gap:4px;min-width:0;padding:8px 9px 7px;border-radius:11px;background:rgba(159,207,227,.055);box-shadow:inset 0 0 0 1px rgba(184,226,239,.055)}
+              .av-metric-label {font-size:8px;font-weight:800;letter-spacing:.55px;color:rgba(214,238,245,.5);white-space:nowrap}
+              .av-metric strong {font-size:15px;line-height:18px;font-weight:900;color:#f2fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+              .av-meter {height:3px;width:100%;background:rgba(255,255,255,.10);border-radius:4px;overflow:hidden;margin-top:2px}
+              .av-meter div {height:100%;border-radius:4px;background:linear-gradient(90deg,rgba(var(--c),.55),rgb(var(--c)));transition:width .5s ease}
+              .av-metric-foot {font-size:8px;color:rgba(218,237,244,.32);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+              @keyframes avSpin {to {transform:rotate(360deg)}}
+              @keyframes avPulse {50% {opacity:.3;transform:scale(.65)}}
+              @media (prefers-reduced-motion:reduce) {.av-radar,.av-chip i {animation:none !important}}
 
   # ==========================================================
   #  PRÉVISIONS MÉTÉO À 7 JOURS (ouverte depuis l'accueil)

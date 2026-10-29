@@ -16,6 +16,7 @@ from .const import (
     CONF_SECTIONS,
     CONF_AIR,
     CONF_CLIMATE,
+    CONF_VACUUM,
     DEFAULT_STYLE,
     STYLES,
     CONF_RAPPELS,
@@ -138,7 +139,7 @@ class MaisonOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         return self.async_show_menu(
             step_id="init",
-            menu_options=["categorie_rappels", "categorie_eclairage", "categorie_meteo", "climatisation", "apparence"],
+            menu_options=["categorie_rappels", "categorie_eclairage", "categorie_meteo", "climatisation", "aspirateur", "apparence"],
         )
 
     async def async_step_categorie_rappels(self, user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -388,6 +389,15 @@ class MaisonOptionsFlow(OptionsFlow):
             }
         )
         return self.async_show_form(step_id="apparence", data_schema=schema)
+
+    # -- aspirateur -----------------------------------------------------------
+    async def async_step_aspirateur(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        if user_input is not None:
+            return self._save(**{CONF_VACUUM: user_input.get(CONF_VACUUM) or None})
+        current = self._entry.options.get(CONF_VACUUM)
+        key = vol.Optional(CONF_VACUUM, description={"suggested_value": current}) if current else vol.Optional(CONF_VACUUM)
+        schema = vol.Schema({key: sel.EntitySelector(sel.EntitySelectorConfig(domain="vacuum"))})
+        return self.async_show_form(step_id="aspirateur", data_schema=schema)
 
     # -- climatisation --------------------------------------------------------
     async def async_step_climatisation(self, user_input: dict[str, Any] | None = None) -> FlowResult:

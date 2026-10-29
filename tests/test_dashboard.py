@@ -56,5 +56,28 @@ class Sections(unittest.TestCase):
         self.assertIn("ids: []", out)
 
 
+class Aspirateur(unittest.TestCase):
+    SRC = (
+        "cols: __NAVCOLS__\nnav:\n  cards:\n    - a\n    __VAC_NAV__\n"
+        "  # ==========================================================\n"
+        "  #  PAGE : ASPIRATEUR ROBOT\n  - title: Aspirateur\n    entity: __VACUUM__\n"
+        "  # ==========================================================\n  #  PRÉVISIONS MÉTÉO\nfin\n"
+    )
+
+    def test_sans_aspirateur(self):
+        out = d.render(self.SRC)
+        self.assertIn("cols: 2", out)
+        self.assertNotIn("Aspirateur", out)
+        self.assertNotIn("__", out)
+        self.assertIn("PRÉVISIONS", out)
+
+    def test_avec_aspirateur(self):
+        out = d.render(self.SRC, None, None, "vacuum.cookie", {"__VAC_NAV__": "- b:\n    x: 1\n"})
+        self.assertIn("cols: 3", out)
+        self.assertIn("entity: vacuum.cookie", out)
+        self.assertIn("    - b:\n        x: 1", out)
+        self.assertNotIn("__", out)
+
+
 if __name__ == "__main__":
     unittest.main()
