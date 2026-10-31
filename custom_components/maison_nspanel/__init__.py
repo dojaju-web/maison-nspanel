@@ -9,9 +9,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import CoreState, HomeAssistant
 
-from .const import CONF_CLIMATE, CONF_SECTIONS, CONF_VACUUM, DOMAIN, STATIC_URL
+from .const import CONF_CLIMATE, CONF_SECTIONS, CONF_VAC_SENSORS, CONF_VACUUM, DOMAIN, STATIC_URL
 from .dashboard import sync
 from .panel import async_refresh_lovelace, async_register_panel, async_unregister_panel
+from .vacuum import pick
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,12 +37,48 @@ async def _async_register_images(hass: HomeAssistant) -> None:
 
 
 def _vacuum(hass: HomeAssistant, entry: ConfigEntry) -> str | None:
-    """Aspirateur choisi dans Configurer, sinon le premier détecté (ou None)."""
+    """Aspirateur choisi dans les réglages, sinon le premier détecté (ou None)."""
     chosen = entry.options.get(CONF_VACUUM)
     if chosen:
         return chosen
     found = sorted(hass.states.async_entity_ids("vacuum"))
     return found[0] if found else None
+
+
+def detect_vacuum(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, str]:
+    """Aspirateur et capteurs devinés (affichés comme « Auto » dans les réglages)."""
+    vac = _vacuum(hass, entry)
+    found: dict[str, str] = {}
+    if not vac:
+        return found
+    found["vacuum"] = vac
+    try:
+        from homeassistant.helpers import entity_registry as er
+
+        reg = er.async_get(hass)
+        ent = reg.async_get(vac)
+        if ent and ent.device_id:
+            rows = []
+            for e in er.async_entries_for_device(reg, ent.device_id):
+                st = hass.states.get(e.entity_id)
+                rows.append(
+                    {
+                        "entity_id": e.entity_id,
+                        "device_class": e.device_class or e.original_device_class,
+                        "name": e.name or e.original_name,
+                        "unit": (st.attributes.get("unit_of_measurement") if st else None) or e.unit_of_measurement,
+                    }
+                )
+            found.update(pick(rows))
+    except Exception as err:  # noqa: BLE001 - la détection est un confort
+        _LOGGER.debug("Détection des capteurs de l'aspirateur impossible : %s", err)
+    return found
+
+
+def _vac_cfg(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, str]:
+    """Capteurs de l'aspirateur : réglage manuel, sinon détection automatique."""
+    auto = detect_vacuum(hass, entry)
+    return {k: entry.options.get(k) or auto.get(k) or "" for k in CONF_VAC_SENSORS}
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -59,6 +96,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             entry.options.get(CONF_CLIMATE),
             entry.options.get(CONF_SECTIONS),
             _vacuum(hass, entry),
+            _vac_cfg(hass, entry),
         )
         if changed:
             _LOGGER.info("Dashboard régénéré pour %s", entry.options.get(CONF_CLIMATE))
@@ -80,8 +118,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Arrête l'intégration."""
-    async_unregister_panel(hass)
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Retire le panneau quand l'intégration est supprimée."""
+    async_unregister_panel(hass)
 
 
 async def _async_reload_on_change(hass: HomeAssistant, entry: ConfigEntry) -> None:

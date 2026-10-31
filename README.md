@@ -83,7 +83,7 @@ Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entit
 
 ## Page Éclairage personnalisable
 
-**Éditeur visuel** : un panneau « Éclairage NSPanel » apparaît dans la barre latérale de Home Assistant (administrateurs). Glissez-déposez les sections et les lumières, renommez-les, ajoutez-en depuis la liste des lumières disponibles, puis cliquez sur **Enregistrer**. Les menus de Configurer → Éclairage restent disponibles en alternative.
+**Éditeur visuel** : voir « Panneau de réglages » ci-dessous (onglet Éclairage).
 
 Dans **Configurer → Éclairage**, vous pouvez :
 - **Ajouter une section** (nom + lumières ou interrupteurs) ;
@@ -95,3 +95,16 @@ Seules les entités `light.*` sont comptées dans « allumées » sur l'accueil 
 ## Page Aspirateur robot
 
 Si un aspirateur (`vacuum.*`) est trouvé, une page **Aspirateur** et un bouton sur l'accueil apparaissent automatiquement : état, batterie, puissance d'aspiration, alerte, et commandes (démarrer, pause, base, puissance, localiser, stop). Pour choisir un autre aspirateur : **Configurer → Aspirateur robot**. Sans aspirateur, la page et le bouton sont masqués.
+
+## Panneau de réglages
+
+Un panneau **Maison NSPanel** apparaît dans la barre latérale de Home Assistant (administrateurs). Tous les réglages y sont regroupés en onglets, enregistrés d'un seul clic :
+
+- **Éclairage** : sections et lumières, glisser-déposer, renommage ;
+- **Rappels** : texte, icône, jours, plage horaire, couleur, activation ;
+- **Météo** : entité météo, capteur de vigilance, seuil d'affichage ;
+- **Climatisation** : entité Sensibo, qualité de l'air ;
+- **Aspirateur** : entité et capteurs (batterie, puissance, surface, durée, alerte) — laissés vides, ils sont détectés automatiquement ;
+- **Apparence** : style « verre sombre » ou « ardoise ».
+
+Le menu **Configurer** de l'intégration renvoie simplement vers ce panneau.

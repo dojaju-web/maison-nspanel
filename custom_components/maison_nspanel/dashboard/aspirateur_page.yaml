@@ -1,0 +1,310 @@
+- title: Aspirateur
+  path: aspirateur
+  type: panel
+  background: "radial-gradient(120% 80% at 85% 0%, #15233f 0%, #0b1120 55%, #070b14 100%) fixed"
+  cards:
+    - type: vertical-stack
+      cards:
+
+        # ---------- EN-TÊTE ----------
+        - type: custom:button-card
+          entity: __VACUUM__
+          show_icon: true
+          show_name: true
+          show_label: true
+          name: Aspirateur
+          icon: mdi:robot-vacuum
+          size: 22px
+          triggers_update: [__VAC_TRIG__]
+          tap_action:
+            action: navigate
+            navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/accueil'; ]]]"
+          label: >
+            [[[
+              const n = { cleaning: 'EN ACTION', docked: 'SUR SA BASE', returning: 'RETOUR BASE', paused: 'EN PAUSE', idle: 'PRÊT', error: 'ALERTE', unavailable: 'HORS LIGNE' };
+              return 'ROBOT · ' + (n[entity.state] || 'CONNECTÉ');
+            ]]]
+          custom_fields:
+            nav: >
+              <ha-icon icon="mdi:home" style="--mdc-icon-size:16px"></ha-icon><span>Accueil</span>
+          styles:
+            grid:
+              - grid-template-areas: '"i n nav" "i l nav"'
+              - grid-template-columns: min-content 1fr min-content
+              - grid-template-rows: min-content min-content
+              - align-content: center
+              - column-gap: 12px
+              - row-gap: 2px
+            card:
+              - min-height: 14vh
+              - padding: 3.5vh 14px 1vh 14px
+              - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
+              - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(255,255,255,.08)' ]]]"
+              - background: "[[[ const c = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba(' + c + ',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
+              - box-shadow: none
+            img_cell:
+              - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
+              - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
+              - align-self: center
+              - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
+              - background: "[[[ return 'rgba(' + (({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184') + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.14' : '.20') + ')' ]]]"
+              - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'inset 0 0 0 1px rgba(' + (({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184') + ',.16)' : 'none' ]]]"
+            icon:
+              - width: 22px
+              - color: "[[[ return 'rgb(' + (({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184') + ')' ]]]"
+            label:
+              - justify-self: start
+              - align-self: start
+              - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+              - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px' ]]]"
+              - font-weight: 800
+              - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(232,246,255,.45)' : '#94A3B8' ]]]"
+              - text-transform: uppercase
+              - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.9px' : '2px' ]]]"
+            name:
+              - justify-self: start
+              - align-self: end
+              - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+              - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '20px' ]]]"
+              - font-weight: 900
+              - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
+              - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+              - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '-0.5px' ]]]"
+              - line-height: 1.15
+              - color: '#FFFFFF'
+            custom_fields:
+              nav:
+                - align-self: center
+                - display: flex
+                - align-items: center
+                - gap: 6px
+                - padding: 6px 12px
+                - border-radius: 999px
+                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '11px' ]]]"
+                - font-weight: 800
+                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.7px' : '1px' ]]]"
+                - text-transform: uppercase
+                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(220,247,255,.72)' : 'rgb(203,213,225)' ]]]"
+                - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(70,168,188,.09)' : 'rgba(203,213,225,.14)' ]]]"
+                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(203,213,225,.35)' ]]]"
+
+        # ---------- ÉTAT + MESURES ----------
+        - type: custom:button-card
+          entity: __VACUUM__
+          triggers_update: [__VAC_TRIG__]
+          show_icon: false
+          show_name: false
+          show_state: false
+          tap_action:
+            action: more-info
+          custom_fields:
+            dash: >
+              [[[
+                const FR = { cleaning: 'Nettoyage en cours', docked: 'Sur sa base', returning: 'Retour à la base', paused: 'Nettoyage en pause', idle: 'Prêt à nettoyer', error: 'Attention requise', unavailable: 'Hors ligne', unknown: 'État inconnu' };
+                const s = String(entity.state || 'unknown').toLowerCase();
+                const at = entity.attributes || {};
+                const rgb = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184';
+                const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const ok = (v) => v !== undefined && v !== null && !['unknown', 'unavailable', 'none', ''].includes(String(v).trim().toLowerCase());
+                const ent = (id) => { const e = id ? states[id] : null; return (e && ok(e.state)) ? e : null; };
+                const num = (v) => { const n = parseFloat(String(v).replace(',', '.')); return Number.isFinite(n) ? n : NaN; };
+                const offline = s === 'unavailable' || s === 'unknown';
+                const moving = s === 'cleaning' || s === 'returning';
+                // Batterie : capteur choisi, sinon attribut de l'aspirateur
+                const be = ent('__VAC_BATTERY__');
+                const lvl = num(be ? be.state : at.battery_level);
+                const has = Number.isFinite(lvl);
+                const pct = has ? Math.min(100, Math.max(0, Math.round(lvl))) : 0;
+                // Aspiration
+                const fe = ent('__VAC_FAN__');
+                let fan = fe ? fe.state : (ok(at.fan_speed) ? at.fan_speed : '');
+                const FAN = { quiet: 'Silencieux', silent: 'Silencieux', standard: 'Standard', normal: 'Standard', balanced: 'Équilibré', medium: 'Moyen', strong: 'Fort', high: 'Fort', turbo: 'Turbo', max: 'Max', off: 'Arrêt' };
+                fan = fan ? (FAN[String(fan).toLowerCase()] || (String(fan).replace(/[_-]/g, ' ').replace(/^./, (m) => m.toUpperCase()))) : '--';
+                // Surface nettoyée
+                const ae = ent('__VAC_AREA__');
+                const av = ae ? ae.state : (ok(at.cleaned_area) ? at.cleaned_area : (ok(at.cleaning_area) ? at.cleaning_area : ''));
+                const au = ae && ae.attributes && ae.attributes.unit_of_measurement ? ae.attributes.unit_of_measurement : 'm²';
+                const area = ok(av) && Number.isFinite(num(av)) ? Math.round(num(av) * 10) / 10 + ' ' + au : '--';
+                // Durée de nettoyage
+                const te = ent('__VAC_TIME__');
+                const tv = te ? te.state : (ok(at.cleaning_time) ? at.cleaning_time : (ok(at.cleaning_duration) ? at.cleaning_duration : ''));
+                const tu = te && te.attributes && te.attributes.unit_of_measurement ? String(te.attributes.unit_of_measurement).toLowerCase() : 'min';
+                let time = '--';
+                if (ok(tv) && Number.isFinite(num(tv))) {
+                  const n = num(tv);
+                  const mins = (tu === 's' || tu === 'sec') ? n / 60 : (tu === 'h') ? n * 60 : n;
+                  time = mins >= 60 ? Math.floor(mins / 60) + ' h ' + String(Math.round(mins % 60)).padStart(2, '0') : Math.round(mins) + ' min';
+                }
+                // Alerte
+                const le = ent('__VAC_ALERT__');
+                let alertTxt = '';
+                if (le) { const v = String(le.state).toLowerCase(); if (v === 'on') alertTxt = (le.attributes && le.attributes.friendly_name) || 'Alerte'; else if (!['off', 'ok', '0', 'false', 'no error', 'none'].includes(v)) alertTxt = le.state; }
+                else if (ok(at.error) && !['0', 'false', 'none', 'ok', 'no error'].includes(String(at.error).toLowerCase())) alertTxt = at.error;
+                if (!alertTxt && s === 'error') alertTxt = 'Attention requise';
+                const charge = s === 'docked' ? (has && pct >= 100 ? 'Charge terminée' : 'En charge')
+                  : s === 'returning' ? 'Regagne sa base' : s === 'cleaning' ? 'Nettoyage en cours'
+                  : s === 'paused' ? 'Prêt à reprendre' : offline ? 'Aucune donnée' : 'À l\'arrêt';
+                const cls = moving ? 'av-moving' : offline ? 'av-offline' : 'av-ready';
+                return `
+                  <div class="av-shell ${cls}" style="--c:${rgb}">
+                    <div class="av-hero">
+                      <div class="av-statusblock">
+                        <div class="av-kicker">ÉTAT DU ROBOT</div>
+                        <div class="av-status">${FR[s] || esc(s)}</div>
+                        <div class="av-charge"><span class="av-dot"></span>${alertTxt ? '⚠ ' + esc(alertTxt) : charge}</div>
+                      </div>
+                      <div class="av-machine">
+                        <div class="av-radar"></div>
+                        <div class="av-robot">
+                          <svg viewBox="0 0 180 180" aria-hidden="true">
+                            <defs>
+                              <radialGradient id="av-metal" cx="34%" cy="26%" r="80%">
+                                <stop offset="0" stop-color="#3b4650"/>
+                                <stop offset=".48" stop-color="#1c252f"/>
+                                <stop offset="1" stop-color="#080e16"/>
+                              </radialGradient>
+                            </defs>
+                            <circle cx="90" cy="90" r="76" fill="#070b11" stroke="#52606b" stroke-opacity=".55" stroke-width="3"/>
+                            <circle cx="90" cy="90" r="69" fill="url(#av-metal)" stroke="#a0b1bd" stroke-opacity=".12" stroke-width="1"/>
+                            <path d="M35 70 A58 58 0 0 1 145 70" fill="none" stroke="#8bc9df" stroke-opacity=".28" stroke-width="2"/>
+                            <circle cx="90" cy="74" r="20" fill="#121c27" stroke="#718594" stroke-opacity=".7" stroke-width="2"/>
+                            <circle cx="90" cy="74" r="12" fill="#273745"/>
+                            <rect x="58" y="112" width="64" height="15" rx="7" fill="#0d1620" stroke="#607681" stroke-opacity=".45"/>
+                            <circle cx="78" cy="119.5" r="2" fill="#607681"/><circle cx="90" cy="119.5" r="2" fill="#607681"/><circle cx="102" cy="119.5" r="2" fill="#607681"/>
+                            <rect x="75" y="141" width="30" height="3" rx="2" style="fill:rgb(${rgb})" opacity=".9"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="av-metrics">
+                      <div class="av-metric">
+                        <span class="av-metric-label">BATTERIE</span>
+                        <strong>${has ? pct + '%' : '--'}</strong>
+                        <div class="av-meter"><div style="width:${pct}%"></div></div>
+                      </div>
+                      <div class="av-metric">
+                        <span class="av-metric-label">ASPIRATION</span>
+                        <strong>${esc(fan)}</strong>
+                        <span class="av-metric-foot">Puissance</span>
+                      </div>
+                      <div class="av-metric">
+                        <span class="av-metric-label">SURFACE</span>
+                        <strong>${esc(area)}</strong>
+                        <span class="av-metric-foot">Nettoyée</span>
+                      </div>
+                      <div class="av-metric">
+                        <span class="av-metric-label">DURÉE</span>
+                        <strong>${esc(time)}</strong>
+                        <span class="av-metric-foot">Dernier cycle</span>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              ]]]
+          extra_styles: >
+            .av-shell {box-sizing:border-box;width:100%;padding:10px 14px 12px;display:flex;flex-direction:column;gap:10px;color:#f5fbff;text-align:left;overflow:hidden;font-family:'Inter','Segoe UI',Roboto,sans-serif;position:relative}
+            .av-hero {min-height:0;display:flex;align-items:center;justify-content:space-between;gap:2px}
+            .av-statusblock {min-width:0;max-width:62%;position:relative;z-index:2}
+            .av-kicker {font-size:9px;font-weight:800;letter-spacing:1.4px;color:rgba(194,222,235,.55);margin-bottom:6px}
+            .av-status {font-size:clamp(18px,3.4vw,24px);line-height:1.1;font-weight:900;letter-spacing:-.6px;white-space:normal;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.2)}
+            .av-moving .av-status {color:rgb(var(--c))}
+            .av-charge {margin-top:9px;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:650;color:rgba(215,238,247,.62)}
+            .av-dot {width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:rgb(var(--c));box-shadow:0 0 9px rgba(var(--c),.65)}
+            .av-machine {width:116px;height:116px;flex:0 0 116px;position:relative;display:grid;place-items:center;margin-right:-6px}
+            .av-machine::before {content:"";position:absolute;inset:2px;border-radius:50%;background:radial-gradient(circle,rgba(var(--c),.13),transparent 70%)}
+            .av-radar {position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(var(--c),.14);background:conic-gradient(from 90deg, transparent 0deg,rgba(var(--c),.16) 45deg,transparent 115deg);opacity:.4}
+            .av-moving .av-radar {opacity:1;animation:avSpin 5s linear infinite}
+            .av-robot {width:104px;height:104px;position:relative;filter:drop-shadow(0 12px 12px rgba(0,0,0,.50))}
+            .av-robot svg {width:100%;height:100%;display:block}
+            .av-metrics {display:grid;grid-template-columns:repeat(4,1fr);gap:6px;z-index:2}
+            .av-metric {display:flex;flex-direction:column;gap:4px;min-width:0;padding:8px 8px 7px;border-radius:12px;background:rgba(159,207,227,.055);box-shadow:inset 0 0 0 1px rgba(184,226,239,.07)}
+            .av-metric-label {font-size:8px;font-weight:800;letter-spacing:.55px;color:rgba(214,238,245,.55);white-space:nowrap}
+            .av-metric strong {font-size:14px;line-height:18px;font-weight:900;color:#f2fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+            .av-meter {height:3px;width:100%;background:rgba(255,255,255,.10);border-radius:4px;overflow:hidden;margin-top:2px}
+            .av-meter div {height:100%;border-radius:4px;background:linear-gradient(90deg,rgba(var(--c),.55),rgb(var(--c)));transition:width .5s ease}
+            .av-metric-foot {font-size:8px;color:rgba(218,237,244,.38);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+            @keyframes avSpin {to {transform:rotate(360deg)}}
+            @media (prefers-reduced-motion:reduce) {.av-radar {animation:none !important}}
+          styles:
+            grid:
+              - grid-template-areas: '"dash"'
+              - grid-template-columns: 1fr
+            card:
+              - padding: 0
+              - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
+              - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(255,255,255,.08)' ]]]"
+              - background: "[[[ const c = ({ cleaning: '34,211,238', returning: '56,189,248', docked: '74,222,128', paused: '250,204,21', error: '251,146,60' })[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba(' + c + ',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
+              - box-shadow: none
+              - overflow: hidden
+            custom_fields:
+              dash:
+                - width: 100%
+
+        # ---------- COMMANDES ----------
+        - type: grid
+          columns: 3
+          square: false
+          cards:
+            - type: custom:button-card
+              template: tile_vac
+              entity: __VACUUM__
+              name: Démarrer
+              icon: mdi:play
+              variables: { rgb: "74,222,128", active_states: "cleaning" }
+              tap_action:
+                action: perform-action
+                perform_action: vacuum.start
+                target:
+                  entity_id: __VACUUM__
+            - type: custom:button-card
+              template: tile_vac
+              entity: __VACUUM__
+              name: Pause
+              icon: mdi:pause
+              variables: { rgb: "250,204,21", active_states: "paused" }
+              tap_action:
+                action: perform-action
+                perform_action: vacuum.pause
+                target:
+                  entity_id: __VACUUM__
+            - type: custom:button-card
+              template: tile_vac
+              entity: __VACUUM__
+              name: Base
+              icon: mdi:home-import-outline
+              variables: { rgb: "56,189,248", active_states: "returning,docked" }
+              tap_action:
+                action: perform-action
+                perform_action: vacuum.return_to_base
+                target:
+                  entity_id: __VACUUM__
+            - type: custom:button-card
+              template: tile_vac
+              entity: __VACUUM__
+              name: Aspiration
+              icon: mdi:fan
+              variables: { rgb: "167,139,250", active_states: "" }
+              __VAC_FAN_TAP__
+            - type: custom:button-card
+              template: tile_vac
+              entity: __VACUUM__
+              name: Localiser
+              icon: mdi:map-marker-radius
+              variables: { rgb: "45,212,191", active_states: "" }
+              tap_action:
+                action: perform-action
+                perform_action: vacuum.locate
+                target:
+                  entity_id: __VACUUM__
+            - type: custom:button-card
+              template: tile_vac
+              entity: __VACUUM__
+              name: Stop
+              icon: mdi:stop
+              variables: { rgb: "251,146,60", active_states: "" }
+              tap_action:
+                action: perform-action
+                perform_action: vacuum.stop
+                target:
+                  entity_id: __VACUUM__

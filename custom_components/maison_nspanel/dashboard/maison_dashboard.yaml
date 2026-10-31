@@ -527,6 +527,55 @@ button_card_templates:
             return Math.min(hi, Math.max(lo, t));
           ]]]
 
+  tile_vac:
+    show_icon: true
+    show_name: true
+    show_label: false
+    size: 22px
+    variables:
+      rgb: "148,163,184"
+      active_states: ""
+    styles:
+      grid:
+        - grid-template-areas: '"i" "n"'
+        - grid-template-rows: 1fr min-content
+        - grid-template-columns: 1fr
+        - row-gap: 3px
+      card:
+        - overflow: hidden
+        - height: 100%
+        - min-height: 12vh
+        - padding: 6px 2px
+        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)' ]]]"
+        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)' ]]]"
+        - box-shadow: none
+        - transition: all .3s ease
+      img_cell:
+        - width: 32px
+        - height: 32px
+        - justify-self: center
+        - align-self: center
+      icon:
+        - width: 22px
+        - color: "[[[ return 'rgb(' + variables.rgb + ')' ]]]"
+      name:
+        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+        - font-size: 11px
+        - font-weight: 800
+        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px' ]]]"
+        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0' ]]]"
+    state:
+      - operator: template
+        value: "[[[ return String(variables.active_states).split(',').includes(entity.state) ]]]"
+        styles:
+          card:
+            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)' ]]]"
+            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)' ]]]"
+          name:
+            - color: '#FFFFFF'
+
 # ============================================================
 #  DASHBOARD
 # ============================================================
@@ -1671,6 +1720,7 @@ views:
                 variables: { kind: "on", rgb: "167,139,250", min_h: 16vh }
                 tap_action:
                   action: toggle
+
 
   # ==========================================================
   #  PRÉVISIONS MÉTÉO À 7 JOURS (ouverte depuis l'accueil)

@@ -15,9 +15,42 @@ from typing import Any
 DEFAULT_CLIMATE = "climate.sejour_climatisation"
 DEFAULT_PREFIX = "sejour_climatisation"  # préfixe commun aux entités Sensibo du modèle
 
-VAC_BEGIN = "  # ==========================================================\n  #  PAGE : ASPIRATEUR ROBOT"
-VAC_END = "  # ==========================================================\n  #  PRÉVISIONS MÉTÉO"
-FRAGMENTS = {"__VAC_NAV__": "aspirateur_nav.yaml", "__VAC_NAVB__": "aspirateur_navb.yaml"}
+FRAGMENTS = {
+    "__VAC_NAV__": "aspirateur_nav.yaml",
+    "__VAC_NAVB__": "aspirateur_navb.yaml",
+    "__VAC_PAGE__": "aspirateur_page.yaml",
+}
+# Capteurs facultatifs de l'aspirateur : clé de réglage -> repère du modèle
+VAC_SENSORS = {
+    "vac_battery": "__VAC_BATTERY__",
+    "vac_fan": "__VAC_FAN__",
+    "vac_area": "__VAC_AREA__",
+    "vac_time": "__VAC_TIME__",
+    "vac_alert": "__VAC_ALERT__",
+}
+
+FAN_TAP_SELECT = """tap_action:
+  action: perform-action
+  perform_action: select.select_next
+  target:
+    entity_id: {sel}
+  data:
+    cycle: true
+"""
+FAN_TAP_VACUUM = """tap_action:
+  action: perform-action
+  perform_action: vacuum.set_fan_speed
+  target:
+    entity_id: {vac}
+  data:
+    fan_speed: >
+      [[[
+        const list = entity.attributes.fan_speed_list || [];
+        if (!list.length) return entity.attributes.fan_speed;
+        const i = list.indexOf(entity.attributes.fan_speed);
+        return list[(i + 1) % list.length];
+      ]]]
+"""
 
 MODELE = "modele.yaml"
 CIBLE = "maison_dashboard.yaml"
@@ -138,20 +171,24 @@ def render(
     sections: Any = None,
     vacuum: str | None = None,
     fragments: dict[str, str] | None = None,
+    vac_cfg: dict[str, str] | None = None,
 ) -> str:
     """Remplace les repères du modèle, puis le préfixe d'entités de climatisation."""
     secs = normalize_sections(sections)
     lights = light_entities(secs)
     trig = all_entities(secs) or ["sun.sun"]
     if vacuum:
+        cfg = vac_cfg or {}
         for token, block in (fragments or {}).items():
             text = _inject(text, token, block)
+        fan = cfg.get("vac_fan")
+        text = _inject(text, "__VAC_FAN_TAP__", FAN_TAP_SELECT.format(sel=fan) if fan else FAN_TAP_VACUUM.format(vac=vacuum))
+        ids = [vacuum] + [cfg[k] for k in VAC_SENSORS if cfg.get(k)]
+        text = text.replace("__VAC_TRIG__", ", ".join(json.dumps(e) for e in dict.fromkeys(ids)))
+        for key, token in VAC_SENSORS.items():
+            text = text.replace(token, str(cfg.get(key) or ""))
         text = text.replace("__VACUUM__", vacuum).replace("__NAVCOLS__", "3")
     else:
-        i = text.find(VAC_BEGIN)
-        j = text.find(VAC_END)
-        if i != -1 and j > i:
-            text = text[:i] + text[j:]
         for token in FRAGMENTS:
             text = _inject(text, token, "")
         text = text.replace("__NAVCOLS__", "2")
@@ -163,7 +200,13 @@ def render(
     return text.replace(DEFAULT_PREFIX, prefix_of(climate_entity))
 
 
-def sync(folder: Path, climate_entity: str | None, sections: Any = None, vacuum: str | None = None) -> bool:
+def sync(
+    folder: Path,
+    climate_entity: str | None,
+    sections: Any = None,
+    vacuum: str | None = None,
+    vac_cfg: dict[str, str] | None = None,
+) -> bool:
     """Écrit maison_dashboard.yaml si son contenu doit changer. True si réécrit."""
     modele = folder / MODELE
     cible = folder / CIBLE
@@ -174,7 +217,7 @@ def sync(folder: Path, climate_entity: str | None, sections: Any = None, vacuum:
         for token, name in FRAGMENTS.items():
             f = folder / name
             fragments[token] = f.read_text(encoding="utf-8") if f.exists() else ""
-    new = render(modele.read_text(encoding="utf-8"), climate_entity, sections, vacuum, fragments)
+    new = render(modele.read_text(encoding="utf-8"), climate_entity, sections, vacuum, fragments, vac_cfg)
     if cible.exists() and cible.read_text(encoding="utf-8") == new:
         return False
     cible.write_text(new, encoding="utf-8")

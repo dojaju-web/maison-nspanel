@@ -59,24 +59,34 @@ class Sections(unittest.TestCase):
 class Aspirateur(unittest.TestCase):
     SRC = (
         "cols: __NAVCOLS__\nnav:\n  cards:\n    - a\n    __VAC_NAV__\n"
-        "  # ==========================================================\n"
-        "  #  PAGE : ASPIRATEUR ROBOT\n  - title: Aspirateur\n    entity: __VACUUM__\n"
-        "  # ==========================================================\n  #  PRÉVISIONS MÉTÉO\nfin\n"
+        "pages:\n  __VAC_PAGE__\n\nfin\n"
     )
+    FRAG = {
+        "__VAC_NAV__": "- b:\n    x: 1\n",
+        "__VAC_PAGE__": "- title: Aspirateur\n  entity: __VACUUM__\n  bat: __VAC_BATTERY__\n  trig: [__VAC_TRIG__]\n  __VAC_FAN_TAP__\n",
+    }
 
     def test_sans_aspirateur(self):
         out = d.render(self.SRC)
         self.assertIn("cols: 2", out)
         self.assertNotIn("Aspirateur", out)
         self.assertNotIn("__", out)
-        self.assertIn("PRÉVISIONS", out)
 
     def test_avec_aspirateur(self):
-        out = d.render(self.SRC, None, None, "vacuum.cookie", {"__VAC_NAV__": "- b:\n    x: 1\n"})
+        out = d.render(self.SRC, None, None, "vacuum.cookie", self.FRAG, {"vac_battery": "sensor.bat"})
         self.assertIn("cols: 3", out)
         self.assertIn("entity: vacuum.cookie", out)
+        self.assertIn("bat: sensor.bat", out)
+        self.assertIn('trig: ["vacuum.cookie", "sensor.bat"]', out)
         self.assertIn("    - b:\n        x: 1", out)
+        self.assertIn("vacuum.set_fan_speed", out)  # pas de select : l'aspirateur lui-même
         self.assertNotIn("__", out)
+
+    def test_aspiration_via_select(self):
+        out = d.render(self.SRC, None, None, "vacuum.cookie", self.FRAG, {"vac_fan": "select.mode"})
+        self.assertIn("select.select_next", out)
+        self.assertIn("entity_id: select.mode", out)
+        self.assertNotIn("vacuum.set_fan_speed", out)
 
 
 if __name__ == "__main__":
