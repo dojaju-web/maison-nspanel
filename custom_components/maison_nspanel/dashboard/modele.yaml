@@ -1138,7 +1138,7 @@ views:
           card:
             - position: relative
             - min-height: 100vh
-            - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 17vh 14px' : '6vh 14px 3vh 14px' ]]]"
+            - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 20vh 14px' : '6vh 14px 3vh 14px' ]]]"
             - border-radius: 0
             - border: none
             - box-shadow: none

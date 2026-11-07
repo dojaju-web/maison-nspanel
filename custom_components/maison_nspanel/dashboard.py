@@ -39,8 +39,8 @@ MENU_TABS = (
 _STY = "states['sensor.maison_nspanel_rappels']"
 _LIQ = f"({_STY} && {_STY}.attributes.style === 'liquid')"
 # Reflets « Liquid Glass » : verre dépoli, bord clair et lueur interne
-LG_BLUR = "blur(28px) saturate(1.9)"
-LG_EDGE = "inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.12), 0 14px 34px rgba(0,0,0,.40)"
+LG_BLUR = "blur(30px) saturate(1.9)"
+LG_EDGE = "inset 0 1px 1px rgba(255,255,255,.95), inset 0 -1px 1px rgba(255,255,255,.55), 0 12px 32px rgba(0,0,0,.30)"
 LG_ACCENT = "64,156,255"
 
 
@@ -82,21 +82,21 @@ def gen_menu(has_vacuum: bool, active: str = "accueil") -> tuple[str, str]:
             "              - align-content: center",
             "              - row-gap: 2px",
             "            card:",
-            "              - height: 52px",
+            "              - height: 62px",
             "              - padding: 0",
-            "              - border-radius: 26px",
-            f"              - background: {'linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.12))' if on else 'transparent'}",
-            f"              - border: {'1px solid rgba(255,255,255,.38)' if on else '1px solid transparent'}",
-            f"              - box-shadow: {'inset 0 1px 0 rgba(255,255,255,.55), 0 2px 8px rgba(0,0,0,.18)' if on else 'none'}",
+            "              - border-radius: 31px",
+            f"              - background: {'rgba(120,120,128,.20)' if on else 'transparent'}",
+            f"              - border: {'1px solid rgba(255,255,255,.55)' if on else '1px solid transparent'}",
+            f"              - box-shadow: {'inset 0 1px 1px rgba(255,255,255,.7)' if on else 'none'}",
             "            icon:",
-            "              - width: 24px",
-            f"              - color: {'rgb(' + LG_ACCENT + ')' if on else 'rgba(255,255,255,.80)'}",
+            "              - width: 30px",
+            f"              - color: {'rgb(' + LG_ACCENT + ')' if on else 'rgba(20,20,24,.92)'}",
             "            name:",
             "              - font-family: \"'Inter','SF Pro Text','Segoe UI',Roboto,sans-serif\"",
-            "              - font-size: 10px",
-            "              - font-weight: 600",
+            "              - font-size: 12px",
+            "              - font-weight: 500",
             "              - letter-spacing: .1px",
-            f"              - color: {'rgb(' + LG_ACCENT + ')' if on else 'rgba(255,255,255,.80)'}",
+            f"              - color: {'rgb(' + LG_ACCENT + ')' if on else 'rgba(20,20,24,.92)'}",
             "              - white-space: nowrap",
         ]
     out += [
@@ -107,12 +107,12 @@ def gen_menu(has_vacuum: bool, active: str = "accueil") -> tuple[str, str]:
         "        - column-gap: 2px",
         "        - align-items: stretch",
         "      card:",
-        "        - padding: 6px",
-        "        - border-radius: 34px",
-        "        - background: linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.07))",
+        "        - padding: 7px",
+        "        - border-radius: 40px",
+        "        - background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(245,245,250,.62))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
-        "        - border: 1px solid rgba(255,255,255,.32)",
+        "        - border: 1px solid rgba(255,255,255,.70)",
         f"        - box-shadow: {LG_EDGE}",
         "      custom_fields:",
     ]
