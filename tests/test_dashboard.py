@@ -90,30 +90,27 @@ class Aspirateur(unittest.TestCase):
 
 
 class Menu(unittest.TestCase):
-    SRC = (
-        "a:\n  custom_fields:\n    __MENU__\n  styles:\n    __MENU_STYLE__\n"
-        "areas: '\\\"nav nav\\\"__MENU_ROW2__' rows: 1fr__MENU_ROWS__\n"
-    )
+    SRC = "a:\n  custom_fields:\n    __MENU__\n  styles:\n    __MENU_STYLE__\n"
 
-    def test_sans_menu(self):
+    def test_menu_toujours_rendu(self):
         out = d.render(self.SRC)
-        self.assertNotIn("menu", out)
-        self.assertNotIn("__", out)
-
-    def test_menu(self):
-        out = d.render(self.SRC, menu=True)
         self.assertIn("menu:", out)
         self.assertIn("t3:", out)  # 4 onglets sans aspirateur : t0..t3
         self.assertNotIn("t4:", out)
-        self.assertIn("2.4fr 1fr 1fr 1fr", out)
-        self.assertIn('\\\"menu menu\\\"', out)
         self.assertNotIn("__", out)
+
+    def test_menu_flottant_liquid(self):
+        out = d.render(self.SRC)
+        self.assertIn("position: absolute", out)
+        self.assertIn("backdrop-filter: blur(28px)", out)
+        self.assertIn("style === 'liquid'", out)
 
     def test_menu_avec_aspirateur(self):
         field, style = d.gen_menu(True)
         self.assertIn("t4:", field)
         self.assertIn("/aspirateur", field)
-        self.assertIn("grid-area: menu", style)
+        self.assertIn("repeat(5, 1fr)", field)
+        self.assertIn("z-index", style)
 
 
 if __name__ == "__main__":

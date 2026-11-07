@@ -7,7 +7,6 @@ from typing import Any
 from .const import (
     CONF_AIR,
     CONF_CLIMATE,
-    CONF_MENU,
     CONF_RAPPELS,
     CONF_SECTIONS,
     CONF_STYLE,
@@ -48,7 +47,6 @@ def current_settings(entry) -> dict[str, Any]:
         "style": o.get(CONF_STYLE) or DEFAULT_STYLE,
         "climate_entity": o.get(CONF_CLIMATE) or DEFAULT_CLIMATE,
         "air_enabled": bool(o.get(CONF_AIR, True)),
-        "menu_enabled": bool(o.get(CONF_MENU, True)),
         "vacuum_entity": o.get(CONF_VACUUM) or "",
         **{k: o.get(k) or "" for k in CONF_VAC_SENSORS},
         "rappels": [normalize(r) for r in o.get(CONF_RAPPELS, [])],
@@ -75,8 +73,6 @@ def clean_settings(raw: dict[str, Any]) -> dict[str, Any]:
         out["style"] = raw["style"]
     if "air_enabled" in raw:
         out["air_enabled"] = bool(raw["air_enabled"])
-    if "menu_enabled" in raw:
-        out["menu_enabled"] = bool(raw["menu_enabled"])
     if "rappels" in raw:
         out["rappels"] = [normalize(r) for r in raw["rappels"] if isinstance(r, dict)]
     if "sections" in raw:
@@ -94,7 +90,6 @@ def apply_settings(options: dict[str, Any], clean: dict[str, Any]) -> dict[str, 
         "style": CONF_STYLE,
         "climate_entity": CONF_CLIMATE,
         "air_enabled": CONF_AIR,
-        "menu_enabled": CONF_MENU,
         "vacuum_entity": CONF_VACUUM,
         "rappels": CONF_RAPPELS,
         "sections": CONF_SECTIONS,

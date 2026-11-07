@@ -25,7 +25,6 @@ class Settings(unittest.TestCase):
         self.assertEqual(s["weather_entity"], "weather.maison")
         self.assertEqual(s["style"], "verre")
         self.assertTrue(s["air_enabled"])
-        self.assertTrue(s["menu_enabled"])
         self.assertEqual(s["vacuum_entity"], "")
         self.assertEqual(len(s["sections"]), 2)
 

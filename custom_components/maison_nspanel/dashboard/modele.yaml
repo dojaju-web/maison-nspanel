@@ -748,14 +748,17 @@ views:
                   - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
                   - background: >
                       [[[
+                        if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.07))';
                         if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) return 'rgba(16,23,40,.62)';
                         const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                         const st = w ? w.state : '';
                         const tint = ({ sunny: '251,191,36', partlycloudy: '251,191,36', rainy: '96,165,250', pouring: '96,165,250', lightning: '96,165,250', 'lightning-rainy': '96,165,250', snowy: '186,230,253' })[st] || '148,163,184';
                         return 'linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%)';
                       ]]]
-                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)') ]]]"
-                  - box-shadow: none
+                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1px solid rgba(255,255,255,.34)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)')) ]]]"
+                  - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(255,255,255,.1), 0 10px 28px rgba(0,0,0,.28)' : 'none' ]]]"
+                  - backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(22px) saturate(1.8)' : 'none' ]]]"
+                  - -webkit-backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(22px) saturate(1.8)' : 'none' ]]]"
                 img_cell:
                   - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
                   - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
@@ -796,6 +799,7 @@ views:
               const temp = (t !== undefined && t !== null) ? (Math.round(Number(t) * 10) / 10) + ' °C' : '-- °C';
               const hum = (h !== undefined && h !== null) ? ' · ' + Math.round(Number(h)) + ' %' : '';
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.07));backdrop-filter:blur(22px) saturate(1.8);-webkit-backdrop-filter:blur(22px) saturate(1.8);border:1px solid rgba(255,255,255,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.1),0 10px 28px rgba(0,0,0,.28)' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
               if (ar) {
                 // Style ardoise (d'après la carte « Salon » de la démo) : dégradé teinté sur l'icône, fond sombre
                 const tint = (t === undefined || t === null) ? '148,163,184' : Number(t) < 19 ? '56,189,248' : Number(t) < 24 ? '16,185,129' : Number(t) < 27 ? '249,115,22' : '239,68,68';
@@ -804,7 +808,7 @@ views:
                   + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">INTÉRIEUR' + hum + '</div>'
                   + '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap">' + temp + '</div></div></div>';
               }
-              return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
+              return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
                 + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:#7DD3FC;flex:none"></ha-icon>'
                 + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">INTÉRIEUR' + hum + '</div>'
                 + '<div style="font-size:18px;font-weight:700;color:#FFFFFF;white-space:nowrap">' + temp + '</div></div></div>';
@@ -830,6 +834,7 @@ views:
               const qLabel = q === null ? 'n/d' : labels[q];
               const qCol = q === null ? '#94A3B8' : cols[q];
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.07));backdrop-filter:blur(22px) saturate(1.8);-webkit-backdrop-filter:blur(22px) saturate(1.8);border:1px solid rgba(255,255,255,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.1),0 10px 28px rgba(0,0,0,.28)' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
               if (ar) {
                 const tints = ['74,222,128', '163,230,53', '250,204,21', '251,146,60'];   // mêmes couleurs que le style verre sombre
                 const tint = q === null ? '148,163,184' : tints[q];
@@ -838,7 +843,7 @@ views:
                   + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
                   + '<div style="font-size:18px;font-weight:800;color:rgb(' + tint + ');white-space:nowrap">' + qLabel + '</div></div></div>';
               }
-              return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12);text-align:left">'
+              return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
                 + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none"></ha-icon>'
                 + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
                 + '<div style="font-size:18px;font-weight:700;color:' + qCol + ';white-space:nowrap">' + qLabel + '</div></div></div>';
@@ -1119,14 +1124,21 @@ views:
           __MENU__
         styles:
           grid:
-            - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\"__MENU_ROW2__' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\"__MENU_ROW3__' ]]]"
+            - grid-template-areas: >
+                [[[
+                  const a = states['sensor.maison_nspanel_rappels'] ? states['sensor.maison_nspanel_rappels'].attributes : {};
+                  const two = a.air_enabled === false;
+                  if (a.style === 'liquid') return two ? '"clock clock" "weather indoor"' : '"clock clock clock" "weather indoor air"';
+                  return two ? '"clock clock" "weather indoor" "nav nav" "navb navb"' : '"clock clock clock" "weather indoor air" "nav nav nav" "navb navb navb"';
+                ]]]
             - grid-template-columns: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
-            - grid-template-rows: 1fr min-content min-content min-content__MENU_ROWS__
+            - grid-template-rows: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1fr min-content' : '1fr min-content min-content min-content' ]]]"
             - column-gap: 8px
             - row-gap: 8px
           card:
+            - position: relative
             - min-height: 100vh
-            - padding: 6vh 14px 3vh 14px
+            - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 17vh 14px' : '6vh 14px 3vh 14px' ]]]"
             - border-radius: 0
             - border: none
             - box-shadow: none
@@ -1199,7 +1211,7 @@ views:
               - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? 'none' : 'block' ]]]"
             nav:
               - width: 100%
-              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'block' ]]]"
+              - display: "[[[ const st = states['sensor.maison_nspanel_rappels'] ? states['sensor.maison_nspanel_rappels'].attributes.style : ''; return (st === 'ardoise' || st === 'liquid') ? 'none' : 'block' ]]]"
             navb:
               - width: 100%
               - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'block' : 'none' ]]]"

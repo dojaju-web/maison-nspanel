@@ -10,7 +10,7 @@ const TABS = [
 ];
 const DAYS = [["mon", "Lun"], ["tue", "Mar"], ["wed", "Mer"], ["thu", "Jeu"], ["fri", "Ven"], ["sat", "Sam"], ["sun", "Dim"]];
 const MIN_LABELS = { jamais: "Jamais", jaune: "À partir de jaune", orange: "À partir d'orange", rouge: "Rouge seulement", toujours: "Toujours (même vert)" };
-const STYLE_LABELS = { verre: ["Verre sombre", "Cartes en verre teinté, titres en capitales (par défaut)."], ardoise: ["Ardoise", "Cartes sobres, titres en minuscules, météo en fond."] };
+const STYLE_LABELS = { verre: ["Verre sombre", "Cartes en verre teinté, titres en capitales (par défaut)."], ardoise: ["Ardoise", "Cartes sobres, titres en minuscules, météo en fond."], liquid: ["Liquid Glass", "Verre dépoli translucide et menu flottant façon iOS sur l'accueil."] };
 const VAC_FIELDS = [
   ["vac_battery", "Batterie", "sensor", "Capteur de batterie (%)"],
   ["vac_fan", "Puissance d'aspiration", "select", "Liste de choix (select) ou laissez vide pour utiliser l'aspirateur"],
@@ -312,7 +312,6 @@ class MaisonNspanelEditeur extends HTMLElement {
     const cur = this._cfg.style;
     return `<div class="one"><section class="card">
       ${Object.entries(STYLE_LABELS).map(([k, [l, h]]) => `<label class="radio ${cur === k ? "on" : ""}"><input type="radio" name="style" class="rad" data-key="style" value="${k}" ${cur === k ? "checked" : ""} /><div><b>${l}</b><small>${h}</small></div></label>`).join("")}
-      <label class="check"><input type="checkbox" class="chk" data-key="menu_enabled" ${this._cfg.menu_enabled ? "checked" : ""} /><span>Afficher le menu de navigation en bas de l'accueil</span></label>
     </section></div>`;
   }
 

@@ -9,7 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import CoreState, HomeAssistant
 
-from .const import CONF_CLIMATE, CONF_MENU, CONF_SECTIONS, CONF_VAC_SENSORS, CONF_VACUUM, DOMAIN, STATIC_URL
+from .const import CONF_CLIMATE, CONF_SECTIONS, CONF_VAC_SENSORS, CONF_VACUUM, DOMAIN, STATIC_URL
 from .dashboard import sync
 from .panel import async_refresh_lovelace, async_register_panel, async_unregister_panel
 from .vacuum import pick
@@ -97,7 +97,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             entry.options.get(CONF_SECTIONS),
             _vacuum(hass, entry),
             _vac_cfg(hass, entry),
-            bool(entry.options.get(CONF_MENU, True)),
         )
         if changed:
             _LOGGER.info("Dashboard régénéré pour %s", entry.options.get(CONF_CLIMATE))

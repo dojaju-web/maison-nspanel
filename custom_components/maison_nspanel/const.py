@@ -10,12 +10,11 @@ CONF_STYLE = "style"
 CONF_CLIMATE = "climate_entity"
 CONF_AIR = "air_enabled"
 CONF_VACUUM = "vacuum_entity"
-CONF_MENU = "menu_enabled"
 CONF_VAC_SENSORS = ("vac_battery", "vac_fan", "vac_area", "vac_time", "vac_alert")
 CONF_SECTIONS = "sections"
 
-# Styles du dashboard : "verre" (verre sombre, défaut) ou "ardoise" (cartes sobres, titres en minuscules)
-STYLES = ["verre", "ardoise"]
+# Styles du dashboard : "verre" (verre sombre, défaut), "ardoise" (cartes sobres) ou "liquid" (Liquid Glass, menu flottant)
+STYLES = ["verre", "ardoise", "liquid"]
 DEFAULT_STYLE = "verre"
 
 # Les images météo du dashboard sont servies à cette adresse
