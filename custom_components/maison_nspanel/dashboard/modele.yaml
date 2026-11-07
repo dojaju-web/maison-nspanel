@@ -1116,11 +1116,12 @@ views:
                         - width: 100%
                         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
                 __VAC_NAVB__
+          __MENU__
         styles:
           grid:
-            - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\"' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\"' ]]]"
+            - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\"__MENU_ROW2__' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\"__MENU_ROW3__' ]]]"
             - grid-template-columns: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
-            - grid-template-rows: 1fr min-content min-content min-content
+            - grid-template-rows: 1fr min-content min-content min-content__MENU_ROWS__
             - column-gap: 8px
             - row-gap: 8px
           card:
@@ -1202,6 +1203,7 @@ views:
             navb:
               - width: 100%
               - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'block' : 'none' ]]]"
+            __MENU_STYLE__
 
   # ==========================================================
   #  PAGE 2 : LUMIÈRES

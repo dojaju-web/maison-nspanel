@@ -89,5 +89,32 @@ class Aspirateur(unittest.TestCase):
         self.assertNotIn("vacuum.set_fan_speed", out)
 
 
+class Menu(unittest.TestCase):
+    SRC = (
+        "a:\n  custom_fields:\n    __MENU__\n  styles:\n    __MENU_STYLE__\n"
+        "areas: '\\\"nav nav\\\"__MENU_ROW2__' rows: 1fr__MENU_ROWS__\n"
+    )
+
+    def test_sans_menu(self):
+        out = d.render(self.SRC)
+        self.assertNotIn("menu", out)
+        self.assertNotIn("__", out)
+
+    def test_menu(self):
+        out = d.render(self.SRC, menu=True)
+        self.assertIn("menu:", out)
+        self.assertIn("t3:", out)  # 4 onglets sans aspirateur : t0..t3
+        self.assertNotIn("t4:", out)
+        self.assertIn("2.4fr 1fr 1fr 1fr", out)
+        self.assertIn('\\\"menu menu\\\"', out)
+        self.assertNotIn("__", out)
+
+    def test_menu_avec_aspirateur(self):
+        field, style = d.gen_menu(True)
+        self.assertIn("t4:", field)
+        self.assertIn("/aspirateur", field)
+        self.assertIn("grid-area: menu", style)
+
+
 if __name__ == "__main__":
     unittest.main()

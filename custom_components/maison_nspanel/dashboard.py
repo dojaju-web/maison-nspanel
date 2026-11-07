@@ -29,6 +29,98 @@ VAC_SENSORS = {
     "vac_alert": "__VAC_ALERT__",
 }
 
+MENU_TABS = (
+    ("accueil", "Accueil", "mdi:home", "56,189,248"),
+    ("lumieres", "Éclairage", "mdi:lightbulb-group", "250,204,21"),
+    ("climat", "Climatisation", "mdi:air-conditioner", "34,211,238"),
+    ("aspirateur", "Aspirateur", "mdi:robot-vacuum", "74,222,128"),
+    ("previsions", "Prévisions", "mdi:weather-partly-cloudy", "147,197,253"),
+)
+_STY = "states['sensor.maison_nspanel_rappels']"
+_ARD = f"({_STY} && {_STY}.attributes.style === 'ardoise')"
+
+
+def _tpl(a: str, b: str) -> str:
+    return f'"[[[ return {_ARD} ? {a} : {b} ]]]"'
+
+
+def gen_menu(has_vacuum: bool, active: str = "accueil") -> tuple[str, str]:
+    """Barre d'onglets du bas : l'onglet actif s'élargit et affiche son nom.
+
+    Renvoie (champ personnalisé, style de zone de grille), à l'indentation zéro.
+    """
+    tabs = [t for t in MENU_TABS if has_vacuum or t[0] != "aspirateur"]
+    ids = [f"t{i}" for i in range(len(tabs))]
+    cols = " ".join("2.4fr" if t[0] == active else "1fr" for t in tabs)
+    out = [
+        "menu:",
+        "  card:",
+        "    type: custom:button-card",
+        "    show_icon: false",
+        "    show_name: false",
+        "    show_label: false",
+        "    triggers_update: [sensor.maison_nspanel_rappels]",
+        "    custom_fields:",
+    ]
+    for (path, name, icon, rgb), tid in zip(tabs, ids):
+        on = path == active
+        out += [
+            f"      {tid}:",
+            "        card:",
+            "          type: custom:button-card",
+            f"          icon: {icon}",
+            f"          name: {name}",
+            f"          show_name: {'true' if on else 'false'}",
+            "          tap_action:",
+            "            action: navigate",
+            f"            navigation_path: \"[[[ return '/' + window.location.pathname.split('/')[1] + '/{path}'; ]]]\"",
+            "          styles:",
+            "            grid:",
+            f"              - grid-template-areas: '{chr(34) + 'i n' + chr(34) if on else chr(34) + 'i' + chr(34)}'",
+            f"              - grid-template-columns: {'min-content auto' if on else '1fr'}",
+            "              - justify-content: center",
+            "              - align-items: center",
+            "              - column-gap: 8px",
+            "            card:",
+            "              - height: 46px",
+            "              - padding: 0 6px",
+            "              - border-radius: 23px",
+            "              - box-shadow: none",
+            f"              - background: {'"linear-gradient(135deg, rgba(' + rgb + ',.30), rgba(' + rgb + ',.10))"' if False else ('linear-gradient(135deg, rgba(' + rgb + ',.30), rgba(' + rgb + ',.10))' if on else 'transparent')}",
+            f"              - border: {'1px solid rgba(' + rgb + ',.40)' if on else 'none'}",
+            "            icon:",
+            f"              - width: {'22px' if on else '24px'}",
+            f"              - color: {'rgb(' + rgb + ')' if on else 'rgba(203,213,225,.72)'}",
+            "            name:",
+            "              - font-family: \"'Inter','Segoe UI',Roboto,sans-serif\"",
+            "              - font-size: 12px",
+            "              - font-weight: 800",
+            "              - color: '#FFFFFF'",
+            f"              - letter-spacing: {_tpl(chr(39) + '.3px' + chr(39), chr(39) + '1px' + chr(39))}",
+            f"              - text-transform: {_tpl(chr(39) + 'none' + chr(39), chr(39) + 'uppercase' + chr(39))}",
+            "              - white-space: nowrap",
+        ]
+    out += [
+        "    styles:",
+        "      grid:",
+        f"        - grid-template-areas: '\"{' '.join(ids)}\"'",
+        f"        - grid-template-columns: {cols}",
+        "        - column-gap: 4px",
+        "        - align-items: stretch",
+        "      card:",
+        "        - padding: 5px",
+        "        - border-radius: 28px",
+        f"        - background: {_tpl(chr(39) + 'linear-gradient(115deg, rgba(9,22,32,.93), rgba(5,12,22,.88) 56%, rgba(13,30,42,.92))' + chr(39), chr(39) + 'rgba(16,23,40,.86)' + chr(39))}",
+        f"        - border: {_tpl(chr(39) + '1px solid rgba(184,226,239,.10)' + chr(39), chr(39) + '1px solid rgba(255,255,255,.10)' + chr(39))}",
+        "        - box-shadow: 0 6px 22px rgba(0,0,0,.35)",
+        "      custom_fields:",
+    ]
+    for tid in ids:
+        out += [f"        {tid}:", "          - grid-area: " + tid, "          - width: 100%"]
+    style = ["menu:", "  - grid-area: menu", "  - width: 100%", "  - margin-top: 2px"]
+    return "\n".join(out) + "\n", "\n".join(style) + "\n"
+
+
 FAN_TAP_SELECT = """tap_action:
   action: perform-action
   perform_action: select.select_next
@@ -172,6 +264,7 @@ def render(
     vacuum: str | None = None,
     fragments: dict[str, str] | None = None,
     vac_cfg: dict[str, str] | None = None,
+    menu: bool = False,
 ) -> str:
     """Remplace les repères du modèle, puis le préfixe d'entités de climatisation."""
     secs = normalize_sections(sections)
@@ -192,6 +285,17 @@ def render(
         for token in FRAGMENTS:
             text = _inject(text, token, "")
         text = text.replace("__NAVCOLS__", "2")
+    if menu:
+        field, style = gen_menu(bool(vacuum))
+        text = _inject(text, "__MENU__", field)
+        text = _inject(text, "__MENU_STYLE__", style)
+        text = text.replace("__MENU_ROW2__", ' \\"menu menu\\"').replace("__MENU_ROW3__", ' \\"menu menu menu\\"')
+        text = text.replace("__MENU_ROWS__", " min-content")
+    else:
+        for token in ("__MENU__", "__MENU_STYLE__"):
+            text = _inject(text, token, "")
+        for token in ("__MENU_ROW2__", "__MENU_ROW3__", "__MENU_ROWS__"):
+            text = text.replace(token, "")
     text = text.replace("__SECTIONS__", gen_sections(secs))
     text = text.replace("__LIGHTS_IDS__", json.dumps(lights))
     text = text.replace("__LIGHTS_TRIG__", json.dumps(trig))
@@ -206,6 +310,7 @@ def sync(
     sections: Any = None,
     vacuum: str | None = None,
     vac_cfg: dict[str, str] | None = None,
+    menu: bool = False,
 ) -> bool:
     """Écrit maison_dashboard.yaml si son contenu doit changer. True si réécrit."""
     modele = folder / MODELE
@@ -217,7 +322,7 @@ def sync(
         for token, name in FRAGMENTS.items():
             f = folder / name
             fragments[token] = f.read_text(encoding="utf-8") if f.exists() else ""
-    new = render(modele.read_text(encoding="utf-8"), climate_entity, sections, vacuum, fragments, vac_cfg)
+    new = render(modele.read_text(encoding="utf-8"), climate_entity, sections, vacuum, fragments, vac_cfg, menu)
     if cible.exists() and cible.read_text(encoding="utf-8") == new:
         return False
     cible.write_text(new, encoding="utf-8")

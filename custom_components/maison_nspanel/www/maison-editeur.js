@@ -312,6 +312,7 @@ class MaisonNspanelEditeur extends HTMLElement {
     const cur = this._cfg.style;
     return `<div class="one"><section class="card">
       ${Object.entries(STYLE_LABELS).map(([k, [l, h]]) => `<label class="radio ${cur === k ? "on" : ""}"><input type="radio" name="style" class="rad" data-key="style" value="${k}" ${cur === k ? "checked" : ""} /><div><b>${l}</b><small>${h}</small></div></label>`).join("")}
+      <label class="check"><input type="checkbox" class="chk" data-key="menu_enabled" ${this._cfg.menu_enabled ? "checked" : ""} /><span>Afficher le menu de navigation en bas de l'accueil</span></label>
     </section></div>`;
   }
 

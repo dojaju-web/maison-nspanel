@@ -105,6 +105,6 @@ Un panneau **Maison NSPanel** apparaît dans la barre latérale de Home Assistan
 - **Météo** : entité météo, capteur de vigilance, seuil d'affichage ;
 - **Climatisation** : entité Sensibo, qualité de l'air ;
 - **Aspirateur** : entité et capteurs (batterie, puissance, surface, durée, alerte) — laissés vides, ils sont détectés automatiquement ;
-- **Apparence** : style « verre sombre » ou « ardoise ».
+- **Apparence** : style « verre sombre » ou « ardoise », menu de navigation en bas de l'accueil (barre d'onglets : l'onglet actif s'élargit et affiche son nom).
 
 Le menu **Configurer** de l'intégration renvoie simplement vers ce panneau.

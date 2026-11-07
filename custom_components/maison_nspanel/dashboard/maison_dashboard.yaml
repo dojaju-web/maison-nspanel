@@ -1114,11 +1114,180 @@ views:
                       c:
                         - width: 100%
                         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+          menu:
+            card:
+              type: custom:button-card
+              show_icon: false
+              show_name: false
+              show_label: false
+              triggers_update: [sensor.maison_nspanel_rappels]
+              custom_fields:
+                t0:
+                  card:
+                    type: custom:button-card
+                    icon: mdi:home
+                    name: Accueil
+                    show_name: true
+                    tap_action:
+                      action: navigate
+                      navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/accueil'; ]]]"
+                    styles:
+                      grid:
+                        - grid-template-areas: '"i n"'
+                        - grid-template-columns: min-content auto
+                        - justify-content: center
+                        - align-items: center
+                        - column-gap: 8px
+                      card:
+                        - height: 46px
+                        - padding: 0 6px
+                        - border-radius: 23px
+                        - box-shadow: none
+                        - background: linear-gradient(135deg, rgba(56,189,248,.30), rgba(56,189,248,.10))
+                        - border: 1px solid rgba(56,189,248,.40)
+                      icon:
+                        - width: 22px
+                        - color: rgb(56,189,248)
+                      name:
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                        - font-size: 12px
+                        - font-weight: 800
+                        - color: '#FFFFFF'
+                        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '1px' ]]]"
+                        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                        - white-space: nowrap
+                t1:
+                  card:
+                    type: custom:button-card
+                    icon: mdi:lightbulb-group
+                    name: Éclairage
+                    show_name: false
+                    tap_action:
+                      action: navigate
+                      navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/lumieres'; ]]]"
+                    styles:
+                      grid:
+                        - grid-template-areas: '"i"'
+                        - grid-template-columns: 1fr
+                        - justify-content: center
+                        - align-items: center
+                        - column-gap: 8px
+                      card:
+                        - height: 46px
+                        - padding: 0 6px
+                        - border-radius: 23px
+                        - box-shadow: none
+                        - background: transparent
+                        - border: none
+                      icon:
+                        - width: 24px
+                        - color: rgba(203,213,225,.72)
+                      name:
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                        - font-size: 12px
+                        - font-weight: 800
+                        - color: '#FFFFFF'
+                        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '1px' ]]]"
+                        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                        - white-space: nowrap
+                t2:
+                  card:
+                    type: custom:button-card
+                    icon: mdi:air-conditioner
+                    name: Climatisation
+                    show_name: false
+                    tap_action:
+                      action: navigate
+                      navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/climat'; ]]]"
+                    styles:
+                      grid:
+                        - grid-template-areas: '"i"'
+                        - grid-template-columns: 1fr
+                        - justify-content: center
+                        - align-items: center
+                        - column-gap: 8px
+                      card:
+                        - height: 46px
+                        - padding: 0 6px
+                        - border-radius: 23px
+                        - box-shadow: none
+                        - background: transparent
+                        - border: none
+                      icon:
+                        - width: 24px
+                        - color: rgba(203,213,225,.72)
+                      name:
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                        - font-size: 12px
+                        - font-weight: 800
+                        - color: '#FFFFFF'
+                        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '1px' ]]]"
+                        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                        - white-space: nowrap
+                t3:
+                  card:
+                    type: custom:button-card
+                    icon: mdi:weather-partly-cloudy
+                    name: Prévisions
+                    show_name: false
+                    tap_action:
+                      action: navigate
+                      navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/previsions'; ]]]"
+                    styles:
+                      grid:
+                        - grid-template-areas: '"i"'
+                        - grid-template-columns: 1fr
+                        - justify-content: center
+                        - align-items: center
+                        - column-gap: 8px
+                      card:
+                        - height: 46px
+                        - padding: 0 6px
+                        - border-radius: 23px
+                        - box-shadow: none
+                        - background: transparent
+                        - border: none
+                      icon:
+                        - width: 24px
+                        - color: rgba(203,213,225,.72)
+                      name:
+                        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
+                        - font-size: 12px
+                        - font-weight: 800
+                        - color: '#FFFFFF'
+                        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '1px' ]]]"
+                        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+                        - white-space: nowrap
+              styles:
+                grid:
+                  - grid-template-areas: '"t0 t1 t2 t3"'
+                  - grid-template-columns: 2.4fr 1fr 1fr 1fr
+                  - column-gap: 4px
+                  - align-items: stretch
+                card:
+                  - padding: 5px
+                  - border-radius: 28px
+                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'linear-gradient(115deg, rgba(9,22,32,.93), rgba(5,12,22,.88) 56%, rgba(13,30,42,.92))' : 'rgba(16,23,40,.86)' ]]]"
+                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.10)' : '1px solid rgba(255,255,255,.10)' ]]]"
+                  - box-shadow: 0 6px 22px rgba(0,0,0,.35)
+                custom_fields:
+                  t0:
+                    - grid-area: t0
+                    - width: 100%
+                  t1:
+                    - grid-area: t1
+                    - width: 100%
+                  t2:
+                    - grid-area: t2
+                    - width: 100%
+                  t3:
+                    - grid-area: t3
+                    - width: 100%
         styles:
           grid:
-            - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\"' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\"' ]]]"
+            - grid-template-areas: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '\"clock clock\" \"weather indoor\" \"nav nav\" \"navb navb\" \"menu menu\"' : '\"clock clock clock\" \"weather indoor air\" \"nav nav nav\" \"navb navb navb\" \"menu menu menu\"' ]]]"
             - grid-template-columns: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
-            - grid-template-rows: 1fr min-content min-content min-content
+            - grid-template-rows: 1fr min-content min-content min-content min-content
             - column-gap: 8px
             - row-gap: 8px
           card:
@@ -1200,6 +1369,10 @@ views:
             navb:
               - width: 100%
               - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'block' : 'none' ]]]"
+            menu:
+              - grid-area: menu
+              - width: 100%
+              - margin-top: 2px
 
   # ==========================================================
   #  PAGE 2 : LUMIÈRES
