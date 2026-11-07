@@ -83,15 +83,15 @@ _WX = "(states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspa
 def _tab_color(path: str, vacuum: str | None) -> str:
     """Expression JS : couleur « R,V,B » de l'état de l'élément, ou null s'il est inactif."""
     if path == "accueil":
-        return "'59,140,245'"
+        return "'0,145,255'"
     if path == "lumieres":
-        return "([__LIGHTS_JS__].some(i => states[i] && states[i].state === 'on') ? '250,204,21' : null)"
+        return "([__LIGHTS_JS__].some(i => states[i] && states[i].state === 'on') ? '255,214,0' : null)"
     if path == "climat":
-        return ("((states['climate.sejour_climatisation'] && ({cool:'34,211,238',heat:'251,146,60',dry:'250,204,21',"
-                "fan_only:'148,163,184',heat_cool:'74,222,128',auto:'74,222,128'})[states['climate.sejour_climatisation'].state]) || null)")
+        return ("((states['climate.sejour_climatisation'] && ({cool:'60,211,254',heat:'255,146,48',dry:'0,218,195',"
+                "fan_only:'142,142,147',heat_cool:'48,209,88',auto:'48,209,88'})[states['climate.sejour_climatisation'].state]) || null)")
     if path == "aspirateur":
-        return (f"((states['{vacuum}'] && ({{cleaning:'34,211,238',returning:'56,189,248',paused:'250,204,21',"
-                f"error:'251,146,60'}})[states['{vacuum}'].state]) || null)")
+        return (f"((states['{vacuum}'] && ({{cleaning:'60,211,254',returning:'109,124,255',paused:'255,214,0',"
+                f"error:'255,66,69'}})[states['{vacuum}'].state]) || null)")
     return (f"((states[{_WX}] && ({{sunny:'251,191,36',partlycloudy:'251,191,36',rainy:'96,165,250',pouring:'96,165,250',"
             "lightning:'96,165,250','lightning-rainy':'96,165,250',snowy:'125,211,252'})[states[" + _WX + "].state]) ? "
             "({sunny:'251,191,36',partlycloudy:'251,191,36',rainy:'96,165,250',pouring:'96,165,250',lightning:'96,165,250',"
@@ -147,7 +147,7 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
             "              - height: 64px",
             "              - padding: 0",
             "              - border-radius: 32px",
-            f"              - background: {'rgba(10,11,13,.62)' if on else 'transparent'}",
+            f"              - background: {'rgba(28,28,30,.85)' if on else 'transparent'}",
             f"              - border: {'1px solid rgba(255,255,255,.04)' if on else '1px solid transparent'}",
             f"              - box-shadow: {'inset 0 1px 3px rgba(0,0,0,.5)' if on else 'none'}",
             "            img_cell:",
@@ -177,7 +177,7 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "      card:",
         "        - padding: 4px",
         "        - border-radius: 38px",
-        "        - background: linear-gradient(180deg, rgba(62,63,68,.74), rgba(44,45,49,.74))",
+        "        - background: linear-gradient(180deg, rgba(58,58,60,.74), rgba(44,44,46,.74))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
         "        - backdrop-filter: url(#lg-refract) blur(14px) saturate(1.4)",

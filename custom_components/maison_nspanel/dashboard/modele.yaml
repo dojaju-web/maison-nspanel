@@ -99,7 +99,7 @@ button_card_templates:
         - min-height: "[[[ return variables.min_h ]]]"
         - padding: 8px 6px
         - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-        - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.12') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.72) 62%)' ]]]"
+        - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.12') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '44,44,46' : '16,23,40')) + ',.72) 62%)' ]]]"
         - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
         - box-shadow: none
         - transition: all .3s ease
@@ -127,7 +127,7 @@ button_card_templates:
         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
         - font-size: 12px
         - font-weight: 600
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E9096' : '#94A3B8') ]]]"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E8E93' : '#94A3B8') ]]]"
         - padding-bottom: 2px
         - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
         - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
@@ -136,7 +136,7 @@ button_card_templates:
         value: "[[[ return variables.ids.some(i => states[i] && ['on','cool','heat','dry','fan_only','heat_cool','auto'].includes(states[i].state)); ]]]"
         styles:
           card:
-            - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.28') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.78) 68%)' ]]]"
+            - background: "[[[ return 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + variables.rgb + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.16' : '.28') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '44,44,46' : '16,23,40')) + ',.78) 68%)' ]]]"
             - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.55)') ]]]"
           img_cell:
             - background: "[[[ return 'rgba(' + variables.rgb + ',.30)' ]]]"
@@ -675,16 +675,18 @@ views:
               const vi = states['sensor.maison_nspanel_vigilance'];
               const viOk = !!(vi && vi.attributes && vi.attributes.niveau !== undefined);
               let vigHtml = '';
+              const SYS = [[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[183,138,102]];
+              const snap = c => { if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return c; const v = String(c).split(',').map(Number); let b = SYS[0], bd = 1e9; SYS.forEach(x => { const d = (x[0]-v[0])**2 + (x[1]-v[1])**2 + (x[2]-v[2])**2; if (d < bd) { bd = d; b = x; } }); return b.join(','); };
               if (vigS || viOk) {
                 const lv = viOk ? vi.attributes.niveau : (vigLv[String(vigS.state || '').toLowerCase()] || 1);
                 const mini = (variables.vigilance_min !== undefined) ? variables.vigilance_min : 2;
                 if (viOk ? vi.attributes.afficher : lv >= mini) {
-                  const c = viOk ? vi.attributes.couleur : vigRgb[lv];
+                  const c = snap(viOk ? vi.attributes.couleur : vigRgb[lv]);
                   const nom = ['', 'vert', 'jaune', 'orange', 'rouge'][lv].toUpperCase();
                   const ph = viOk ? (vi.attributes.phenomenes || []).map(x => x.nom).join(' · ') : Object.keys(vigS.attributes || {}).filter(k => vigLv[String(vigS.attributes[k]).toLowerCase()] >= 2)
                     .sort((a, b) => vigLv[String(vigS.attributes[b]).toLowerCase()] - vigLv[String(vigS.attributes[a]).toLowerCase()])
                     .map(k => k.replace(/-/g, ' / ')).join(' · ');
-                  vigHtml = '<div style="max-width:100%"><div style="display:inline-flex;align-items:center;gap:10px;padding:6px 13px 6px 6px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.16') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%);border:1px solid rgba(' + c + ',.60);max-width:100%;box-sizing:border-box;text-align:left">'
+                  vigHtml = '<div style="max-width:100%"><div style="display:inline-flex;align-items:center;gap:10px;padding:6px 13px 6px 6px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.16') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '44,44,46' : '16,23,40')) + ',.82) 60%);border:1px solid rgba(' + c + ',.60);max-width:100%;box-sizing:border-box;text-align:left">'
                     + '<span style="display:flex;flex:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(' + c + ',.20);border:1px solid rgba(' + c + ',.45);box-shadow:0 0 14px rgba(' + c + ',.40)">'
                     + '<ha-icon icon="mdi:weather-cloudy-alert" style="--mdc-icon-size:20px;color:rgb(' + c + ')"></ha-icon></span>'
                     + '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgb(' + c + ')">Vigilance ' + nom + '</span>'
@@ -692,9 +694,9 @@ views:
                 }
               }
               const pills = actifs.map(r => {
-                const c = r.couleur || '250,204,21';
+                const c = snap(r.couleur || '250,204,21');
                 // Même style que l'alerte « FILTRE À NETTOYER » : bordure ambre, puce teintée, texte en capitales espacées
-                return '<div style="max-width:100%"><div style="display:inline-flex;align-items:center;gap:10px;padding:6px 13px 6px 6px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%);border:1px solid rgba(' + c + ',.55)">'
+                return '<div style="max-width:100%"><div style="display:inline-flex;align-items:center;gap:10px;padding:6px 13px 6px 6px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '44,44,46' : '16,23,40')) + ',.82) 60%);border:1px solid rgba(' + c + ',.55)">'
                   + '<span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(' + c + ',.20);border:1px solid rgba(' + c + ',.45);box-shadow:0 0 14px rgba(' + c + ',.40)">'
                   + '<ha-icon icon="' + (r.icone || 'mdi:bell-outline') + '" style="--mdc-icon-size:20px;color:rgb(' + c + ')"></ha-icon></span>'
                   + '<span style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgb(' + c + ')">' + (r.texte || '') + '</span></div></div>';
@@ -703,7 +705,7 @@ views:
               return '<div style="text-align:center">'
                 + '<div style="' + panel + '">'
                 + '<div style="font-size:21vh;font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;color:#FFFFFF;text-shadow:0 2px 24px rgba(0,0,0,.65)">' + time + '</div>'
-                + '<div style="margin-top:1.2vh;font-size:19px;font-weight:600;letter-spacing:.5px;color:#E2E8F0;text-shadow:0 1px 10px rgba(0,0,0,.7)">' + date + '</div>'
+                + '<div style="margin-top:1.2vh;font-size:19px;font-weight:600;letter-spacing:.5px;color:' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#E2E8F0') + ';text-shadow:0 1px 10px rgba(0,0,0,.7)">' + date + '</div>'
                 + '</div>'
                 + ((pills || vigHtml) ? '<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:1.4vh">' + pills + vigHtml + '</div>' : '')
                 + '</div>';
@@ -751,7 +753,7 @@ views:
                   - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '27px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px') ]]]"
                   - background: >
                       [[[
-                        if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(52,53,58,.62)';
+                        if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.62)';
                         if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) return 'rgba(16,23,40,.62)';
                         const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                         const st = w ? w.state : '';
@@ -775,7 +777,7 @@ views:
                         const c = { sunny: '#FBBF24', 'clear-night': '#E2E8F0', partlycloudy: '#FCD34D', cloudy: '#CBD5E1', fog: '#CBD5E1', windy: '#CBD5E1', 'windy-variant': '#CBD5E1', rainy: '#7DD3FC', pouring: '#60A5FA', snowy: '#E0F2FE', 'snowy-rainy': '#BAE6FD', hail: '#BAE6FD', lightning: '#FACC15', 'lightning-rainy': '#FACC15', exceptional: '#FB923C' };
                         const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                         const s = (() => { const w0 = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')]; const sn = states['sun.sun']; let x = w0 ? w0.state : 'unknown'; if (sn && sn.state === 'above_horizon' && x === 'clear-night') x = 'sunny'; if (sn && sn.state === 'below_horizon' && x === 'sunny') x = 'clear-night'; return x; })();
-                        return (w && c[s]) || '#E2E8F0';
+                        return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : ((w && c[s]) || '#E2E8F0');
                       ]]]
                 label:
                   - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
@@ -802,9 +804,9 @@ views:
               const temp = (t !== undefined && t !== null) ? (Math.round(Number(t) * 10) / 10) + ' °C' : '-- °C';
               const hum = (h !== undefined && h !== null) ? ' · ' + Math.round(Number(h)) + ' %' : '';
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
-              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(52,53,58,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
-              const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E9096' : '#94A3B8';
-              const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#3B8CF5' : '#7DD3FC';
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(44,44,46,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E8E93' : '#94A3B8';
+              const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#7DD3FC';
               if (ar) {
                 // Style ardoise (d'après la carte « Salon » de la démo) : dégradé teinté sur l'icône, fond sombre
                 const tint = (t === undefined || t === null) ? '148,163,184' : Number(t) < 19 ? '56,189,248' : Number(t) < 24 ? '16,185,129' : Number(t) < 27 ? '249,115,22' : '239,68,68';
@@ -835,13 +837,13 @@ views:
                 val = Math.round(tvoc) + ' ppb';
               }
               const labels = ['Excellente', 'Bonne', 'Moyenne', 'Mauvaise'];
-              const cols = ['#4ADE80', '#A3E635', '#FACC15', '#FB923C'];
+              const cols = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? ['#30D158', '#FFD60A', '#FF9230', '#FF4245'] : ['#4ADE80', '#A3E635', '#FACC15', '#FB923C'];
               const qLabel = q === null ? 'n/d' : labels[q];
-              const qCol = q === null ? '#94A3B8' : cols[q];
+              const qCol = q === null ? ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E8E93' : '#94A3B8') : cols[q];
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
-              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(52,53,58,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
-              const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E9096' : '#94A3B8';
-              const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#3B8CF5' : '#7DD3FC';
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(44,44,46,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E8E93' : '#94A3B8';
+              const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#7DD3FC';
               if (ar) {
                 const tints = ['74,222,128', '163,230,53', '250,204,21', '251,146,60'];   // mêmes couleurs que le style verre sombre
                 const tint = q === null ? '148,163,184' : tints[q];
@@ -1195,7 +1197,7 @@ views:
                     windy: [shade, wind, clouds, grey],
                     'windy-variant': [shade, wind, clouds, grey]
                   };
-                  return ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'linear-gradient(180deg, rgba(18,19,22,.80) 0%, rgba(18,19,22,.95) 100%), ' : '') + photo + (layers[c] || [shade, sky]).join(', ');
+                  return ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'linear-gradient(180deg, rgba(28,28,30,.82) 0%, rgba(28,28,30,.95) 100%), ' : '') + photo + (layers[c] || [shade, sky]).join(', ');
                 ]]]
           custom_fields:
             clock:
@@ -1834,16 +1836,18 @@ views:
                   const vi = states['sensor.maison_nspanel_vigilance'];
                   const viOk = !!(vi && vi.attributes && vi.attributes.niveau !== undefined);
                   let vigHtml = '';
+                  const SYS = [[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[183,138,102]];
+                  const snap = c => { if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return c; const v = String(c).split(',').map(Number); let b = SYS[0], bd = 1e9; SYS.forEach(x => { const d = (x[0]-v[0])**2 + (x[1]-v[1])**2 + (x[2]-v[2])**2; if (d < bd) { bd = d; b = x; } }); return b.join(','); };
                   if (vigS || viOk) {
                     const lv = viOk ? vi.attributes.niveau : (vigLv[String(vigS.state || '').toLowerCase()] || 1);
                     const mini = (variables.vigilance_min !== undefined) ? variables.vigilance_min : 2;
                     if (viOk ? vi.attributes.afficher : lv >= mini) {
-                      const c = viOk ? vi.attributes.couleur : vigRgb[lv];
+                      const c = snap(viOk ? vi.attributes.couleur : vigRgb[lv]);
                       const nom = ['', 'vert', 'jaune', 'orange', 'rouge'][lv].toUpperCase();
                       const ph = viOk ? (vi.attributes.phenomenes || []).map(x => x.nom).join(' · ') : Object.keys(vigS.attributes || {}).filter(k => vigLv[String(vigS.attributes[k]).toLowerCase()] >= 2)
                         .sort((a, b) => vigLv[String(vigS.attributes[b]).toLowerCase()] - vigLv[String(vigS.attributes[a]).toLowerCase()])
                         .map(k => k.replace(/-/g, ' / ')).join(' · ');
-                      vigHtml = '<div style="margin-bottom:1vh;text-align:center"><div style="display:inline-flex;align-items:center;gap:10px;padding:7px 18px 7px 7px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.16') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : '16,23,40') + ',.82) 60%);border:1px solid rgba(' + c + ',.60);max-width:92%;box-sizing:border-box;text-align:left">'
+                      vigHtml = '<div style="margin-bottom:1vh;text-align:center"><div style="display:inline-flex;align-items:center;gap:10px;padding:7px 18px 7px 7px;border-radius:18px;background:linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(' + c + ',' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.00' : '.16') + ') 0%, rgba(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '5,12,22' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '44,44,46' : '16,23,40')) + ',.82) 60%);border:1px solid rgba(' + c + ',.60);max-width:92%;box-sizing:border-box;text-align:left">'
                         + '<span style="display:flex;flex:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(' + c + ',.20);border:1px solid rgba(' + c + ',.45);box-shadow:0 0 14px rgba(' + c + ',.40)">'
                         + '<ha-icon icon="mdi:weather-cloudy-alert" style="--mdc-icon-size:20px;color:rgb(' + c + ')"></ha-icon></span>'
                         + '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgb(' + c + ')">Vigilance ' + nom + '</span>'
