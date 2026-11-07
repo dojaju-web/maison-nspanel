@@ -127,7 +127,7 @@ button_card_templates:
         - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
         - font-size: 12px
         - font-weight: 600
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#94A3B8') ]]]"
+        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E9096' : '#94A3B8') ]]]"
         - padding-bottom: 2px
         - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
         - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
@@ -647,7 +647,6 @@ views:
         tap_action:
           action: none
         custom_fields:
-          lgdefs: '__LG_DEFS__'
           clock: >
             [[[
               const tz = hass.config.time_zone, d = new Date();
@@ -700,8 +699,7 @@ views:
                   + '<ha-icon icon="' + (r.icone || 'mdi:bell-outline') + '" style="--mdc-icon-size:20px;color:rgb(' + c + ')"></ha-icon></span>'
                   + '<span style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgb(' + c + ')">' + (r.texte || '') + '</span></div></div>';
               }).join('');
-              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.05));backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:url(#lg-refract) blur(4px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);border:1px solid rgba(255,255,255,.30);box-shadow:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -1px 1px rgba(255,255,255,.12),0 10px 28px rgba(0,0,0,.30)' : '';
-              const panel = GLASS ? 'display:inline-block;padding:.6vh 4.5vh 1.6vh;border-radius:38px;' + GLASS : '';
+              const panel = '';
               return '<div style="text-align:center">'
                 + '<div style="' + panel + '">'
                 + '<div style="font-size:21vh;font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;color:#FFFFFF;text-shadow:0 2px 24px rgba(0,0,0,.65)">' + time + '</div>'
@@ -738,8 +736,6 @@ views:
               tap_action:
                 action: navigate
                 navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/previsions'; ]]]"
-              custom_fields:
-                lg: '__LG_DEFS__'
               styles:
                 grid:
                   - grid-template-areas: '"i l" "i n"'
@@ -751,22 +747,21 @@ views:
                   - align-items: center
                 card:
                   - padding: 8px 12px
-                  - min-height: 9vh
-                  - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
+                  - min-height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '54px' : '9vh' ]]]"
+                  - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '27px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px') ]]]"
                   - background: >
                       [[[
-                        if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.05))';
+                        if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(52,53,58,.62)';
                         if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) return 'rgba(16,23,40,.62)';
                         const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                         const st = w ? w.state : '';
                         const tint = ({ sunny: '251,191,36', partlycloudy: '251,191,36', rainy: '96,165,250', pouring: '96,165,250', lightning: '96,165,250', 'lightning-rainy': '96,165,250', snowy: '186,230,253' })[st] || '148,163,184';
                         return 'linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%)';
                       ]]]
-                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1px solid rgba(255,255,255,.30)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)')) ]]]"
-                  - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(255,255,255,.1), 0 10px 28px rgba(0,0,0,.28)' : 'none' ]]]"
-                  - backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(22px) saturate(1.6)' : 'none' ]]]"
-                  - -webkit-backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(22px) saturate(1.6)' : 'none' ]]]"
-                  - backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'url(#lg-refract) blur(4px) saturate(1.6)' : 'none' ]]]"
+                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1px solid rgba(255,255,255,.10)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)')) ]]]"
+                  - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'inset 0 1px 0 rgba(255,255,255,.12), 0 6px 18px rgba(0,0,0,.35)' : 'none' ]]]"
+                  - backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(24px) saturate(1.4)' : 'none' ]]]"
+                  - -webkit-backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(24px) saturate(1.4)' : 'none' ]]]"
                 img_cell:
                   - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
                   - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
@@ -799,11 +794,6 @@ views:
                   - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
                   - justify-self: start
                   - white-space: nowrap
-                custom_fields:
-                  lg:
-                    - position: absolute
-                    - width: 0
-                    - height: 0
           indoor: >
             [[[
               const c = states['climate.sejour_climatisation'];
@@ -812,7 +802,9 @@ views:
               const temp = (t !== undefined && t !== null) ? (Math.round(Number(t) * 10) / 10) + ' °C' : '-- °C';
               const hum = (h !== undefined && h !== null) ? ' · ' + Math.round(Number(h)) + ' %' : '';
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
-              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.05));backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:url(#lg-refract) blur(4px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);border:1px solid rgba(255,255,255,.30);box-shadow:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -1px 1px rgba(255,255,255,.12),0 10px 28px rgba(0,0,0,.30)' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(52,53,58,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E9096' : '#94A3B8';
+              const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#3B8CF5' : '#7DD3FC';
               if (ar) {
                 // Style ardoise (d'après la carte « Salon » de la démo) : dégradé teinté sur l'icône, fond sombre
                 const tint = (t === undefined || t === null) ? '148,163,184' : Number(t) < 19 ? '56,189,248' : Number(t) < 24 ? '16,185,129' : Number(t) < 27 ? '249,115,22' : '239,68,68';
@@ -822,8 +814,8 @@ views:
                   + '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap">' + temp + '</div></div></div>';
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
-                + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:#7DD3FC;flex:none"></ha-icon>'
-                + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">INTÉRIEUR' + hum + '</div>'
+                + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:' + ICO + ';flex:none"></ha-icon>'
+                + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:' + LBL + ';white-space:nowrap">INTÉRIEUR' + hum + '</div>'
                 + '<div style="font-size:18px;font-weight:700;color:#FFFFFF;white-space:nowrap">' + temp + '</div></div></div>';
             ]]]
           air: >
@@ -847,7 +839,9 @@ views:
               const qLabel = q === null ? 'n/d' : labels[q];
               const qCol = q === null ? '#94A3B8' : cols[q];
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
-              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.05));backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:url(#lg-refract) blur(4px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);border:1px solid rgba(255,255,255,.30);box-shadow:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -1px 1px rgba(255,255,255,.12),0 10px 28px rgba(0,0,0,.30)' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(52,53,58,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E9096' : '#94A3B8';
+              const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#3B8CF5' : '#7DD3FC';
               if (ar) {
                 const tints = ['74,222,128', '163,230,53', '250,204,21', '251,146,60'];   // mêmes couleurs que le style verre sombre
                 const tint = q === null ? '148,163,184' : tints[q];
@@ -858,7 +852,7 @@ views:
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
                 + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none"></ha-icon>'
-                + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#94A3B8;white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
+                + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:' + LBL + ';white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
                 + '<div style="font-size:18px;font-weight:700;color:' + qCol + ';white-space:nowrap">' + qLabel + '</div></div></div>';
             ]]]
           nav:
@@ -1151,7 +1145,7 @@ views:
           card:
             - position: relative
             - min-height: 100vh
-            - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 20vh 14px' : '6vh 14px 3vh 14px' ]]]"
+            - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 22vh 14px' : '6vh 14px 3vh 14px' ]]]"
             - border-radius: 0
             - border: none
             - box-shadow: none
@@ -1201,13 +1195,9 @@ views:
                     windy: [shade, wind, clouds, grey],
                     'windy-variant': [shade, wind, clouds, grey]
                   };
-                  return photo + (layers[c] || [shade, sky]).join(', ');
+                  return ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'linear-gradient(180deg, rgba(18,19,22,.80) 0%, rgba(18,19,22,.95) 100%), ' : '') + photo + (layers[c] || [shade, sky]).join(', ');
                 ]]]
           custom_fields:
-            lgdefs:
-              - position: absolute
-              - width: 0
-              - height: 0
             clock:
               - align-self: center
               - justify-self: stretch

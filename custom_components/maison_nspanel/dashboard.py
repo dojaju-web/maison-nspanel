@@ -39,8 +39,8 @@ MENU_TABS = (
 _STY = "states['sensor.maison_nspanel_rappels']"
 _LIQ = f"({_STY} && {_STY}.attributes.style === 'liquid')"
 # Reflets « Liquid Glass » : verre dépoli, bord clair et lueur interne
-LG_BLUR = "blur(30px) saturate(1.9)"
-LG_EDGE = "inset 0 1px 1px rgba(255,255,255,.55), inset 0 -1px 1px rgba(255,255,255,.12), 0 12px 32px rgba(0,0,0,.35)"
+LG_BLUR = "blur(24px) saturate(1.4)"
+LG_EDGE = "inset 0 1px 0 rgba(255,255,255,.14), 0 8px 24px rgba(0,0,0,.45)"
 LG_ACCENT = "64,156,255"
 
 
@@ -83,7 +83,7 @@ _WX = "(states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspa
 def _tab_color(path: str, vacuum: str | None) -> str:
     """Expression JS : couleur « R,V,B » de l'état de l'élément, ou null s'il est inactif."""
     if path == "accueil":
-        return "'56,189,248'"
+        return "'59,140,245'"
     if path == "lumieres":
         return "([__LIGHTS_JS__].some(i => states[i] && states[i].state === 'on') ? '250,204,21' : null)"
     if path == "climat":
@@ -144,12 +144,12 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
             "              - align-content: center",
             "              - row-gap: 2px",
             "            card:",
-            "              - height: 62px",
+            "              - height: 64px",
             "              - padding: 0",
-            "              - border-radius: 31px",
-            f"              - background: {'rgba(255,255,255,.16)' if on else 'transparent'}",
-            f"              - border: {'1px solid rgba(255,255,255,.30)' if on else '1px solid transparent'}",
-            f"              - box-shadow: {'inset 0 1px 1px rgba(255,255,255,.7)' if on else 'none'}",
+            "              - border-radius: 32px",
+            f"              - background: {'rgba(10,11,13,.62)' if on else 'transparent'}",
+            f"              - border: {'1px solid rgba(255,255,255,.04)' if on else '1px solid transparent'}",
+            f"              - box-shadow: {'inset 0 1px 3px rgba(0,0,0,.5)' if on else 'none'}",
             "            img_cell:",
             "              - width: 30px",
             "              - height: 30px",
@@ -175,13 +175,13 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "        - column-gap: 2px",
         "        - align-items: stretch",
         "      card:",
-        "        - padding: 7px",
-        "        - border-radius: 40px",
-        "        - background: radial-gradient(120px 40px at 18% 0%, rgba(255,255,255,.30), transparent 70%), linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04))",
+        "        - padding: 4px",
+        "        - border-radius: 38px",
+        "        - background: linear-gradient(180deg, rgba(62,63,68,.74), rgba(44,45,49,.74))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
-        "        - backdrop-filter: url(#lg-refract) blur(3px) saturate(1.6)",
-        "        - border: 1px solid rgba(255,255,255,.30)",
+        "        - backdrop-filter: url(#lg-refract) blur(14px) saturate(1.4)",
+        "        - border: 1px solid rgba(255,255,255,.10)",
         f"        - box-shadow: {LG_EDGE}",
         "      custom_fields:",
     ]
@@ -191,9 +191,9 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
     style = [
         "menu:",
         "  - position: absolute",
-        "  - left: 14px",
-        "  - right: 14px",
-        "  - bottom: 2.4vh",
+        "  - left: 25px",
+        "  - right: 25px",
+        "  - bottom: 26px",
         "  - z-index: 5",
         f"  - display: \"[[[ return {_LIQ} ? 'block' : 'none' ]]]\"",
     ]
