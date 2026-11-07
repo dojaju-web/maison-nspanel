@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+from urllib.parse import quote
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +43,35 @@ _LIQ = f"({_STY} && {_STY}.attributes.style === 'liquid')"
 LG_BLUR = "blur(30px) saturate(1.9)"
 LG_EDGE = "inset 0 1px 1px rgba(255,255,255,.95), inset 0 -1px 1px rgba(255,255,255,.55), 0 12px 32px rgba(0,0,0,.30)"
 LG_ACCENT = "64,156,255"
+
+
+def _lg_filter(width: int = 452, height: int = 76, scale: int = 46) -> str:
+    """Filtre SVG de réfraction « verre liquide » (carte de déplacement : les bords courbent l'image).
+
+    Utilisé par backdrop-filter: url(#lg-refract) ; sans WebGL ni capture du DOM.
+    """
+    grad = lambda i, x2, y2, c: (  # noqa: E731
+        f'<linearGradient id="{i}" x1="0" x2="{x2}" y1="0" y2="{y2}">'
+        f'<stop offset="0" stop-color="rgb({c[0]})"/><stop offset="{c[3]}" stop-color="rgb({c[1]})"/>'
+        f'<stop offset="{1 - float(c[3]):.2f}" stop-color="rgb({c[1]})"/><stop offset="1" stop-color="rgb({c[2]})"/></linearGradient>'
+    )
+    m = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}"><defs>'
+        + grad("r", 1, 0, ("255,0,0", "128,0,0", "0,0,0", ".12"))
+        + grad("g", 0, 1, ("0,255,0", "0,128,0", "0,0,0", ".32"))
+        + f'</defs><rect width="{width}" height="{height}" fill="rgb(0,0,0)"/>'
+        f'<rect width="{width}" height="{height}" fill="url(#r)"/>'
+        f'<rect width="{width}" height="{height}" fill="url(#g)" style="mix-blend-mode:screen"/></svg>'
+    )
+    uri = "data:image/svg+xml," + quote(m)
+    return (
+        '<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">'
+        '<filter id="lg-refract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+        f'<feImage href="{uri}" x="0" y="0" width="{width}" height="{height}" preserveAspectRatio="none" result="map"/>'
+        f'<feDisplacementMap in="SourceGraphic" in2="map" scale="{scale}" xChannelSelector="R" yChannelSelector="G"/>'
+        "</filter></svg>"
+    )
+
 
 
 _WX = "(states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison'"
@@ -88,6 +118,7 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "    show_label: false",
         "    triggers_update: [sensor.maison_nspanel_rappels]",
         "    custom_fields:",
+        f"      defs: '{_lg_filter()}'",
     ]
     for (path, name, icon), tid in zip(tabs, ids):
         on = path == active
@@ -143,15 +174,17 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "      card:",
         "        - padding: 7px",
         "        - border-radius: 40px",
-        "        - background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.12))",
+        "        - background: radial-gradient(120px 40px at 18% 0%, rgba(255,255,255,.45), transparent 70%), linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.07))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
+        "        - backdrop-filter: url(#lg-refract) blur(3px) saturate(1.8)",
         "        - border: 1px solid rgba(255,255,255,.55)",
         f"        - box-shadow: {LG_EDGE}",
         "      custom_fields:",
     ]
     for tid in ids:
         out += [f"        {tid}:", "          - grid-area: " + tid, "          - width: 100%"]
+    out += ["        defs:", "          - position: absolute", "          - width: 0", "          - height: 0"]
     style = [
         "menu:",
         "  - position: absolute",
