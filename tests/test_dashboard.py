@@ -106,7 +106,10 @@ class Menu(unittest.TestCase):
         self.assertIn("style === 'liquid'", out)
 
     def test_menu_avec_aspirateur(self):
-        field, style = d.gen_menu(True)
+        field, style = d.gen_menu(True, vacuum="vacuum.cookie")
+        self.assertIn("states['vacuum.cookie']", field)
+        self.assertIn("[__LIGHTS_JS__]", field)
+        self.assertIn("rgb(12,12,16)", field)
         self.assertIn("t4:", field)
         self.assertIn("/aspirateur", field)
         self.assertIn("repeat(5, 1fr)", field)

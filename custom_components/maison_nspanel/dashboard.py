@@ -44,7 +44,33 @@ LG_EDGE = "inset 0 1px 1px rgba(255,255,255,.95), inset 0 -1px 1px rgba(255,255,
 LG_ACCENT = "64,156,255"
 
 
-def gen_menu(has_vacuum: bool, active: str = "accueil") -> tuple[str, str]:
+_WX = "(states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison'"
+
+
+def _tab_color(path: str, vacuum: str | None) -> str:
+    """Expression JS : couleur « R,V,B » de l'état de l'élément, ou null s'il est inactif."""
+    if path == "accueil":
+        return "'56,189,248'"
+    if path == "lumieres":
+        return "([__LIGHTS_JS__].some(i => states[i] && states[i].state === 'on') ? '250,204,21' : null)"
+    if path == "climat":
+        return ("((states['climate.sejour_climatisation'] && ({cool:'34,211,238',heat:'251,146,60',dry:'250,204,21',"
+                "fan_only:'148,163,184',heat_cool:'74,222,128',auto:'74,222,128'})[states['climate.sejour_climatisation'].state]) || null)")
+    if path == "aspirateur":
+        return (f"((states['{vacuum}'] && ({{cleaning:'34,211,238',returning:'56,189,248',paused:'250,204,21',"
+                f"error:'251,146,60'}})[states['{vacuum}'].state]) || null)")
+    return (f"((states[{_WX}] && ({{sunny:'251,191,36',partlycloudy:'251,191,36',rainy:'96,165,250',pouring:'96,165,250',"
+            "lightning:'96,165,250','lightning-rainy':'96,165,250',snowy:'125,211,252'})[states[" + _WX + "].state]) ? "
+            "({sunny:'251,191,36',partlycloudy:'251,191,36',rainy:'96,165,250',pouring:'96,165,250',lightning:'96,165,250',"
+            "'lightning-rainy':'96,165,250',snowy:'125,211,252'})[states[" + _WX + "].state] : null)")
+
+
+def _tab_rgb(path: str, vacuum: str | None) -> str:
+    return f"\"[[[ const r = {_tab_color(path, vacuum)}; return r ? 'rgb(' + r + ')' : 'rgb(12,12,16)' ]]]\""
+
+
+
+def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = None) -> tuple[str, str]:
     """Menu flottant « Liquid Glass » (barre d'onglets iOS) pour l'accueil.
 
     Renvoie (champ personnalisé, style de zone), à l'indentation zéro. La barre flotte
@@ -85,18 +111,18 @@ def gen_menu(has_vacuum: bool, active: str = "accueil") -> tuple[str, str]:
             "              - height: 62px",
             "              - padding: 0",
             "              - border-radius: 31px",
-            f"              - background: {'rgba(120,120,128,.20)' if on else 'transparent'}",
+            f"              - background: {'rgba(120,120,128,.18)' if on else 'transparent'}",
             f"              - border: {'1px solid rgba(255,255,255,.55)' if on else '1px solid transparent'}",
             f"              - box-shadow: {'inset 0 1px 1px rgba(255,255,255,.7)' if on else 'none'}",
             "            icon:",
             "              - width: 30px",
-            f"              - color: {'rgb(' + LG_ACCENT + ')' if on else 'rgba(20,20,24,.92)'}",
+            f"              - color: {_tab_rgb(path, vacuum)}",
             "            name:",
             "              - font-family: \"'Inter','SF Pro Text','Segoe UI',Roboto,sans-serif\"",
             "              - font-size: 12px",
             "              - font-weight: 500",
             "              - letter-spacing: .1px",
-            f"              - color: {'rgb(' + LG_ACCENT + ')' if on else 'rgba(20,20,24,.92)'}",
+            f"              - color: {_tab_rgb(path, vacuum)}",
             "              - white-space: nowrap",
         ]
     out += [
@@ -109,10 +135,10 @@ def gen_menu(has_vacuum: bool, active: str = "accueil") -> tuple[str, str]:
         "      card:",
         "        - padding: 7px",
         "        - border-radius: 40px",
-        "        - background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(245,245,250,.62))",
+        "        - background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.12))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
-        "        - border: 1px solid rgba(255,255,255,.70)",
+        "        - border: 1px solid rgba(255,255,255,.55)",
         f"        - box-shadow: {LG_EDGE}",
         "      custom_fields:",
     ]
@@ -293,7 +319,7 @@ def render(
         for token in FRAGMENTS:
             text = _inject(text, token, "")
         text = text.replace("__NAVCOLS__", "2")
-    field, style = gen_menu(bool(vacuum))
+    field, style = gen_menu(bool(vacuum), vacuum=vacuum)
     text = _inject(text, "__MENU__", field)
     text = _inject(text, "__MENU_STYLE__", style)
     text = text.replace("__SECTIONS__", gen_sections(secs))
