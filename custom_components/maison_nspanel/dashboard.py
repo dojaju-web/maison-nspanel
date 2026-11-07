@@ -32,42 +32,45 @@ VAC_SENSORS = {
 
 MENU_TABS = (
     ("accueil", "Accueil", "mdi:home"),
-    ("lumieres", "Éclairage", "mdi:lightbulb-group"),
+    ("lumieres", "Lumières", "mdi:lightbulb-group"),
     ("climat", "Climat", "mdi:air-conditioner"),
     ("aspirateur", "Aspirateur", "mdi:robot-vacuum"),
-    ("previsions", "Prévisions", "mdi:weather-partly-cloudy"),
 )
 _STY = "states['sensor.maison_nspanel_rappels']"
 _LIQ = f"({_STY} && {_STY}.attributes.style === 'liquid')"
 # Reflets « Liquid Glass » : verre dépoli, bord clair et lueur interne
 LG_BLUR = "blur(30px) saturate(1.9)"
-LG_EDGE = "inset 0 1px 1px rgba(255,255,255,.95), inset 0 -1px 1px rgba(255,255,255,.55), 0 12px 32px rgba(0,0,0,.30)"
+LG_EDGE = "inset 0 1px 1px rgba(255,255,255,.55), inset 0 -1px 1px rgba(255,255,255,.12), 0 12px 32px rgba(0,0,0,.35)"
 LG_ACCENT = "64,156,255"
 
 
-def _lg_filter(width: int = 452, height: int = 76, scale: int = 46) -> str:
+def _lg_filter(scale: float = 0.12) -> str:
     """Filtre SVG de réfraction « verre liquide » (carte de déplacement : les bords courbent l'image).
 
+    Les unités relatives à l'élément (objectBoundingBox) l'adaptent à toute taille de bulle.
     Utilisé par backdrop-filter: url(#lg-refract) ; sans WebGL ni capture du DOM.
     """
-    grad = lambda i, x2, y2, c: (  # noqa: E731
-        f'<linearGradient id="{i}" x1="0" x2="{x2}" y1="0" y2="{y2}">'
-        f'<stop offset="0" stop-color="rgb({c[0]})"/><stop offset="{c[3]}" stop-color="rgb({c[1]})"/>'
-        f'<stop offset="{1 - float(c[3]):.2f}" stop-color="rgb({c[1]})"/><stop offset="1" stop-color="rgb({c[2]})"/></linearGradient>'
-    )
+    def grad(i, x2, y2, c):
+        return (
+            f'<linearGradient id="{i}" x1="0" x2="{x2}" y1="0" y2="{y2}">'
+            f'<stop offset="0" stop-color="rgb({c[0]})"/><stop offset="{c[3]}" stop-color="rgb({c[1]})"/>'
+            f'<stop offset="{1 - float(c[3]):.2f}" stop-color="rgb({c[1]})"/><stop offset="1" stop-color="rgb({c[2]})"/></linearGradient>'
+        )
+
     m = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}"><defs>'
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100" viewBox="0 0 400 100" preserveAspectRatio="none"><defs>'
         + grad("r", 1, 0, ("255,0,0", "128,0,0", "0,0,0", ".12"))
         + grad("g", 0, 1, ("0,255,0", "0,128,0", "0,0,0", ".32"))
-        + f'</defs><rect width="{width}" height="{height}" fill="rgb(0,0,0)"/>'
-        f'<rect width="{width}" height="{height}" fill="url(#r)"/>'
-        f'<rect width="{width}" height="{height}" fill="url(#g)" style="mix-blend-mode:screen"/></svg>'
+        + '</defs><rect width="400" height="100" fill="rgb(0,0,0)"/>'
+        '<rect width="400" height="100" fill="url(#r)"/>'
+        '<rect width="400" height="100" fill="url(#g)" style="mix-blend-mode:screen"/></svg>'
     )
     uri = "data:image/svg+xml," + quote(m)
     return (
         '<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">'
-        '<filter id="lg-refract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
-        f'<feImage href="{uri}" x="0" y="0" width="{width}" height="{height}" preserveAspectRatio="none" result="map"/>'
+        '<filter id="lg-refract" primitiveUnits="objectBoundingBox" x="0" y="0" width="1" height="1" '
+        'color-interpolation-filters="sRGB">'
+        f'<feImage href="{uri}" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>'
         f'<feDisplacementMap in="SourceGraphic" in2="map" scale="{scale}" xChannelSelector="R" yChannelSelector="G"/>'
         "</filter></svg>"
     )
@@ -96,7 +99,7 @@ def _tab_color(path: str, vacuum: str | None) -> str:
 
 
 def _tab_rgb(path: str, vacuum: str | None) -> str:
-    return f"\"[[[ const r = {_tab_color(path, vacuum)}; return r ? 'rgb(' + r + ')' : 'rgb(12,12,16)' ]]]\""
+    return f"\"[[[ const r = {_tab_color(path, vacuum)}; return r ? 'rgb(' + r + ')' : 'rgb(255,255,255)' ]]]\""
 
 
 
@@ -144,8 +147,8 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
             "              - height: 62px",
             "              - padding: 0",
             "              - border-radius: 31px",
-            f"              - background: {'rgba(120,120,128,.18)' if on else 'transparent'}",
-            f"              - border: {'1px solid rgba(255,255,255,.55)' if on else '1px solid transparent'}",
+            f"              - background: {'rgba(255,255,255,.16)' if on else 'transparent'}",
+            f"              - border: {'1px solid rgba(255,255,255,.30)' if on else '1px solid transparent'}",
             f"              - box-shadow: {'inset 0 1px 1px rgba(255,255,255,.7)' if on else 'none'}",
             "            img_cell:",
             "              - width: 30px",
@@ -174,11 +177,11 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "      card:",
         "        - padding: 7px",
         "        - border-radius: 40px",
-        "        - background: radial-gradient(120px 40px at 18% 0%, rgba(255,255,255,.45), transparent 70%), linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.07))",
+        "        - background: radial-gradient(120px 40px at 18% 0%, rgba(255,255,255,.30), transparent 70%), linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
-        "        - backdrop-filter: url(#lg-refract) blur(3px) saturate(1.8)",
-        "        - border: 1px solid rgba(255,255,255,.55)",
+        "        - backdrop-filter: url(#lg-refract) blur(3px) saturate(1.6)",
+        "        - border: 1px solid rgba(255,255,255,.30)",
         f"        - box-shadow: {LG_EDGE}",
         "      custom_fields:",
     ]
@@ -363,6 +366,7 @@ def render(
     field, style = gen_menu(bool(vacuum), vacuum=vacuum)
     text = _inject(text, "__MENU__", field)
     text = _inject(text, "__MENU_STYLE__", style)
+    text = text.replace("__LG_DEFS__", _lg_filter())
     text = text.replace("__SECTIONS__", gen_sections(secs))
     text = text.replace("__LIGHTS_IDS__", json.dumps(lights))
     text = text.replace("__LIGHTS_TRIG__", json.dumps(trig))

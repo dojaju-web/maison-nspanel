@@ -95,8 +95,8 @@ class Menu(unittest.TestCase):
     def test_menu_toujours_rendu(self):
         out = d.render(self.SRC)
         self.assertIn("menu:", out)
-        self.assertIn("t3:", out)  # 4 onglets sans aspirateur : t0..t3
-        self.assertNotIn("t4:", out)
+        self.assertIn("t2:", out)  # 3 onglets sans aspirateur : t0..t2
+        self.assertNotIn("t3:", out)
         self.assertNotIn("__", out)
 
     def test_menu_flottant_liquid(self):
@@ -114,10 +114,10 @@ class Menu(unittest.TestCase):
         field, style = d.gen_menu(True, vacuum="vacuum.cookie")
         self.assertIn("states['vacuum.cookie']", field)
         self.assertIn("[__LIGHTS_JS__]", field)
-        self.assertIn("rgb(12,12,16)", field)
-        self.assertIn("t4:", field)
+        self.assertIn("rgb(255,255,255)", field)
+        self.assertIn("t3:", field)
         self.assertIn("/aspirateur", field)
-        self.assertIn("repeat(5, 1fr)", field)
+        self.assertIn("repeat(4, 1fr)", field)
         self.assertIn("z-index", style)
 
 

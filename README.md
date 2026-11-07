@@ -77,7 +77,7 @@ l'action *Release* crée seule la release `vX.Y.Z`, ce qui permet à HACS de pro
 - **Rappels** : ajouter, modifier, supprimer.
 - **Météo et vigilance** : entité météo, alerte Météo-France.
 - **Climatisation et qualité de l'air** : entité de climatisation (les entités liées — ventilation, alerte de filtre, capteurs d'air — sont déduites de son nom, comme `switch.<nom>_climate_react`) et affichage de la qualité de l'air. Désactivée, la tuile « Air » disparaît et les deux tuiles de température prennent toute la largeur.
-- **Apparence** : style « verre sombre », « ardoise » ou « Liquid Glass » (verre dépoli translucide ; sur l'accueil, menu flottant façon barre d'onglets iOS : Accueil, Éclairage, Climat, Aspirateur si détecté, Prévisions).
+- **Apparence** : style « verre sombre », « ardoise » ou « Liquid Glass » (verre dépoli translucide ; sur l'accueil, menu flottant façon barre d'onglets iOS : Accueil, Lumières, Climat et Aspirateur si détecté ; heure, date et bulles en verre liquide).
 
 Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entité de climatisation change : **rechargez ensuite la page du panneau** (Home Assistant relit désormais le fichier tout seul ; si rien ne change, utilisez ⋮ > *Actualiser* sur le tableau de bord, sans redémarrage).
 
