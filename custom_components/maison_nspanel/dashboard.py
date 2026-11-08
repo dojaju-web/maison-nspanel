@@ -39,7 +39,7 @@ MENU_TABS = (
 _STY = "states['sensor.maison_nspanel_rappels']"
 _LIQ = f"({_STY} && {_STY}.attributes.style === 'liquid')"
 # Reflets « Liquid Glass » : verre dépoli, bord clair et lueur interne
-LG_BLUR = "blur(24px) saturate(1.4)"
+LG_BLUR = "blur(12px) saturate(1.6)"
 LG_EDGE = "inset 0 1px 0 rgba(255,255,255,.14), 0 8px 24px rgba(0,0,0,.45)"
 LG_ACCENT = "64,156,255"
 
@@ -180,7 +180,7 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "        - background: linear-gradient(180deg, rgba(58,58,60,.74), rgba(44,44,46,.74))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
-        "        - backdrop-filter: url(#lg-refract) blur(14px) saturate(1.4)",
+        "        - backdrop-filter: url(#lg-refract) blur(12px) saturate(1.6)",
         "        - border: 1px solid rgba(255,255,255,.10)",
         f"        - box-shadow: {LG_EDGE}",
         "      custom_fields:",
@@ -367,6 +367,8 @@ def render(
     text = _inject(text, "__MENU__", field)
     text = _inject(text, "__MENU_STYLE__", style)
     text = text.replace("__LG_DEFS__", _lg_filter())
+    pages = ["lumieres", "climat", "previsions"] + (["aspirateur"] if vacuum else [])
+    text = text.replace("__WARM_PAGES__", json.dumps(pages))
     text = text.replace("__SECTIONS__", gen_sections(secs))
     text = text.replace("__LIGHTS_IDS__", json.dumps(lights))
     text = text.replace("__LIGHTS_TRIG__", json.dumps(trig))

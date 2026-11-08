@@ -102,7 +102,7 @@ class Menu(unittest.TestCase):
     def test_menu_flottant_liquid(self):
         out = d.render(self.SRC)
         self.assertIn("position: absolute", out)
-        self.assertIn("backdrop-filter: blur(24px)", out)
+        self.assertIn("backdrop-filter: blur(12px)", out)
         self.assertIn("style === 'liquid'", out)
 
     def test_refraction_verre_liquide(self):

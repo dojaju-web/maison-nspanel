@@ -647,8 +647,29 @@ views:
         tap_action:
           action: none
         custom_fields:
+          lgdefs: '__LG_DEFS__'
           clock: >
             [[[
+              // Préchauffage : Home Assistant ne construit une page qu'à sa première visite. On les visite une fois,
+              // en douce, juste après l'affichage de l'accueil, pour que les ouvertures suivantes soient instantanées.
+              if (!window._jvWarm) {
+                window._jvWarm = true;
+                window._jvTouch = Date.now();
+                ['pointerdown', 'touchstart'].forEach(e => window.addEventListener(e, () => { window._jvTouch = Date.now(); }, true));
+                setTimeout(function warm() {
+                  const parts = window.location.pathname.split('/');
+                  if (parts[2] !== 'accueil') return;
+                  if (Date.now() - window._jvTouch < 6000) { setTimeout(warm, 6000); return; }
+                  const pages = __WARM_PAGES__, base = '/' + parts[1] + '/', root = document.documentElement;
+                  const go = p => { history.pushState(null, '', base + p); window.dispatchEvent(new CustomEvent('location-changed')); };
+                  root.style.visibility = 'hidden';
+                  let i = 0;
+                  (function step() {
+                    if (i < pages.length) { go(pages[i++]); setTimeout(step, 700); }
+                    else { go('accueil'); setTimeout(() => { root.style.visibility = ''; }, 350); }
+                  })();
+                }, 8000);
+              }
               const tz = hass.config.time_zone, d = new Date();
               const time = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: tz });
               const w = d.toLocaleDateString('fr-FR', { weekday: 'short', timeZone: tz });
@@ -738,6 +759,8 @@ views:
               tap_action:
                 action: navigate
                 navigation_path: "[[[ return '/' + window.location.pathname.split('/')[1] + '/previsions'; ]]]"
+              custom_fields:
+                lg: '__LG_DEFS__'
               styles:
                 grid:
                   - grid-template-areas: '"i l" "i n"'
@@ -753,25 +776,27 @@ views:
                   - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '27px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px') ]]]"
                   - background: >
                       [[[
-                        if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.62)';
+                        if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.04))';
                         if (!(states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) return 'rgba(16,23,40,.62)';
                         const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                         const st = w ? w.state : '';
                         const tint = ({ sunny: '251,191,36', partlycloudy: '251,191,36', rainy: '96,165,250', pouring: '96,165,250', lightning: '96,165,250', 'lightning-rainy': '96,165,250', snowy: '186,230,253' })[st] || '148,163,184';
                         return 'linear-gradient(90deg, rgba(' + tint + ',.16) 0%, rgba(6,12,22,.97) 27%, rgba(6,12,22,.96) 100%)';
                       ]]]
-                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1px solid rgba(255,255,255,.10)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)')) ]]]"
-                  - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'inset 0 1px 0 rgba(255,255,255,.12), 0 6px 18px rgba(0,0,0,.35)' : 'none' ]]]"
-                  - backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(24px) saturate(1.4)' : 'none' ]]]"
-                  - -webkit-backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(24px) saturate(1.4)' : 'none' ]]]"
+                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1px solid rgba(255,255,255,.28)' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.12)')) ]]]"
+                  - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'inset 0 1.5px 1px rgba(255,255,255,.60), inset 0 -1.5px 1px rgba(255,255,255,.30), inset 0 0 14px rgba(255,255,255,.10), 0 8px 24px rgba(0,0,0,.35)' : 'none' ]]]"
+                  - backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(8px) saturate(1.8)' : 'none' ]]]"
+                  - -webkit-backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'blur(8px) saturate(1.8)' : 'none' ]]]"
+                  - backdrop-filter: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'url(#lg-refract) blur(8px) saturate(1.9)' : 'none' ]]]"
                 img_cell:
-                  - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
-                  - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px' ]]]"
-                  - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '50%' : '0' ]]]"
-                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.04)' : 'transparent' ]]]"
+                  - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '38px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px') ]]]"
+                  - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '38px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '30px' : '28px') ]]]"
+                  - border-radius: "[[[ return ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') || (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise')) ? '50%' : '0' ]]]"
+                  - background: >
+                      [[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) { const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')]; return (w && w.state !== 'unavailable' && w.state !== 'unknown') ? 'rgb(0,145,255)' : 'rgba(142,142,147,.45)' } return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.04)' : 'transparent' ]]]
                   - justify-self: center
                 icon:
-                  - width: 26px
+                  - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '22px' : '26px' ]]]"
                   - color: >
                       [[[
                         const c = { sunny: '#FBBF24', 'clear-night': '#E2E8F0', partlycloudy: '#FCD34D', cloudy: '#CBD5E1', fog: '#CBD5E1', windy: '#CBD5E1', 'windy-variant': '#CBD5E1', rainy: '#7DD3FC', pouring: '#60A5FA', snowy: '#E0F2FE', 'snowy-rainy': '#BAE6FD', hail: '#BAE6FD', lightning: '#FACC15', 'lightning-rainy': '#FACC15', exceptional: '#FB923C' };
@@ -796,6 +821,11 @@ views:
                   - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
                   - justify-self: start
                   - white-space: nowrap
+                custom_fields:
+                  lg:
+                    - position: absolute
+                    - width: 0
+                    - height: 0
           indoor: >
             [[[
               const c = states['climate.sejour_climatisation'];
@@ -804,7 +834,7 @@ views:
               const temp = (t !== undefined && t !== null) ? (Math.round(Number(t) * 10) / 10) + ' °C' : '-- °C';
               const hum = (h !== undefined && h !== null) ? ' · ' + Math.round(Number(h)) + ' %' : '';
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
-              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(44,44,46,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));backdrop-filter:blur(8px) saturate(1.8);backdrop-filter:url(#lg-refract) blur(8px) saturate(1.9);-webkit-backdrop-filter:blur(8px) saturate(1.8);border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.60),inset 0 -1.5px 1px rgba(255,255,255,.30),inset 0 0 14px rgba(255,255,255,.10),0 8px 24px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
               const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E8E93' : '#94A3B8';
               const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#7DD3FC';
               if (ar) {
@@ -814,6 +844,13 @@ views:
                   + '<div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:20px;color:rgb(' + tint + ')"></ha-icon></div>'
                   + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">INTÉRIEUR' + hum + '</div>'
                   + '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,.96);white-space:nowrap">' + temp + '</div></div></div>';
+              }
+              if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) {
+                const dc = (t === undefined || t === null) ? 'rgba(142,142,147,.45)' : 'rgb(' + (Number(t) < 19 ? '60,211,254' : Number(t) < 24 ? '48,209,88' : Number(t) < 27 ? '255,146,48' : '255,66,69') + ')';
+                return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;padding:8px 12px 8px 8px;' + GLASS + ';text-align:left">'
+                  + '<div style="flex:none;width:38px;height:38px;border-radius:50%;background:' + dc + ';display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 1px rgba(255,255,255,.35)"><ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:22px;color:#FFFFFF"></ha-icon></div>'
+                  + '<div style="min-width:0"><div style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#8E8E93;white-space:nowrap">INTÉRIEUR' + hum + '</div>'
+                  + '<div style="font-size:18px;font-weight:700;color:#FFFFFF;white-space:nowrap">' + temp + '</div></div></div>';
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
                 + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:' + ICO + ';flex:none"></ha-icon>'
@@ -841,7 +878,7 @@ views:
               const qLabel = q === null ? 'n/d' : labels[q];
               const qCol = q === null ? ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E8E93' : '#94A3B8') : cols[q];
               const ar = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise');
-              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:rgba(44,44,46,.62);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
+              const GLASS = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));backdrop-filter:blur(8px) saturate(1.8);backdrop-filter:url(#lg-refract) blur(8px) saturate(1.9);-webkit-backdrop-filter:blur(8px) saturate(1.8);border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.60),inset 0 -1.5px 1px rgba(255,255,255,.30),inset 0 0 14px rgba(255,255,255,.10),0 8px 24px rgba(0,0,0,.35);border-radius:27px;min-height:54px' : 'background:rgba(16,23,40,.62);border:1px solid rgba(255,255,255,.12)';
               const LBL = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#8E8E93' : '#94A3B8';
               const ICO = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#7DD3FC';
               if (ar) {
@@ -851,6 +888,13 @@ views:
                   + '<div style="flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center"><ha-icon icon="mdi:air-filter" style="--mdc-icon-size:20px;color:rgb(' + tint + ')"></ha-icon></div>'
                   + '<div style="min-width:0"><div style="font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(255,255,255,.40);white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
                   + '<div style="font-size:18px;font-weight:800;color:rgb(' + tint + ');white-space:nowrap">' + qLabel + '</div></div></div>';
+              }
+              if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) {
+                const dc = q === null ? 'rgba(142,142,147,.45)' : 'rgb(' + ['48,209,88', '255,214,0', '255,146,48', '255,66,69'][q] + ')';
+                return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;padding:8px 12px 8px 8px;' + GLASS + ';text-align:left">'
+                  + '<div style="flex:none;width:38px;height:38px;border-radius:50%;background:' + dc + ';display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 1px rgba(255,255,255,.35)"><ha-icon icon="mdi:air-filter" style="--mdc-icon-size:22px;color:#FFFFFF"></ha-icon></div>'
+                  + '<div style="min-width:0"><div style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#8E8E93;white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
+                  + '<div style="font-size:18px;font-weight:700;color:#FFFFFF;white-space:nowrap">' + qLabel + '</div></div></div>';
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
                 + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none"></ha-icon>'
@@ -1197,9 +1241,13 @@ views:
                     windy: [shade, wind, clouds, grey],
                     'windy-variant': [shade, wind, clouds, grey]
                   };
-                  return ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'linear-gradient(180deg, rgba(28,28,30,.82) 0%, rgba(28,28,30,.95) 100%), ' : '') + photo + (layers[c] || [shade, sky]).join(', ');
+                  return ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'linear-gradient(180deg, rgba(28,28,30,.66) 0%, rgba(28,28,30,.86) 100%), ' : '') + photo + (layers[c] || [shade, sky]).join(', ');
                 ]]]
           custom_fields:
+            lgdefs:
+              - position: absolute
+              - width: 0
+              - height: 0
             clock:
               - align-self: center
               - justify-self: stretch
