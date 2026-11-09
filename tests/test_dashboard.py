@@ -105,10 +105,10 @@ class Menu(unittest.TestCase):
         self.assertIn("backdrop-filter: blur(12px)", out)
         self.assertIn("style === 'liquid'", out)
 
-    def test_refraction_verre_liquide(self):
+    def test_un_seul_liserere(self):
         out = d.render(self.SRC)
-        self.assertIn("feDisplacementMap", out)
-        self.assertIn("backdrop-filter: url(#lg-refract)", out)
+        self.assertNotIn("lg-refract", out)
+        self.assertIn("border-color: rgba(255,255,255,.30)", out)
 
     def test_menu_avec_aspirateur(self):
         field, style = d.gen_menu(True, vacuum="vacuum.cookie")

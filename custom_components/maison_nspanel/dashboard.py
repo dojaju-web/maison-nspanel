@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import re
-from urllib.parse import quote
 from pathlib import Path
 from typing import Any
 
@@ -40,40 +39,8 @@ _STY = "states['sensor.maison_nspanel_rappels']"
 _LIQ = f"({_STY} && {_STY}.attributes.style === 'liquid')"
 # Reflets « Liquid Glass » : verre dépoli, bord clair et lueur interne
 LG_BLUR = "blur(12px) saturate(1.6)"
-LG_EDGE = "inset 0 1px 0 rgba(255,255,255,.14), 0 8px 24px rgba(0,0,0,.45)"
+LG_EDGE = "0 8px 24px rgba(0,0,0,.40)"
 LG_ACCENT = "64,156,255"
-
-
-def _lg_filter(scale: float = 0.12) -> str:
-    """Filtre SVG de réfraction « verre liquide » (carte de déplacement : les bords courbent l'image).
-
-    Les unités relatives à l'élément (objectBoundingBox) l'adaptent à toute taille de bulle.
-    Utilisé par backdrop-filter: url(#lg-refract) ; sans WebGL ni capture du DOM.
-    """
-    def grad(i, x2, y2, c):
-        return (
-            f'<linearGradient id="{i}" x1="0" x2="{x2}" y1="0" y2="{y2}">'
-            f'<stop offset="0" stop-color="rgb({c[0]})"/><stop offset="{c[3]}" stop-color="rgb({c[1]})"/>'
-            f'<stop offset="{1 - float(c[3]):.2f}" stop-color="rgb({c[1]})"/><stop offset="1" stop-color="rgb({c[2]})"/></linearGradient>'
-        )
-
-    m = (
-        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100" viewBox="0 0 400 100" preserveAspectRatio="none"><defs>'
-        + grad("r", 1, 0, ("255,0,0", "128,0,0", "0,0,0", ".12"))
-        + grad("g", 0, 1, ("0,255,0", "0,128,0", "0,0,0", ".32"))
-        + '</defs><rect width="400" height="100" fill="rgb(0,0,0)"/>'
-        '<rect width="400" height="100" fill="url(#r)"/>'
-        '<rect width="400" height="100" fill="url(#g)" style="mix-blend-mode:screen"/></svg>'
-    )
-    uri = "data:image/svg+xml," + quote(m)
-    return (
-        '<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">'
-        '<filter id="lg-refract" primitiveUnits="objectBoundingBox" x="0" y="0" width="1" height="1" '
-        'color-interpolation-filters="sRGB">'
-        f'<feImage href="{uri}" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>'
-        f'<feDisplacementMap in="SourceGraphic" in2="map" scale="{scale}" xChannelSelector="R" yChannelSelector="G"/>'
-        "</filter></svg>"
-    )
 
 
 
@@ -121,7 +88,6 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "    show_label: false",
         "    triggers_update: [sensor.maison_nspanel_rappels]",
         "    custom_fields:",
-        f"      defs: '{_lg_filter()}'",
     ]
     for (path, name, icon), tid in zip(tabs, ids):
         on = path == active
@@ -146,10 +112,10 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
             "            card:",
             "              - height: 64px",
             "              - padding: 0",
-            "              - border-radius: 32px",
+            "              - border-radius: 34px",
             f"              - background: {'rgba(28,28,30,.85)' if on else 'transparent'}",
-            f"              - border: {'1px solid rgba(255,255,255,.04)' if on else '1px solid transparent'}",
-            f"              - box-shadow: {'inset 0 1px 3px rgba(0,0,0,.5)' if on else 'none'}",
+            f"              - border: {'1px solid transparent'}",
+            f"              - box-shadow: {'none'}",
             "            img_cell:",
             "              - width: 30px",
             "              - height: 30px",
@@ -160,7 +126,7 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
             "              - height: 30px",
             f"              - color: {_tab_rgb(path, vacuum)}",
             "            name:",
-            "              - font-family: \"'Inter','SF Pro Text','Segoe UI',Roboto,sans-serif\"",
+            "              - font-family: \"-apple-system,'SF Pro Text','Inter',Roboto,sans-serif\"",
             "              - font-size: 12px",
             "              - font-weight: 500",
             "              - letter-spacing: .1px",
@@ -180,14 +146,13 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
         "        - background: linear-gradient(180deg, rgba(58,58,60,.74), rgba(44,44,46,.74))",
         f"        - backdrop-filter: {LG_BLUR}",
         f"        - -webkit-backdrop-filter: {LG_BLUR}",
-        "        - backdrop-filter: url(#lg-refract) blur(12px) saturate(1.6)",
-        "        - border: 1px solid rgba(255,255,255,.10)",
+                "        - border: 1px solid",
+        "        - border-color: rgba(255,255,255,.30) rgba(255,255,255,.10) rgba(255,255,255,.10) rgba(255,255,255,.30)",
         f"        - box-shadow: {LG_EDGE}",
         "      custom_fields:",
     ]
     for tid in ids:
         out += [f"        {tid}:", "          - grid-area: " + tid, "          - width: 100%"]
-    out += ["        defs:", "          - position: absolute", "          - width: 0", "          - height: 0"]
     style = [
         "menu:",
         "  - position: absolute",
@@ -366,7 +331,6 @@ def render(
     field, style = gen_menu(bool(vacuum), vacuum=vacuum)
     text = _inject(text, "__MENU__", field)
     text = _inject(text, "__MENU_STYLE__", style)
-    text = text.replace("__LG_DEFS__", _lg_filter())
     pages = ["lumieres", "climat", "previsions"] + (["aspirateur"] if vacuum else [])
     text = text.replace("__WARM_PAGES__", json.dumps(pages))
     text = text.replace("__SECTIONS__", gen_sections(secs))
