@@ -121,5 +121,52 @@ class Menu(unittest.TestCase):
         self.assertIn("z-index", style)
 
 
+class LiquidContenu(unittest.TestCase):
+    """Couche contenu du thème Liquid Glass : surfaces plates, palette système, mouvement réduit."""
+
+    @classmethod
+    def setUpClass(cls):
+        base = Path(__file__).resolve().parent.parent / "custom_components" / "maison_nspanel" / "dashboard"
+        cls.modele = (base / "modele.yaml").read_text(encoding="utf-8")
+        cls.asp = (base / "aspirateur_page.yaml").read_text(encoding="utf-8")
+
+    def _tpl(self, name):
+        start = self.modele.index(f"\n  {name}:\n")
+        end = self.modele.find("\n  tile_", start + 5)
+        return self.modele[start:end if end > 0 else len(self.modele)]
+
+    def test_tuiles_ont_une_branche_liquid(self):
+        for name in ("tile_light", "tile_base", "tile_vac"):
+            self.assertIn("style === 'liquid'", self._tpl(name), name)
+
+    def test_tuiles_plates_sans_verre(self):
+        for name in ("tile_light", "tile_base", "tile_vac"):
+            self.assertIn("rgba(44,44,46,.80)", self._tpl(name), name)
+        self.assertNotIn("backdrop-filter", self._tpl("tile_light"))
+
+    def test_palette_systeme_et_contraste(self):
+        t = self._tpl("tile_light")
+        self.assertIn("[0,145,255]", t)
+        self.assertIn("#1C1C1E", t)  # glyphe sombre sur couleur claire
+
+    def test_etat_pas_porte_par_la_couleur_seule(self):
+        self.assertIn("2px solid", self._tpl("tile_base"))
+        self.assertIn("'Allumée", self._tpl("tile_light"))
+
+    def test_mouvement_reduit(self):
+        for name in ("tile_light", "tile_base", "tile_vac"):
+            self.assertIn("prefers-reduced-motion", self._tpl(name), name)
+        self.assertIn("prefers-reduced-motion", self.asp)
+
+    def test_police_minimale(self):
+        # le liquid ne descend pas sous 11 px et évite les graisses légères
+        self.assertIn(".av-lq .av-metric-label {font-size:11px", self.asp)
+        self.assertNotIn("font-weight:300", self.asp)
+
+    def test_aspirateur_liquid(self):
+        self.assertIn("av-lq", self.asp)
+        self.assertIn("#8E8E93", self.asp)
+
+
 if __name__ == "__main__":
     unittest.main()

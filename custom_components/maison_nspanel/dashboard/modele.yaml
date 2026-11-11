@@ -175,6 +175,9 @@ button_card_templates:
         const b = entity.attributes.brightness;
         return (b !== undefined && b !== null) ? 'Allumée · ' + Math.round(b / 2.55) + ' %' : 'Allumée';
       ]]]
+    extra_styles: |
+      ha-card:active { opacity: .72; }
+      @media (prefers-reduced-motion: reduce) { ha-card, ha-card * { transition: none !important; animation: none !important; } }
     styles:
       grid:
         - grid-template-areas: '"i" "n" "l"'
@@ -187,9 +190,9 @@ button_card_templates:
         - height: 100%
         - min-height: "[[[ return variables.min_h ]]]"
         - padding: 8px 6px
-        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)' ]]]"
-        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)' ]]]"
+        - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '22px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px'; ]]]"
+        - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.80)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)'; ]]]"
+        - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.10)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)'; ]]]"
         - box-shadow: none
         - transition: all .3s ease
       img_cell:
@@ -197,46 +200,48 @@ button_card_templates:
         - height: 42px
         - justify-self: center
         - align-self: center
-        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '13px' ]]]"
-        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : ('rgba(' + variables.rgb + ',.14)') ]]]"
-        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.28)') ]]]"
+        - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '50%'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '13px'; ]]]"
+        - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(142,142,147,.24)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : ('rgba(' + variables.rgb + ',.14)'); ]]]"
+        - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.28)'); ]]]"
         - transition: all .3s ease
       icon:
         - width: 24px
-        - color: "[[[ return 'rgb(' + variables.rgb + ')' ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; return 'rgb(' + variables.rgb + ')'; ]]]"
       name:
-        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-        - font-size: 12px
-        - font-weight: 800
-        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px' ]]]"
-        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
+        - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+        - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '15px'; return '12px'; ]]]"
+        - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '600'; return '800'; ]]]"
+        - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px'; ]]]"
+        - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase'; ]]]"
         - white-space: nowrap
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0' ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0'; ]]]"
         - margin-top: 2px
         - transition: color .3s ease
       label:
-        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-        - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
-        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '600' ]]]"
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(214,238,245,.5)' : '#8A96A8' ]]]"
+        - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+        - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px'; ]]]"
+        - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '500'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '600'; ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(214,238,245,.5)' : '#8A96A8'; ]]]"
         - padding-bottom: 2px
-        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.6px' : 'normal' ]]]"
+        - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none'; ]]]"
+        - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.6px' : 'normal'; ]]]"
     state:
       - operator: template
         value: "[[[ return entity.state === 'on' ]]]"
         styles:
           card:
-            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)' ]]]"
-            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)' ]]]"
+            - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(58,58,60,.92)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)'; ]]]"
+            - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.22)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)'; ]]]"
           img_cell:
-            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : 'rgba(' + variables.rgb + ',.30)' ]]]"
-            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + variables.rgb + ',.55)' ]]]"
-            - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '0 0 14px rgba(' + variables.rgb + ',.45)' ]]]"
+            - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgb(' + ((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})(variables.rgb.split(',').map(Number)) + ')'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : 'rgba(' + variables.rgb + ',.30)'; ]]]"
+            - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + variables.rgb + ',.55)'; ]]]"
+            - box-shadow: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '0 0 14px rgba(' + variables.rgb + ',.45)'; ]]]"
           name:
-            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '#FFFFFF' : 'rgb(' + variables.rgb + ')' ]]]"
+            - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '#FFFFFF' : 'rgb(' + variables.rgb + ')'; ]]]"
           label:
-            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgb(' + variables.rgb + ')' : '#C7D2E5' ]]]"
+            - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(255,255,255,.85)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgb(' + variables.rgb + ')' : '#C7D2E5'; ]]]"
+          icon:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? ((c)=>((0.2126*c[0]+0.7152*c[1]+0.0722*c[2])/255>.55?'#1C1C1E':'#FFFFFF'))(((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})((variables.rgb).split(',').map(Number)).split(',').map(Number)) : 'rgb(' + variables.rgb + ')' ]]]"
 
   # ----------------------------------------------------------
   # Titre de section : texte à gauche + fine ligne qui s'efface
@@ -270,11 +275,11 @@ button_card_templates:
       custom_fields:
         sep:
           - width: 100%
-          - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-          - font-size: 11px
-          - font-weight: 800
-          - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1.4px' : '3px' ]]]"
-          - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(194,222,235,.55)' : '#6B7A99' ]]]"
+          - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+          - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return '11px'; ]]]"
+          - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '600'; return '800'; ]]]"
+          - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '.6px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1.4px' : '3px'; ]]]"
+          - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(194,222,235,.55)' : '#6B7A99'; ]]]"
 
   # ==========================================================
   #  Modèles de la page Climat
@@ -293,6 +298,9 @@ button_card_templates:
       value: ""
       rgb: "148,163,184"     # couleur de la carte, au format R,G,B
       min_h: 13.5vh          # hauteur minimale du bouton
+    extra_styles: |
+      ha-card:active { opacity: .72; }
+      @media (prefers-reduced-motion: reduce) { ha-card, ha-card * { transition: none !important; animation: none !important; } }
     styles:
       grid:
         - grid-template-areas: '"i" "n" "l"'
@@ -305,9 +313,9 @@ button_card_templates:
         - height: 100%
         - min-height: "[[[ return variables.min_h ]]]"
         - padding: 6px 2px
-        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)' ]]]"
-        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)' ]]]"
+        - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '22px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px'; ]]]"
+        - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.80)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)'; ]]]"
+        - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.10)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)'; ]]]"
         - box-shadow: none
         - transition: all .3s ease
       img_cell:
@@ -315,30 +323,30 @@ button_card_templates:
         - height: 34px
         - justify-self: center
         - align-self: center
-        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '11px' ]]]"
-        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : ('rgba(' + variables.rgb + ',.14)') ]]]"
-        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.28)') ]]]"
+        - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '50%'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '11px'; ]]]"
+        - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(142,142,147,.24)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : ('rgba(' + variables.rgb + ',.14)'); ]]]"
+        - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(' + variables.rgb + ',.28)'); ]]]"
         - transition: all .3s ease
       icon:
         - width: 20px
-        - color: "[[[ return 'rgb(' + variables.rgb + ')' ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; return 'rgb(' + variables.rgb + ')'; ]]]"
       name:
-        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-        - font-size: 11px
-        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '800' : '800' ]]]"
-        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px' ]]]"
-        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0' ]]]"
+        - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+        - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return '11px'; ]]]"
+        - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '600'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '800' : '800'; ]]]"
+        - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px'; ]]]"
+        - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase'; ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0'; ]]]"
         - margin-top: 2px
         - transition: color .3s ease
       label:
-        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-        - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
-        - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '600' ]]]"
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(214,238,245,.5)' : '#8A96A8' ]]]"
+        - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+        - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px'; ]]]"
+        - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '500'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '600'; ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(214,238,245,.5)' : '#8A96A8'; ]]]"
         - padding-bottom: 2px
-        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.6px' : 'normal' ]]]"
+        - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none'; ]]]"
+        - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.6px' : 'normal'; ]]]"
     state:
       - operator: template
         value: >
@@ -356,16 +364,18 @@ button_card_templates:
           ]]]
         styles:
           card:
-            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)' ]]]"
-            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)' ]]]"
+            - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(' + ((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})(variables.rgb.split(',').map(Number)) + ',.30)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)'; ]]]"
+            - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '2px solid ' + 'rgb(' + ((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})(variables.rgb.split(',').map(Number)) + ')'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)'; ]]]"
           img_cell:
-            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : 'rgba(' + variables.rgb + ',.30)' ]]]"
-            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + variables.rgb + ',.55)' ]]]"
-            - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '0 0 14px rgba(' + variables.rgb + ',.45)' ]]]"
+            - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgb(' + ((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})(variables.rgb.split(',').map(Number)) + ')'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'transparent' : 'rgba(' + variables.rgb + ',.30)'; ]]]"
+            - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + variables.rgb + ',.55)'; ]]]"
+            - box-shadow: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '0 0 14px rgba(' + variables.rgb + ',.45)'; ]]]"
           name:
-            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '#FFFFFF' : 'rgb(' + variables.rgb + ')' ]]]"
+            - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '#FFFFFF' : 'rgb(' + variables.rgb + ')'; ]]]"
           label:
-            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgb(' + variables.rgb + ')' : '#8A96A8' ]]]"
+            - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgb(' + variables.rgb + ')' : '#8A96A8'; ]]]"
+          icon:
+            - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? ((c)=>((0.2126*c[0]+0.7152*c[1]+0.0722*c[2])/255>.55?'#1C1C1E':'#FFFFFF'))(((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})((variables.rgb).split(',').map(Number)).split(',').map(Number)) : 'rgb(' + variables.rgb + ')' ]]]"
 
   # ----------------------------------------------------------
   # Mode HVAC
@@ -535,6 +545,9 @@ button_card_templates:
     variables:
       rgb: "148,163,184"
       active_states: ""
+    extra_styles: |
+      ha-card:active { opacity: .72; }
+      @media (prefers-reduced-motion: reduce) { ha-card, ha-card * { transition: none !important; animation: none !important; } }
     styles:
       grid:
         - grid-template-areas: '"i" "n"'
@@ -546,9 +559,9 @@ button_card_templates:
         - height: 100%
         - min-height: 12vh
         - padding: 6px 2px
-        - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-        - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)' ]]]"
-        - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)' ]]]"
+        - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '22px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px'; ]]]"
+        - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.80)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(159,207,227,.055)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.10) 0%, rgba(16,23,40,.82) 62%)'; ]]]"
+        - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.10)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(184,226,239,.07)' : '1px solid rgba(255,255,255,.08)'; ]]]"
         - box-shadow: none
         - transition: all .3s ease
       img_cell:
@@ -558,21 +571,21 @@ button_card_templates:
         - align-self: center
       icon:
         - width: 22px
-        - color: "[[[ return 'rgb(' + variables.rgb + ')' ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgb(' + ((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})(variables.rgb.split(',').map(Number)) + ')'; return 'rgb(' + variables.rgb + ')'; ]]]"
       name:
-        - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-        - font-size: 11px
-        - font-weight: 800
-        - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px' ]]]"
-        - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
-        - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0' ]]]"
+        - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+        - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return '11px'; ]]]"
+        - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '600'; return '800'; ]]]"
+        - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.2px' : '1px'; ]]]"
+        - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase'; ]]]"
+        - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(209,232,243,.92)' : '#B4BED0'; ]]]"
     state:
       - operator: template
         value: "[[[ return String(variables.active_states).split(',').includes(entity.state) ]]]"
         styles:
           card:
-            - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)' ]]]"
-            - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)' ]]]"
+            - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(58,58,60,.92)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + variables.rgb + ',.13)' : 'linear-gradient(145deg, rgba(' + variables.rgb + ',.26) 0%, rgba(16,23,40,.86) 68%)'; ]]]"
+            - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '2px solid ' + 'rgb(' + ((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})(variables.rgb.split(',').map(Number)) + ')'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px solid rgba(' + variables.rgb + ',.30)' : '1px solid rgba(' + variables.rgb + ',.50)'; ]]]"
           name:
             - color: '#FFFFFF'
 
@@ -1318,8 +1331,9 @@ views:
                   }, 1000);
                 }
                 const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
-                if (n === 0) return 'TOUT EST ÉTEINT';
-                return n + (n > 1 ? ' ALLUMÉS' : ' ALLUMÉ') + ' SUR ' + variables.ids.length;
+                const F = t => (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? t.charAt(0) + t.slice(1).toLowerCase() : t;
+                if (n === 0) return F('TOUT EST ÉTEINT');
+                return F(n + (n > 1 ? ' ALLUMÉS' : ' ALLUMÉ') + ' SUR ' + variables.ids.length);
               ]]]
             tap_action:
               action: navigate
@@ -1340,43 +1354,44 @@ views:
               card:
                 - min-height: 14vh
                 - padding: 3.5vh 14px 1vh 14px
-                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
-                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
-                - background: "[[[ const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba(' + c + ',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
+                - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '22px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px'; ]]]"
+                - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.10)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)'); ]]]"
+                - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.80)'; const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba(' + c + ',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)'; ]]]"
                 - box-shadow: none
               img_cell:
                 - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
                 - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
                 - align-self: center
-                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
-                - background: "[[[ const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + c + ',.14)' : (n > 0 ? 'rgba(250,204,21,.20)' : 'rgba(148,163,184,.14)') ]]]"
-                - border: "[[[ const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : (n > 0 ? '1px solid rgba(250,204,21,.45)' : '1px solid rgba(148,163,184,.28)') ]]]"
-                - box-shadow: "[[[ const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'inset 0 0 0 1px rgba(' + c + ',.16)' : (n > 0 ? '0 0 14px rgba(250,204,21,.40)' : 'none') ]]]"
+                - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '50%'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px'; ]]]"
+                - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) { const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; return n > 0 ? 'rgb(255,214,0)' : 'rgba(142,142,147,.24)'; } const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + c + ',.14)' : (n > 0 ? 'rgba(250,204,21,.20)' : 'rgba(148,163,184,.14)'); ]]]"
+                - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : (n > 0 ? '1px solid rgba(250,204,21,.45)' : '1px solid rgba(148,163,184,.28)'); ]]]"
+                - box-shadow: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; const c = n > 0 ? '250,204,21' : '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'inset 0 0 0 1px rgba(' + c + ',.16)' : (n > 0 ? '0 0 14px rgba(250,204,21,.40)' : 'none'); ]]]"
               icon:
                 - width: 22px
                 - color: >
                     [[[
                       const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length;
+                      if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return n > 0 ? '#1C1C1E' : '#8E8E93';
                       return n > 0 ? '#FACC15' : '#94A3B8';
                     ]]]
               label:
                 - justify-self: start
                 - align-self: start
-                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px' ]]]"
-                - font-weight: 800
-                - color: "[[[ const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(232,246,255,.45)' : (n > 0 ? '#FACC15' : '#8A96A8') ]]]"
-                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.9px' : '2px' ]]]"
+                - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px'; ]]]"
+                - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '500'; return '800'; ]]]"
+                - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; const n = variables.ids.filter(i => states[i] && states[i].state === 'on').length; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(232,246,255,.45)' : (n > 0 ? '#FACC15' : '#8A96A8'); ]]]"
+                - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none'; ]]]"
+                - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.9px' : '2px'; ]]]"
               name:
                 - justify-self: start
                 - align-self: end
-                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '20px' ]]]"
-                - font-weight: 900
-                - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
-                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '-0.5px' ]]]"
+                - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '24px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '20px'; ]]]"
+                - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '700'; return '900'; ]]]"
+                - font-style: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'normal'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic'; ]]]"
+                - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase'; ]]]"
+                - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '-0.5px'; ]]]"
                 - line-height: 1.15
                 - color: '#FFFFFF'
               custom_fields:
@@ -1385,16 +1400,16 @@ views:
                   - display: flex
                   - align-items: center
                   - gap: 6px
-                  - padding: 6px 12px
+                  - padding: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '12px 18px'; return '6px 12px'; ]]]"
                   - border-radius: 999px
-                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '11px' ]]]"
-                  - font-weight: 800
-                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.7px' : '1px' ]]]"
-                  - text-transform: uppercase
-                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(220,247,255,.72)' : 'rgb(203,213,225)' ]]]"
-                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(70,168,188,.09)' : 'rgba(203,213,225,.14)' ]]]"
-                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(203,213,225,.35)' ]]]"
+                  - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                  - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '15px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '11px'; ]]]"
+                  - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '600'; return '800'; ]]]"
+                  - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.7px' : '1px'; ]]]"
+                  - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return 'uppercase'; ]]]"
+                  - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(220,247,255,.72)' : 'rgb(203,213,225)'; ]]]"
+                  - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04))'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(70,168,188,.09)' : 'rgba(203,213,225,.14)'; ]]]"
+                  - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.22)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(203,213,225,.35)'; ]]]"
 
           __SECTIONS__
 
@@ -1444,9 +1459,10 @@ views:
                   }, 1000);
                 }
                 const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis'];
-                if (f && f.state === 'on') return 'FILTRE À NETTOYER';
+                const F = t => (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? t.charAt(0) + t.slice(1).toLowerCase() : t;
+                if (f && f.state === 'on') return F('FILTRE À NETTOYER');
                 const on = entity.state !== 'off' && entity.state !== 'unavailable';
-                return 'SENSIBO AIR PRO · ' + (on ? 'EN LIGNE' : 'EN VEILLE');
+                return F('SENSIBO AIR PRO · ' + (on ? 'EN LIGNE' : 'EN VEILLE'));
               ]]]
             tap_action:
               action: navigate
@@ -1475,39 +1491,39 @@ views:
               card:
                 - min-height: 14vh
                 - padding: 3.5vh 14px 1vh 14px
-                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px' ]]]"
-                - border: "[[[ const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; return (f && f.state === 'on') ? '1px solid rgba(250,204,21,.55)' : '1px solid rgba(255,255,255,.08)' ]]]"
-                - background: "[[[ const c = variables.mode_rgb[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba('+c+',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
+                - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '22px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '20px' : '18px'; ]]]"
+                - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.10)'; const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; return (f && f.state === 'on') ? '1px solid rgba(250,204,21,.55)' : '1px solid rgba(255,255,255,.08)'; ]]]"
+                - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.80)'; const c = variables.mode_rgb[entity.state] || '148,163,184'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'radial-gradient(ellipse at 83% 15%, rgba('+c+',.16), transparent 42%), linear-gradient(115deg, rgba(9,22,32,.91), rgba(5,12,22,.77) 56%, rgba(13,30,42,.85))' : 'linear-gradient(145deg, rgba(' + c + ',.14) 0%, rgba(16,23,40,.82) 60%)'; ]]]"
                 - box-shadow: none
               img_cell:
                 - width: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
                 - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '34px' : '40px' ]]]"
                 - align-self: center
-                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
-                - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.14)' : 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.20)' ]]]"
-                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.45)' ]]]"
-                - box-shadow: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'inset 0 0 0 1px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.16)' : (entity.state === 'off' ? 'none' : '0 0 14px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.40)') ]]]"
+                - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '50%'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px'; ]]]"
+                - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return entity.state === 'off' || entity.state === 'unavailable' ? 'rgba(142,142,147,.24)' : 'rgb(' + ((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})((variables.mode_rgb[entity.state] || '148,163,184').split(',').map(Number)) + ')'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.14)' : 'rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.20)'; ]]]"
+                - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.45)'; ]]]"
+                - box-shadow: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'inset 0 0 0 1px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.16)' : (entity.state === 'off' ? 'none' : '0 0 14px rgba(' + (variables.mode_rgb[entity.state] || '148,163,184') + ',.40)'); ]]]"
               icon:
                 - width: 22px
-                - color: "[[[ return 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')' ]]]"
+                - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return entity.state === 'off' || entity.state === 'unavailable' ? '#8E8E93' : ((c)=>((0.2126*c[0]+0.7152*c[1]+0.0722*c[2])/255>.55?'#1C1C1E':'#FFFFFF'))(((r)=>{const S=[[255,66,69],[255,146,48],[255,214,0],[48,209,88],[0,218,195],[0,210,224],[60,211,254],[0,145,255],[109,124,255],[219,52,242],[255,55,95],[142,142,147]];let b=S[0],d=1e9;for(const s of S){const e=(s[0]-r[0])**2+(s[1]-r[1])**2+(s[2]-r[2])**2;if(e<d){d=e;b=s}}return b.join(',')})((variables.mode_rgb[entity.state] || '148,163,184').split(',').map(Number)).split(',').map(Number)); return 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')'; ]]]"
               label:
                 - justify-self: start
                 - align-self: start
-                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px' ]]]"
-                - font-weight: 800
-                - color: "[[[ const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; if (f && f.state === 'on') return '#FACC15'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(232,246,255,.45)' : 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')' ]]]"
-                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.9px' : '2px' ]]]"
+                - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '9px' : '10px'; ]]]"
+                - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '500'; return '800'; ]]]"
+                - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; const f = states['binary_sensor.sejour_climatisation_nettoyage_du_filtre_requis']; if (f && f.state === 'on') return '#FACC15'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(232,246,255,.45)' : 'rgb(' + (variables.mode_rgb[entity.state] || '148,163,184') + ')'; ]]]"
+                - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none'; ]]]"
+                - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.9px' : '2px'; ]]]"
               name:
                 - justify-self: start
                 - align-self: end
-                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '20px' ]]]"
-                - font-weight: 900
-                - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
-                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '-0.5px' ]]]"
+                - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '24px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '15px' : '20px'; ]]]"
+                - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '700'; return '900'; ]]]"
+                - font-style: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'normal'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic'; ]]]"
+                - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase'; ]]]"
+                - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.3px' : '-0.5px'; ]]]"
                 - line-height: 1.15
                 - color: '#FFFFFF'
               custom_fields:
@@ -1516,16 +1532,16 @@ views:
                   - display: flex
                   - align-items: center
                   - gap: 6px
-                  - padding: 6px 12px
+                  - padding: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '12px 18px'; return '6px 12px'; ]]]"
                   - border-radius: 999px
-                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                  - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '11px' ]]]"
-                  - font-weight: 800
-                  - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.7px' : '1px' ]]]"
-                  - text-transform: uppercase
-                  - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(220,247,255,.72)' : 'rgb(203,213,225)' ]]]"
-                  - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(70,168,188,.09)' : 'rgba(203,213,225,.14)' ]]]"
-                  - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(203,213,225,.35)' ]]]"
+                  - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                  - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '15px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '11px'; ]]]"
+                  - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '600'; return '800'; ]]]"
+                  - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.7px' : '1px'; ]]]"
+                  - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return 'uppercase'; ]]]"
+                  - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(220,247,255,.72)' : 'rgb(203,213,225)'; ]]]"
+                  - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04))'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(70,168,188,.09)' : 'rgba(203,213,225,.14)'; ]]]"
+                  - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.22)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : '1px solid rgba(203,213,225,.35)'; ]]]"
 
           # ---------- CONSIGNE : [ - ] [ 22.0° ] [ + ] ----------
           - type: horizontal-stack
@@ -1804,39 +1820,39 @@ views:
               card:
                 - min-height: 14vh
                 - padding: 3.5vh 14px 1vh 14px
-                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px' ]]]"
-                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)') ]]]"
-                - background: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(56,189,248,' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(5,12,22,.82) 60%)' : 'linear-gradient(145deg, rgba(56,189,248,.14) 0%, rgba(16,23,40,.82) 60%)' ]]]"
+                - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '22px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '14px' : '18px'; ]]]"
+                - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.10)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(255,255,255,.08)'); ]]]"
+                - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'rgba(44,44,46,.80)'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'linear-gradient(' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '100deg' : '145deg') + ', rgba(56,189,248,' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '.06' : '.14') + ') 0%, rgba(5,12,22,.82) 60%)' : 'linear-gradient(145deg, rgba(56,189,248,.14) 0%, rgba(16,23,40,.82) 60%)'; ]]]"
                 - box-shadow: none
               img_cell:
                 - width: 40px
                 - height: 40px
                 - align-self: center
-                - border-radius: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px' ]]]"
+                - border-radius: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '50%'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '10px' : '12px'; ]]]"
                 - background: rgba(56,189,248,.20)
-                - border: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(56,189,248,.45)') ]]]"
+                - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : ('1px solid rgba(56,189,248,.45)'); ]]]"
               icon:
                 - width: 22px
                 - color: "#38BDF8"
               label:
                 - justify-self: start
                 - align-self: start
-                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: 10px
-                - font-weight: 800
-                - letter-spacing: 2px
-                - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#38BDF8') ]]]"
-                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal' ]]]"
+                - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '13px'; return '10px'; ]]]"
+                - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '500'; return '800'; ]]]"
+                - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return '2px'; ]]]"
+                - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#8E8E93'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.40)' : ('#38BDF8'); ]]]"
+                - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'uppercase' : 'none'; ]]]"
+                - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '1px' : 'normal'; ]]]"
               name:
                 - justify-self: start
                 - align-self: end
-                - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                - font-size: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '17px' : ('20px') ]]]"
-                - font-weight: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '900' ]]]"
-                - font-style: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic' ]]]"
-                - text-transform: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase' ]]]"
-                - letter-spacing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '-0.5px' ]]]"
+                - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '24px'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '17px' : ('20px'); ]]]"
+                - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '700'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '700' : '900'; ]]]"
+                - font-style: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'normal'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'normal' : 'italic'; ]]]"
+                - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'none' : 'uppercase'; ]]]"
+                - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? '0' : '-0.5px'; ]]]"
                 - line-height: 1.15
                 - color: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'ardoise') ? 'rgba(255,255,255,.90)' : ('#FFFFFF') ]]]"
               custom_fields:
@@ -1845,16 +1861,16 @@ views:
                   - display: flex
                   - align-items: center
                   - gap: 6px
-                  - padding: 6px 12px
+                  - padding: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '12px 18px'; return '6px 12px'; ]]]"
                   - border-radius: 999px
-                  - font-family: "'Inter','Segoe UI',Roboto,sans-serif"
-                  - font-size: 11px
-                  - font-weight: 800
-                  - letter-spacing: 1px
-                  - text-transform: uppercase
-                  - color: rgb(203,213,225)
-                  - background: rgba(203,213,225,.14)
-                  - border: 1px solid rgba(203,213,225,.35)
+                  - font-family: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '-apple-system,SF Pro Text,Inter,Roboto,sans-serif'; return '\\'Inter\\',\\'Segoe UI\\',Roboto,sans-serif'; ]]]"
+                  - font-size: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '15px'; return '11px'; ]]]"
+                  - font-weight: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '600'; return '800'; ]]]"
+                  - letter-spacing: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '0'; return '1px'; ]]]"
+                  - text-transform: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'none'; return 'uppercase'; ]]]"
+                  - color: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '#FFFFFF'; return 'rgb(203,213,225)'; ]]]"
+                  - background: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return 'linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04))'; return 'rgba(203,213,225,.14)'; ]]]"
+                  - border: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '1px solid rgba(255,255,255,.22)'; return '1px solid rgba(203,213,225,.35)'; ]]]"
 
           - type: custom:button-card
             show_icon: false
