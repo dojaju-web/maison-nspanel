@@ -13,7 +13,7 @@ CONF_VACUUM = "vacuum_entity"
 CONF_VAC_SENSORS = ("vac_battery", "vac_fan", "vac_area", "vac_time", "vac_alert")
 CONF_SECTIONS = "sections"
 
-# Styles du dashboard : "verre" (verre sombre, défaut), "ardoise" (cartes sobres) ou "liquid" (Liquid Glass, menu flottant)
+# Styles du dashboard : "verre" (verre sombre, défaut), "ardoise" (cartes sobres) ou "liquid" (affiché « iOS » : surfaces plates, menu flottant en verre)
 STYLES = ["verre", "ardoise", "liquid"]
 DEFAULT_STYLE = "verre"
 

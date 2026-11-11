@@ -10,7 +10,7 @@ const TABS = [
 ];
 const DAYS = [["mon", "Lun"], ["tue", "Mar"], ["wed", "Mer"], ["thu", "Jeu"], ["fri", "Ven"], ["sat", "Sam"], ["sun", "Dim"]];
 const MIN_LABELS = { jamais: "Jamais", jaune: "À partir de jaune", orange: "À partir d'orange", rouge: "Rouge seulement", toujours: "Toujours (même vert)" };
-const STYLE_LABELS = { verre: ["Verre sombre", "Cartes en verre teinté, titres en capitales (par défaut)."], ardoise: ["Ardoise", "Cartes sobres, titres en minuscules, météo en fond."], liquid: ["Liquid Glass", "Verre dépoli translucide et menu flottant façon iOS sur l'accueil."] };
+const STYLE_LABELS = { verre: ["Verre sombre", "Cartes en verre teinté, titres en capitales (par défaut)."], ardoise: ["Ardoise", "Cartes sobres, titres en minuscules, météo en fond."], liquid: ["iOS", "Style inspiré des recommandations Apple : surfaces plates, menu flottant en verre sur l'accueil, palette système."] };
 const VAC_FIELDS = [
   ["vac_battery", "Batterie", "sensor", "Capteur de batterie (%)"],
   ["vac_fan", "Puissance d'aspiration", "select", "Liste de choix (select) ou laissez vide pour utiliser l'aspirateur"],

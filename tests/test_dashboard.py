@@ -122,7 +122,7 @@ class Menu(unittest.TestCase):
 
 
 class LiquidContenu(unittest.TestCase):
-    """Couche contenu du thème Liquid Glass : surfaces plates, palette système, mouvement réduit."""
+    """Couche contenu du thème iOS : surfaces plates, palette système, mouvement réduit."""
 
     @classmethod
     def setUpClass(cls):
@@ -162,6 +162,14 @@ class LiquidContenu(unittest.TestCase):
         # le liquid ne descend pas sous 11 px et évite les graisses légères
         self.assertIn(".av-lq .av-metric-label {font-size:11px", self.asp)
         self.assertNotIn("font-weight:300", self.asp)
+
+    def test_accueil_contenu_plat_menu_verre(self):
+        # le verre est réservé aux contrôles flottants : plus de flou sur bulles/pastilles
+        self.assertNotIn("blur(10px)", self.modele)
+        self.assertIn("rgba(44,44,46,.80)", self.modele)
+        _, style = d.gen_menu(False)
+        self.assertIn("left: 14px", style)
+        self.assertIn("backdrop-filter", d.gen_menu(False)[0])
 
     def test_aspirateur_liquid(self):
         self.assertIn("av-lq", self.asp)

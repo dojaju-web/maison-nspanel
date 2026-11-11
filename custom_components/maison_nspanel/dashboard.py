@@ -156,9 +156,9 @@ def gen_menu(has_vacuum: bool, active: str = "accueil", vacuum: str | None = Non
     style = [
         "menu:",
         "  - position: absolute",
-        "  - left: 25px",
-        "  - right: 25px",
-        "  - bottom: 26px",
+        "  - left: 14px",
+        "  - right: 14px",
+        "  - bottom: 16px",
         "  - z-index: 5",
         f"  - display: \"[[[ return {_LIQ} ? 'block' : 'none' ]]]\"",
     ]
