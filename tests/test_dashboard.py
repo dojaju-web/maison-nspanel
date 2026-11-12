@@ -171,6 +171,13 @@ class LiquidContenu(unittest.TestCase):
         self.assertIn("left: 14px", style)
         self.assertIn("backdrop-filter", d.gen_menu(False)[0])
 
+    def test_style_beta(self):
+        self.assertIn("\"beta\"", (Path(__file__).resolve().parent.parent / "custom_components" / "maison_nspanel" / "const.py").read_text(encoding="utf-8"))
+        for name in ("tile_light", "tile_base", "tile_vac"):
+            self.assertIn("style === 'beta'", self._tpl(name), name)
+        self.assertGreaterEqual(self.modele.count("style === 'beta'"), 40)
+        self.assertIn("style === 'beta'", self.asp)
+
     def test_aspirateur_liquid(self):
         self.assertIn("av-lq", self.asp)
         self.assertIn("#8E8E93", self.asp)

@@ -78,6 +78,7 @@ l'action *Release* crée seule la release `vX.Y.Z`, ce qui permet à HACS de pro
 - **Météo et vigilance** : entité météo, alerte Météo-France.
 - **Climatisation et qualité de l'air** : entité de climatisation (les entités liées — ventilation, alerte de filtre, capteurs d'air — sont déduites de son nom, comme `switch.<nom>_climate_react`) et affichage de la qualité de l'air. Désactivée, la tuile « Air » disparaît et les deux tuiles de température prennent toute la largeur.
 - **Apparence** : style « verre sombre », « ardoise » ou « iOS » (recommandations Apple : sur l'accueil, menu flottant en verre façon barre d'onglets — Accueil, Lumières, Climat et Aspirateur si détecté — et bulles, pastilles et heure en surfaces plates ; sur les autres pages, tuiles plates gris système, couleurs de la palette iOS, états lisibles sans la couleur seule, textes ≥ 11 px).
+- Style « NSPanel-Beta » : inspiré du Dashboard2-Demo — cartes bleu nuit translucides teintées par couleur d'accent, titres gras sans italique, petits sous-titres en capitales espacées, en-têtes de pages assortis.
 
 Le dashboard est régénéré à partir de `dashboard/modele.yaml` quand l'entité de climatisation change : **rechargez ensuite la page du panneau** (Home Assistant relit désormais le fichier tout seul ; si rien ne change, utilisez ⋮ > *Actualiser* sur le tableau de bord, sans redémarrage).
 

@@ -13,8 +13,8 @@ CONF_VACUUM = "vacuum_entity"
 CONF_VAC_SENSORS = ("vac_battery", "vac_fan", "vac_area", "vac_time", "vac_alert")
 CONF_SECTIONS = "sections"
 
-# Styles du dashboard : "verre" (verre sombre, défaut), "ardoise" (cartes sobres) ou "liquid" (affiché « iOS » : surfaces plates, menu flottant en verre)
-STYLES = ["verre", "ardoise", "liquid"]
+# Styles du dashboard : "beta" (NSPanel-Beta, inspiré du Dashboard2-Demo), "verre" (verre sombre, défaut), "ardoise" (cartes sobres) ou "liquid" (affiché « iOS » : surfaces plates, menu flottant en verre)
+STYLES = ["verre", "ardoise", "liquid", "beta"]
 DEFAULT_STYLE = "verre"
 
 # Les images météo du dashboard sont servies à cette adresse
