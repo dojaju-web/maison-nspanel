@@ -130,12 +130,13 @@
                 // Durée de nettoyage
                 const te = ent('__VAC_TIME__');
                 const tv = te ? te.state : (ok(at.cleaning_time) ? at.cleaning_time : (ok(at.cleaning_duration) ? at.cleaning_duration : ''));
-                const tu = te && te.attributes && te.attributes.unit_of_measurement ? String(te.attributes.unit_of_measurement).toLowerCase() : 'min';
+                // Le capteur Xiaomi Miot « clean-time » n'a pas d'unité et renvoie des secondes ; l'attribut du robot (repli) est en minutes
+                const tu = te ? (te.attributes && te.attributes.unit_of_measurement ? String(te.attributes.unit_of_measurement).toLowerCase() : 's') : 'min';
                 let time = '--';
                 if (ok(tv) && Number.isFinite(num(tv))) {
                   const n = num(tv);
-                  const mins = (tu === 's' || tu === 'sec') ? n / 60 : (tu === 'h') ? n * 60 : n;
-                  time = mins >= 60 ? Math.floor(mins / 60) + ' h ' + String(Math.round(mins % 60)).padStart(2, '0') : Math.round(mins) + ' min';
+                  const mins = /^(s|sec|secs|second|seconds|seconde|secondes)$/.test(tu) ? n / 60 : /^(h|hr|hour|hours|heure|heures)$/.test(tu) ? n * 60 : n;
+                  time = Math.round(mins) + ' min';
                 }
                 // Alerte
                 const le = ent('__VAC_ALERT__');
