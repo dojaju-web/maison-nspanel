@@ -17,6 +17,9 @@ const VAC_FIELDS = [
   ["vac_area", "Surface nettoyée", "sensor", "Capteur de surface (m²)"],
   ["vac_time", "Durée de nettoyage", "sensor", "Capteur de durée (s ou min)"],
   ["vac_alert", "Alerte / erreur", "any", "Capteur d'erreur (facultatif)"],
+  ["vac_mode", "Mode de nettoyage", "sensor", "Capteur du mode (aspiration, lavage…) — facultatif"],
+  ["vac_water", "Réservoir d'eau propre", "sensor", "Capteur d'état du réservoir d'eau propre — facultatif"],
+  ["vac_drain", "Réservoir d'eau sale", "sensor", "Capteur d'état du réservoir d'eau sale — facultatif"],
 ];
 
 class MaisonNspanelEditeur extends HTMLElement {

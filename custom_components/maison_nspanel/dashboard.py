@@ -27,6 +27,9 @@ VAC_SENSORS = {
     "vac_area": "__VAC_AREA__",
     "vac_time": "__VAC_TIME__",
     "vac_alert": "__VAC_ALERT__",
+    "vac_mode": "__VAC_MODE__",
+    "vac_water": "__VAC_WATER__",
+    "vac_drain": "__VAC_DRAIN__",
 }
 
 MENU_TABS = (

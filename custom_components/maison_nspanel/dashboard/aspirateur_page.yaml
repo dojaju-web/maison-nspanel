@@ -145,6 +145,24 @@
                 if (le) { const v = String(le.state).toLowerCase(); if (v === 'on') alertTxt = (le.attributes && le.attributes.friendly_name) || 'Alerte'; else if (!['off', 'ok', '0', 'false', 'no error', 'none'].includes(v)) alertTxt = le.state; }
                 else if (ok(at.error) && !['0', 'false', 'none', 'ok', 'no error'].includes(String(at.error).toLowerCase())) alertTxt = at.error;
                 if (!alertTxt && s === 'error') alertTxt = 'Attention requise';
+                // Mode de nettoyage (capteur Miot : BothWork, OnlySweep, OnlyMop, SweepFirst, Custom)
+                const me = ent('__VAC_MODE__');
+                const MODE = { bothwork: 'Aspiration + lavage', onlysweep: 'Aspiration seule', onlymop: 'Lavage seul', sweepfirst: 'Aspiration puis lavage', custom: 'Personnalisé' };
+                const modeTxt = me ? (MODE[String(me.state).toLowerCase().replace(/[^a-z]/g, '')] || esc(String(me.state).replace(/[_-]/g, ' '))) : '';
+                // Réservoirs d'eau (Normal / Nor, FluidLow, Uninstalled / Uninstall, Unusable)
+                const tank = (id, label) => {
+                  const e = ent(id); if (!e) return '';
+                  const v = String(e.state).toLowerCase().replace(/[^a-z]/g, '');
+                  let txt = 'Normal', t = '74,222,128';
+                  if (/^nor/.test(v)) { txt = 'Normal'; }
+                  else if (/low/.test(v)) { txt = 'Niveau bas'; t = '251,146,60'; }
+                  else if (/uninstall/.test(v)) { txt = 'Absent'; t = '251,113,133'; }
+                  else if (/unusable/.test(v)) { txt = 'Inutilisable'; t = '251,113,133'; }
+                  else { txt = esc(String(e.state).replace(/[_-]/g, ' ')); t = '148,163,184'; }
+                  return `<div class="av-tank" style="--t:${t}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.2 4 6 7 6 10.5A6 6 0 0 1 6 13.5C6 10 8.8 7 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><div class="av-tank-t"><span class="av-tank-l">${label}</span><b>${txt}</b></div></div>`;
+                };
+                const tanks = [tank('__VAC_WATER__', 'EAU PROPRE'), tank('__VAC_DRAIN__', 'EAU SALE')].filter(Boolean);
+                const tanksHtml = tanks.length ? `<div class="av-tanks" style="grid-template-columns:repeat(${tanks.length},1fr)">${tanks.join('')}</div>` : '';
                 const charge = s === 'docked' ? (has && pct >= 100 ? 'Charge terminée' : 'En charge')
                   : s === 'returning' ? 'Regagne sa base' : s === 'cleaning' ? 'Nettoyage en cours'
                   : s === 'paused' ? 'Prêt à reprendre' : offline ? 'Aucune donnée' : 'À l\'arrêt';
@@ -155,7 +173,7 @@
                       <div class="av-statusblock">
                         <div class="av-kicker">ÉTAT DU ROBOT</div>
                         <div class="av-status">${FR[s] || esc(s)}</div>
-                        <div class="av-charge"><span class="av-dot"></span>${alertTxt ? '⚠ ' + esc(alertTxt) : charge}</div>
+                        <div class="av-charge"><span class="av-dot"></span>${alertTxt ? '⚠ ' + esc(alertTxt) : (modeTxt ? 'Mode : ' + modeTxt : charge)}</div>
                       </div>
                       <div class="av-machine">
                         <div class="av-radar"></div>
@@ -180,6 +198,7 @@
                         </div>
                       </div>
                     </div>
+                    ${tanksHtml}
                     <div class="av-metrics">
                       <div class="av-metric">
                         <span class="av-metric-label">BATTERIE</span>
@@ -227,6 +246,16 @@
             .av-meter {height:3px;width:100%;background:rgba(255,255,255,.10);border-radius:4px;overflow:hidden;margin-top:2px}
             .av-meter div {height:100%;border-radius:4px;background:linear-gradient(90deg,rgba(var(--c),.55),rgb(var(--c)));transition:width .5s ease}
             .av-metric-foot {font-size:8px;color:rgba(218,237,244,.38);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+            .av-tanks {display:grid;gap:6px;z-index:2}
+            .av-tank {display:flex;align-items:center;gap:8px;min-width:0;padding:7px 10px;border-radius:12px;background:rgba(159,207,227,.055);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+            .av-tank svg {width:18px;height:18px;flex:0 0 18px;color:rgb(var(--t))}
+            .av-tank-t {display:flex;flex-direction:column;min-width:0;line-height:1.2}
+            .av-tank-l {font-size:9px;font-weight:800;letter-spacing:.6px;color:rgba(214,238,245,.55)}
+            .av-tank b {font-size:13px;font-weight:800;color:#f2fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+            .av-lq .av-tank {border-radius:16px;background:rgba(58,58,60,.80)}
+            .av-lq .av-tank-l {font-size:11px;font-weight:500;letter-spacing:0;color:#8E8E93;text-transform:lowercase}
+            .av-lq .av-tank-l::first-letter {text-transform:uppercase}
+            .av-lq .av-tank b {font-size:15px;font-weight:600;color:#fff}
             .av-lq {font-family:-apple-system,'SF Pro Text',Inter,Roboto,sans-serif}
             .av-lq .av-kicker {font-size:13px;font-weight:500;letter-spacing:0;color:#8E8E93;text-transform:lowercase}
             .av-lq .av-kicker::first-letter, .av-lq .av-metric-label::first-letter {text-transform:uppercase}

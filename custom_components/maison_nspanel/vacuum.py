@@ -10,6 +10,9 @@ NOT_FAN_RE = re.compile(r"(water|mop|eau|serpill)", re.I)
 AREA_RE = re.compile(r"(area|surface)", re.I)
 TIME_RE = re.compile(r"(time|duration|duree|durée)", re.I)
 ALERT_RE = re.compile(r"(error|fault|alert|problem|erreur)", re.I)
+MODE_RE = re.compile(r"(clean[_ -]?mode|work[_ -]?mode|mode[_ -]de[_ -]nettoyage)", re.I)
+WATER_RE = re.compile(r"(clean[_ -]?water|water[_ -]?cistern|eau[_ -]?propre)", re.I)
+DRAIN_RE = re.compile(r"(drain[_ -]?cistern|waste[_ -]?water|dirty[_ -]?water|eau[_ -]?sale)", re.I)
 
 
 def _text(e: dict[str, Any]) -> str:
@@ -54,4 +57,13 @@ def pick(entries: Iterable[dict[str, Any]]) -> dict[str, str]:
     alert = first(lambda e: dom(e) in ("sensor", "binary_sensor") and ALERT_RE.search(_text(e)))
     if alert:
         found["vac_alert"] = alert
+    mode = first(lambda e: dom(e) in ("sensor", "select") and MODE_RE.search(_text(e)) and not re.search(r"water|eau|carpet|dock", _text(e), re.I))
+    if mode:
+        found["vac_mode"] = mode
+    water = first(lambda e: dom(e) in ("sensor", "binary_sensor") and WATER_RE.search(_text(e)))
+    if water:
+        found["vac_water"] = water
+    drain = first(lambda e: dom(e) in ("sensor", "binary_sensor") and DRAIN_RE.search(_text(e)))
+    if drain:
+        found["vac_drain"] = drain
     return found

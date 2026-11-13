@@ -184,6 +184,14 @@ class LiquidContenu(unittest.TestCase):
         self.assertIn("tot >= 60 ? Math.floor(tot / 60) + ' h '", self.asp)
         self.assertIn(": tot + ' min'", self.asp)
 
+    def test_mode_et_reservoirs(self):
+        self.assertIn("Aspiration + lavage", self.asp)
+        self.assertIn("'Mode : ' + modeTxt", self.asp)
+        for tok in ("__VAC_MODE__", "__VAC_WATER__", "__VAC_DRAIN__"):
+            self.assertIn(tok, self.asp)
+        for lab in ("Niveau bas", "Absent", "Inutilisable"):
+            self.assertIn(lab, self.asp)
+
     def test_aspirateur_liquid(self):
         self.assertIn("av-lq", self.asp)
         self.assertIn("#8E8E93", self.asp)
