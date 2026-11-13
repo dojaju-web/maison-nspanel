@@ -179,10 +179,10 @@ class LiquidContenu(unittest.TestCase):
         self.assertIn("style === 'beta'", self.asp)
 
     def test_duree_en_minutes_depuis_secondes(self):
-        # sensor.*_clean_time (Xiaomi Miot) = 6006 sans unité : secondes → 100 min, toujours affiché en minutes
+        # sensor.*_clean_time (Xiaomi Miot) = 6006 sans unité : secondes → 1 h 40, minutes sous 1 h, sinon « 1 h 40 »
         self.assertIn("unit_of_measurement).toLowerCase() : 's') : 'min'", self.asp)
-        self.assertIn("time = Math.round(mins) + ' min';", self.asp)
-        self.assertNotIn("' h '", self.asp)
+        self.assertIn("tot >= 60 ? Math.floor(tot / 60) + ' h '", self.asp)
+        self.assertIn(": tot + ' min'", self.asp)
 
     def test_aspirateur_liquid(self):
         self.assertIn("av-lq", self.asp)

@@ -136,7 +136,8 @@
                 if (ok(tv) && Number.isFinite(num(tv))) {
                   const n = num(tv);
                   const mins = /^(s|sec|secs|second|seconds|seconde|secondes)$/.test(tu) ? n / 60 : /^(h|hr|hour|hours|heure|heures)$/.test(tu) ? n * 60 : n;
-                  time = Math.round(mins) + ' min';
+                  const tot = Math.round(mins);
+                  time = tot >= 60 ? Math.floor(tot / 60) + ' h ' + String(tot % 60).padStart(2, '0') : tot + ' min';
                 }
                 // Alerte
                 const le = ent('__VAC_ALERT__');
