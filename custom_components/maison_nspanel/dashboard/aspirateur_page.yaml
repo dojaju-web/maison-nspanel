@@ -149,6 +149,11 @@
                 const me = ent('__VAC_MODE__');
                 const MODE = { bothwork: 'Aspiration + lavage', onlysweep: 'Aspiration seule', onlymop: 'Lavage seul', sweepfirst: 'Aspiration puis lavage', custom: 'Personnalisé' };
                 const modeTxt = me ? (MODE[String(me.state).toLowerCase().replace(/[^a-z]/g, '')] || esc(String(me.state).replace(/[_-]/g, ' '))) : '';
+                // État détaillé sur la station (capteur Miot robot-status)
+                const re_ = ent('__VAC_STATUS__');
+                const RS = { asleep: 'En veille', chargeasleep: 'En charge (veille)', charging: 'En charge', clctdust: 'Vidage des poussières', hotdry: 'Séchage à air chaud', washmop: 'Lavage de la serpillière', backwashmop: 'Retour au lavage serpillière', relocate: 'Relocalisation' };
+                const rsKey = re_ ? String(re_.state).toLowerCase().replace(/[^a-z]/g, '') : '';
+                const rsTxt = (re_ && rsKey && rsKey !== 'none') ? (RS[rsKey] || esc(String(re_.state).replace(/[_-]/g, ' '))) : '';
                 // Réservoirs d'eau (Normal / Nor, FluidLow, Uninstalled / Uninstall, Unusable)
                 const tank = (id, label) => {
                   const e = ent(id); if (!e) return '';
@@ -173,7 +178,7 @@
                       <div class="av-statusblock">
                         <div class="av-kicker">ÉTAT DU ROBOT</div>
                         <div class="av-status">${FR[s] || esc(s)}</div>
-                        <div class="av-charge"><span class="av-dot"></span>${alertTxt ? '⚠ ' + esc(alertTxt) : (modeTxt ? 'Mode : ' + modeTxt : charge)}</div>
+                        <div class="av-charge"><span class="av-dot"></span>${alertTxt ? '⚠ ' + esc(alertTxt) : (s === 'docked' && rsTxt ? rsTxt : (modeTxt ? 'Mode : ' + modeTxt : charge))}</div>
                       </div>
                       <div class="av-machine">
                         <div class="av-radar"></div>

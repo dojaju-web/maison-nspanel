@@ -12,6 +12,7 @@ TIME_RE = re.compile(r"(time|duration|duree|durée)", re.I)
 ALERT_RE = re.compile(r"(error|fault|alert|problem|erreur)", re.I)
 MODE_RE = re.compile(r"(clean[_ -]?mode|work[_ -]?mode|mode[_ -]de[_ -]nettoyage)", re.I)
 WATER_RE = re.compile(r"(clean[_ -]?water|water[_ -]?cistern|eau[_ -]?propre)", re.I)
+STATUS_RE = re.compile(r"robot[_ -]?status", re.I)
 DRAIN_RE = re.compile(r"(drain[_ -]?cistern|waste[_ -]?water|dirty[_ -]?water|eau[_ -]?sale)", re.I)
 
 
@@ -66,4 +67,7 @@ def pick(entries: Iterable[dict[str, Any]]) -> dict[str, str]:
     drain = first(lambda e: dom(e) in ("sensor", "binary_sensor") and DRAIN_RE.search(_text(e)))
     if drain:
         found["vac_drain"] = drain
+    status = first(lambda e: dom(e) == "sensor" and STATUS_RE.search(_text(e)))
+    if status:
+        found["vac_status"] = status
     return found

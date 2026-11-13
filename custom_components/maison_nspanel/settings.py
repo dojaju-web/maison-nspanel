@@ -35,6 +35,7 @@ ENTITY_KEYS = (
     "vac_mode",
     "vac_water",
     "vac_drain",
+    "vac_status",
 )
 
 

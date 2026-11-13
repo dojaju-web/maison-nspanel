@@ -79,13 +79,14 @@ class Detection(unittest.TestCase):
             {"entity_id": p + n, "device_class": None, "name": None, "unit": None}
             for n in (
                 "clean_type_status_p_17_9", "clean_mode_p_17_10", "water_mode_p_17_12", "fan_mode_p_17_13",
-                "clean_count_p_17_14", "clean_water_cistern_p_17_51", "drain_cistern_p_17_52",
+                "clean_count_p_17_14", "clean_water_cistern_p_17_51", "drain_cistern_p_17_52", "robot_status_p_17_49",
             )
         ]
         f = vacuum.pick(rows)
         self.assertEqual(f["vac_mode"], p + "clean_mode_p_17_10")
         self.assertEqual(f["vac_water"], p + "clean_water_cistern_p_17_51")
         self.assertEqual(f["vac_drain"], p + "drain_cistern_p_17_52")
+        self.assertEqual(f["vac_status"], p + "robot_status_p_17_49")
 
     def test_pick_vide(self):
         self.assertEqual(vacuum.pick([]), {})

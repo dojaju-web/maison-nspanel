@@ -192,6 +192,11 @@ class LiquidContenu(unittest.TestCase):
         for lab in ("Niveau bas", "Absent", "Inutilisable"):
             self.assertIn(lab, self.asp)
 
+    def test_etat_robot_sur_station(self):
+        for tok in ("__VAC_STATUS__", "Lavage de la serpillière", "Séchage à air chaud", "Vidage des poussières"):
+            self.assertIn(tok, self.asp)
+        self.assertIn("s === 'docked' && rsTxt", self.asp)
+
     def test_aspirateur_liquid(self):
         self.assertIn("av-lq", self.asp)
         self.assertIn("#8E8E93", self.asp)

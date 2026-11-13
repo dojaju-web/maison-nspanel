@@ -10,7 +10,7 @@ CONF_STYLE = "style"
 CONF_CLIMATE = "climate_entity"
 CONF_AIR = "air_enabled"
 CONF_VACUUM = "vacuum_entity"
-CONF_VAC_SENSORS = ("vac_battery", "vac_fan", "vac_area", "vac_time", "vac_alert", "vac_mode", "vac_water", "vac_drain")
+CONF_VAC_SENSORS = ("vac_battery", "vac_fan", "vac_area", "vac_time", "vac_alert", "vac_mode", "vac_water", "vac_drain", "vac_status")
 CONF_SECTIONS = "sections"
 
 # Styles du dashboard : "beta" (NSPanel-Beta, inspiré du Dashboard2-Demo), "verre" (verre sombre, défaut), "ardoise" (cartes sobres) ou "liquid" (affiché « iOS » : surfaces plates, menu flottant en verre)

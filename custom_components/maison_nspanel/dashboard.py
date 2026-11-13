@@ -30,6 +30,7 @@ VAC_SENSORS = {
     "vac_mode": "__VAC_MODE__",
     "vac_water": "__VAC_WATER__",
     "vac_drain": "__VAC_DRAIN__",
+    "vac_status": "__VAC_STATUS__",
 }
 
 MENU_TABS = (
