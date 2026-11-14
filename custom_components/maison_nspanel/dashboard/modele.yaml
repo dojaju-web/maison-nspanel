@@ -1205,9 +1205,12 @@ views:
             - grid-template-rows: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1fr min-content' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? (states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false ? 'min-content min-content 1fr min-content' : 'min-content min-content min-content 1fr min-content') : '1fr min-content min-content min-content') ]]]"
             - column-gap: 8px
             - row-gap: 8px
+            - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '100%' : 'auto' ]]]"
           card:
             - position: relative
             - min-height: 100vh
+            - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '100vh' : 'auto' ]]]"
+            - box-sizing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'border-box' : 'content-box' ]]]"
             - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 22vh 14px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '3vh 14px 1vh 14px' : '6vh 14px 3vh 14px') ]]]"
             - border-radius: 0
             - border: none
