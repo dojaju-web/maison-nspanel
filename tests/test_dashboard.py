@@ -199,8 +199,10 @@ class LiquidContenu(unittest.TestCase):
 
     def test_beta_maison_en_fond(self):
         base = Path(__file__).resolve().parent.parent / "custom_components" / "maison_nspanel"
-        self.assertTrue((base / "meteo" / "maison-beta.png").exists())
-        self.assertIn("maison-beta.png", self.modele)
+        for jn in ("jour", "nuit"):
+            for k in (("cloudy", "rainy", "snowy", "sunny") if jn == "jour" else ("cloudy", "rainy", "snowy")):
+                self.assertTrue((base / "meteo" / f"maison-{jn}-{k}.jpg").exists())
+        self.assertIn("/maison_nspanel/meteo/maison-' + (bnight ? 'nuit' : 'jour')", self.modele)
         
         # beta : infos à gauche, horloge à droite en haut, menu en bas
         self.assertIn('"weather clock" "indoor clock" "air clock" ". ." "nav nav"', self.modele)

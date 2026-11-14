@@ -1218,7 +1218,20 @@ views:
             - background: >
                 [[[
                   // NSPanel-Beta : maison isométrique en fond, décalée vers le bas sous la date et les informations
-                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) return 'url(/maison_nspanel/meteo/maison-beta.png?v=2) center top / 100% auto no-repeat, #131718';
+                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) {
+                    // NSPanel-Beta : la maison change avec la météo et le jour/la nuit (sun.sun)
+                    const bw = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                    const bsun = states['sun.sun'];
+                    const bnight = bsun ? bsun.state === 'below_horizon' : false;
+                    const bc = bw ? bw.state : 'unknown';
+                    let kind = 'cloudy';
+                    if (['sunny', 'clear-night', 'partlycloudy'].indexOf(bc) >= 0) kind = 'sunny';
+                    else if (['rainy', 'pouring', 'lightning', 'lightning-rainy'].indexOf(bc) >= 0) kind = 'rainy';
+                    else if (['snowy', 'snowy-rainy', 'hail'].indexOf(bc) >= 0) kind = 'snowy';
+                    // Pas d'image « nuit dégagée » : la nuit claire utilise la vue nuit calme
+                    if (bnight && kind === 'sunny') kind = 'cloudy';
+                    return 'url(/maison_nspanel/meteo/maison-' + (bnight ? 'nuit' : 'jour') + '-' + kind + '.jpg?v=1) center 24vh / 100% auto no-repeat, ' + (bnight ? '#060a0e' : '#141718');
+                  }
                   const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                   const sun = states['sun.sun'];
                   const night = sun ? sun.state === 'below_horizon' : false;
