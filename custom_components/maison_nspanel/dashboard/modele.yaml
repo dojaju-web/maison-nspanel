@@ -1197,10 +1197,11 @@ views:
                   const a = states['sensor.maison_nspanel_rappels'] ? states['sensor.maison_nspanel_rappels'].attributes : {};
                   const two = a.air_enabled === false;
                   if (a.style === 'liquid') return two ? '"clock clock" "weather indoor"' : '"clock clock clock" "weather indoor air"';
+                  if (a.style === 'beta') return two ? '"clock clock" "weather indoor" ". ." "nav nav" "navb navb"' : '"clock clock clock" "weather indoor air" ". . ." "nav nav nav" "navb navb navb"';
                   return two ? '"clock clock" "weather indoor" "nav nav" "navb navb"' : '"clock clock clock" "weather indoor air" "nav nav nav" "navb navb navb"';
                 ]]]
             - grid-template-columns: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
-            - grid-template-rows: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1fr min-content' : '1fr min-content min-content min-content' ]]]"
+            - grid-template-rows: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1fr min-content' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'min-content min-content 1fr min-content min-content' : '1fr min-content min-content min-content') ]]]"
             - column-gap: 8px
             - row-gap: 8px
           card:
@@ -1212,6 +1213,8 @@ views:
             - box-shadow: none
             - background: >
                 [[[
+                  // NSPanel-Beta : maison isométrique en fond, décalée vers le bas sous la date et les informations
+                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) return 'url(/maison_nspanel/meteo/maison-beta.png?v=1) center 23vh / 62% auto no-repeat, #131718';
                   const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                   const sun = states['sun.sun'];
                   const night = sun ? sun.state === 'below_horizon' : false;

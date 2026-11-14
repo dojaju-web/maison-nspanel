@@ -197,6 +197,13 @@ class LiquidContenu(unittest.TestCase):
             self.assertIn(tok, self.asp)
         self.assertIn("s === 'docked' && rsTxt", self.asp)
 
+    def test_beta_maison_en_fond(self):
+        base = Path(__file__).resolve().parent.parent / "custom_components" / "maison_nspanel"
+        self.assertTrue((base / "meteo" / "maison-beta.png").exists())
+        self.assertIn("maison-beta.png", self.modele)
+        # date et infos en haut, maison au milieu (ligne 1fr), menu en bas
+        self.assertIn("'min-content min-content 1fr min-content min-content'", self.modele)
+
     def test_aspirateur_liquid(self):
         self.assertIn("av-lq", self.asp)
         self.assertIn("#8E8E93", self.asp)
