@@ -1218,7 +1218,7 @@ views:
             - background: >
                 [[[
                   // NSPanel-Beta : maison isométrique en fond, décalée vers le bas sous la date et les informations
-                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) return 'url(/maison_nspanel/meteo/maison-beta.png?v=1) center 21vh / 70% auto no-repeat, #131718';
+                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) return 'url(/maison_nspanel/meteo/maison-beta.png?v=2) center top / 100% auto no-repeat, #131718';
                   const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                   const sun = states['sun.sun'];
                   const night = sun ? sun.state === 'below_horizon' : false;
