@@ -744,12 +744,13 @@ views:
                   + '<span style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgb(' + c + ')">' + (r.texte || '') + '</span></div></div>';
               }).join('');
               const panel = '';
-              return '<div style="text-align:center">'
+              const BETA = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta');
+              return '<div style="text-align:' + (BETA ? 'right' : 'center') + '">'
                 + '<div style="' + panel + '">'
-                + '<div style="font-size:21vh;font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;color:#FFFFFF;text-shadow:0 2px 24px rgba(0,0,0,.65)">' + time + '</div>'
-                + '<div style="margin-top:1.2vh;font-size:19px;font-weight:600;letter-spacing:.5px;color:' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#E2E8F0') + ';text-shadow:0 1px 10px rgba(0,0,0,.7)">' + date + '</div>'
+                + '<div style="font-size:' + (BETA ? '13vh' : '21vh') + ';font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;color:#FFFFFF;text-shadow:0 2px 24px rgba(0,0,0,.65)">' + time + '</div>'
+                + '<div style="margin-top:1.2vh;font-size:' + (BETA ? '15px' : '19px') + ';font-weight:600;letter-spacing:.5px;color:' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#E2E8F0') + ';text-shadow:0 1px 10px rgba(0,0,0,.7)">' + date + '</div>'
                 + '</div>'
-                + ((pills || vigHtml) ? '<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:1.4vh">' + pills + vigHtml + '</div>' : '')
+                + ((pills || vigHtml) ? '<div style="display:flex;flex-wrap:wrap;justify-content:' + (BETA ? 'flex-end' : 'center') + ';align-items:center;gap:8px;margin-top:1.4vh">' + pills + vigHtml + '</div>' : '')
                 + '</div>';
             ]]]
           weather:
@@ -1197,24 +1198,24 @@ views:
                   const a = states['sensor.maison_nspanel_rappels'] ? states['sensor.maison_nspanel_rappels'].attributes : {};
                   const two = a.air_enabled === false;
                   if (a.style === 'liquid') return two ? '"clock clock" "weather indoor"' : '"clock clock clock" "weather indoor air"';
-                  if (a.style === 'beta') return two ? '"clock clock" "weather indoor" ". ." "nav nav" "navb navb"' : '"clock clock clock" "weather indoor air" ". . ." "nav nav nav" "navb navb navb"';
+                  if (a.style === 'beta') return two ? '"weather clock" "indoor clock" ". ." "nav nav"' : '"weather clock" "indoor clock" "air clock" ". ." "nav nav"';
                   return two ? '"clock clock" "weather indoor" "nav nav" "navb navb"' : '"clock clock clock" "weather indoor air" "nav nav nav" "navb navb navb"';
                 ]]]
-            - grid-template-columns: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
-            - grid-template-rows: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1fr min-content' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'min-content min-content 1fr min-content min-content' : '1fr min-content min-content min-content') ]]]"
+            - grid-template-columns: "[[[ if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) return 'minmax(0, max-content) 1fr'; return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false) ? '1fr 1fr' : '1fr 1fr 1fr' ]]]"
+            - grid-template-rows: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '1fr min-content' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? (states['sensor.maison_nspanel_rappels'].attributes.air_enabled === false ? 'min-content min-content 1fr min-content' : 'min-content min-content min-content 1fr min-content') : '1fr min-content min-content min-content') ]]]"
             - column-gap: 8px
             - row-gap: 8px
           card:
             - position: relative
             - min-height: 100vh
-            - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 22vh 14px' : '6vh 14px 3vh 14px' ]]]"
+            - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 22vh 14px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '3vh 14px 1vh 14px' : '6vh 14px 3vh 14px') ]]]"
             - border-radius: 0
             - border: none
             - box-shadow: none
             - background: >
                 [[[
                   // NSPanel-Beta : maison isométrique en fond, décalée vers le bas sous la date et les informations
-                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) return 'url(/maison_nspanel/meteo/maison-beta.png?v=1) center 23vh / 62% auto no-repeat, #131718';
+                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) return 'url(/maison_nspanel/meteo/maison-beta.png?v=1) center 21vh / 70% auto no-repeat, #131718';
                   const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                   const sun = states['sun.sun'];
                   const night = sun ? sun.state === 'below_horizon' : false;
@@ -1263,7 +1264,7 @@ views:
                 ]]]
           custom_fields:
             clock:
-              - align-self: center
+              - align-self: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'start' : 'center' ]]]"
               - justify-self: stretch
               - width: 100%
               - font-family: "'Inter','Segoe UI',Roboto,sans-serif"

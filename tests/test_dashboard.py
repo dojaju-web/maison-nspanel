@@ -201,8 +201,10 @@ class LiquidContenu(unittest.TestCase):
         base = Path(__file__).resolve().parent.parent / "custom_components" / "maison_nspanel"
         self.assertTrue((base / "meteo" / "maison-beta.png").exists())
         self.assertIn("maison-beta.png", self.modele)
-        # date et infos en haut, maison au milieu (ligne 1fr), menu en bas
-        self.assertIn("'min-content min-content 1fr min-content min-content'", self.modele)
+        
+        # beta : infos à gauche, horloge à droite en haut, menu en bas
+        self.assertIn('"weather clock" "indoor clock" "air clock" ". ." "nav nav"', self.modele)
+        self.assertIn("'3vh 14px 1vh 14px'", self.modele)
 
     def test_aspirateur_liquid(self):
         self.assertIn("av-lq", self.asp)
