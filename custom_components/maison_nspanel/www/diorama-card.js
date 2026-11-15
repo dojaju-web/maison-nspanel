@@ -64,12 +64,18 @@ svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-event
     radial-gradient(30% 18% at 76% 44%, rgba(222,226,232,.36), rgba(222,226,232,0) 100%);
   animation:mist 70s ease-in-out infinite reverse; }
 @keyframes mist { 0%,100%{transform:translate3d(-6%,0,0)} 50%{transform:translate3d(6%,0,0)} }
-#flash { background:#dfe8ff; opacity:0; mix-blend-mode:screen; }
-#flash.on { animation:flash 7s linear infinite; }
-@keyframes flash { 0%,61%,100%{opacity:0} 62%{opacity:.55} 63%{opacity:.08} 64.5%{opacity:.42} 67%{opacity:0} }
+/* foudre : un éclair zigzagant (SVG) avec une lueur bleutée locale, à un endroit différent à chaque coup */
+#bolt { opacity:0; pointer-events:none; }
+#bolt.on { animation:bolt 9s linear infinite; }
+#bolt svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+#bolt .gl { fill:none; stroke:#7aa8ff; stroke-width:7; stroke-linejoin:round; stroke-linecap:round; filter:blur(3px); opacity:.85; }
+#bolt .co { fill:none; stroke:#f4f8ff; stroke-width:1.9; stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+#bolt .br { fill:none; stroke:#dce8ff; stroke-width:1.1; stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+#glow { position:absolute; inset:0; mix-blend-mode:screen; background:radial-gradient(60% 55% at var(--bx,50%) 22%, rgba(120,160,255,.30), rgba(120,160,255,0) 70%); }
+@keyframes bolt { 0%,70%,100%{opacity:0} 71%{opacity:1} 72.5%{opacity:.25} 74%{opacity:.95} 75.5%{opacity:.3} 78%{opacity:.7} 84%{opacity:0} }
 /* page cachée : pas d'animation inutile */
-:host(.pause) .drop, :host(.pause) .flake, :host(.pause) .cloud, :host(.pause) #fog::before, :host(.pause) #fog::after, :host(.pause) #flash.on { animation-play-state:paused !important; }
-@media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog::before,#fog::after,#flash.on{ animation:none !important; } }
+:host(.pause) .drop, :host(.pause) .flake, :host(.pause) .cloud, :host(.pause) #fog::before, :host(.pause) #fog::after, :host(.pause) #bolt.on { animation-play-state:paused !important; }
+@media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog::before,#fog::after,#bolt.on{ animation:none !important; } }
 `;
 
 class DioramaCard extends HTMLElement {
@@ -100,12 +106,13 @@ class DioramaCard extends HTMLElement {
         <img class="fond" id="fa" decoding="async" alt="Diorama de la maison"><img class="fond" id="fb" decoding="async" alt="">
         <svg id="volets" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg>
         <div class="layer" id="clouds"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
-        <div class="layer" id="fog"></div><div class="layer" id="fx"></div><div class="layer" id="flash"></div>
+        <div class="layer" id="fog"></div><div class="layer" id="fx"></div><div class="layer" id="bolt"><div id="glow"></div><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path class="gl"/><path class="co"/><path class="br"/></svg></div>
       </div></ha-card>`;
     const $ = (id) => this._root.getElementById(id);
     this._stage = this._root.querySelector('.stage');
     this._fa = $('fa'); this._fb = $('fb'); this._front = null;
-    this._svg = $('volets'); this._fx = $('fx'); this._fog = $('fog'); this._flash = $('flash');
+    this._svg = $('volets'); this._fx = $('fx'); this._fog = $('fog'); this._bolt = $('bolt');
+    this._bolt.addEventListener('animationiteration', () => this._strike());
     this._clouds = [...this._root.querySelectorAll('.cloud')];
     this._w = 0;
     const ro = new ResizeObserver(() => {
@@ -184,10 +191,32 @@ class DioramaCard extends HTMLElement {
       c.style.background = [[22,66,20,44],[44,44,26,66],[66,50,24,56],[84,62,18,40]].map(([x,y,w,h]) =>
         `radial-gradient(ellipse ${w}% ${h}% at ${x}% ${y}%, rgba(${rgb},.97) 58%, rgba(${rgb},0) 100%)`).join(','); });
     this._fog.style.opacity = fxm === 'brouillard' ? (night ? .7 : 1) : 0;
-    this._flash.classList.toggle('on', fxm === 'orage');
+    this._bolt.classList.toggle('on', fxm === 'orage');
+    if (fxm === 'orage') this._strike();
 
     this._particles(fxm, lite);
     this._shutters(night, sol, volets);
+  }
+
+  // trace un nouvel éclair : départ en haut, zigzag vers le bas, une ou deux branches ; durée du cycle variable
+  _strike() {
+    const r = (a, b) => a + Math.random() * (b - a);
+    const left = Math.random() < .5, x0 = left ? r(10, 40) : r(60, 90);
+    let x = x0, y = -2; const pts = [[x, y]], endY = r(24, 38);   // reste dans le ciel : l'éclair touche au plus le toit
+    while (y < endY) { y += r(4, 7); x += r(-5, 5); pts.push([x, y]); }
+    const d = (a) => 'M' + a.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+    const brs = [];
+    for (let k = 0; k < 2; k++) {
+      const at = pts[Math.floor(r(2, pts.length - 2))], dir = Math.random() < .5 ? -1 : 1, b = [at];
+      let bx = at[0], by = at[1];
+      for (let n = 0; n < 3; n++) { bx += dir * r(3, 8); by += r(4, 8); b.push([bx, by]); }
+      brs.push(d(b));
+    }
+    const [gl, co, br] = this._bolt.querySelectorAll('path');
+    gl.setAttribute('d', d(pts)); co.setAttribute('d', d(pts)); br.setAttribute('d', brs.join(' '));
+    this._bolt.style.setProperty('--bx', x0.toFixed(0) + '%');
+    this._bolt.querySelector('#glow').style.setProperty('--bx', x0.toFixed(0) + '%');
+    this._bolt.style.animationDuration = r(6, 12).toFixed(1) + 's';
   }
 
   _particles(meteo, lite) {
