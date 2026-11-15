@@ -131,15 +131,17 @@ class DioramaCard extends HTMLElement {
 
   _resolve() {
     const c = this._c;
+    const b = this._beta();
     let moment = this._state(c.sun_entity) === 'below_horizon' ? 'nuit' : 'jour';
     const mo = this._state(c.moment_override);
     if (mo === 'jour' || mo === 'nuit') moment = mo;
+    if (b.moment === 'jour' || b.moment === 'nuit') moment = b.moment;   // test depuis les réglages
     const sx = this._hass.states[WX_SENSOR];
     const wx = c.weather_entity || (sx && sx.attributes && sx.attributes.weather_entity) || 'weather.forecast_maison';
     let meteo = METEO[this._state(wx)] || 'clair';
     const wo = this._state(c.weather_override);
     if (AMBIANCES.includes(wo)) meteo = wo;
-    const b = this._beta();
+    if (AMBIANCES.includes(b.meteo)) meteo = b.meteo;                       // test depuis les réglages
     const shut = { nuit: 'night', jamais: 'never', toujours: 'always' }[b.volets] || c.shutters;
     let volets;
     if (shut === 'night') volets = moment === 'nuit';

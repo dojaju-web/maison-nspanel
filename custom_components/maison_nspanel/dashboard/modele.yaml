@@ -1229,7 +1229,8 @@ views:
                     // du décor assombri selon la météo (mêmes coefficients que diorama-card), pour éviter toute bande.
                     if (((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.beta) || {}).diorama === false) return '#131415';
                     const bwx = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
-                    const bk = ({ partlycloudy: .94, cloudy: .84, 'windy-variant': .84, exceptional: .84, fog: .95, rainy: .96, 'snowy-rainy': .96, pouring: .86, hail: .86, lightning: .78, 'lightning-rainy': .78 })[bwx ? bwx.state : ''] || 1;
+                    const bf = ({ eclaircies: .94, nuageux: .84, pluie: .96, averse: .86, orage: .78, brouillard: .95, clair: 1, neige: 1 })[((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.beta) || {}).meteo];
+                    const bk = bf || ({ partlycloudy: .94, cloudy: .84, 'windy-variant': .84, exceptional: .84, fog: .95, rainy: .96, 'snowy-rainy': .96, pouring: .86, hail: .86, lightning: .78, 'lightning-rainy': .78 })[bwx ? bwx.state : ''] || 1;
                     return 'rgb(' + Math.round(18 * bk) + ',' + Math.round(20 * bk) + ',' + Math.round(22 * bk) + ')';
                   }
                   const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];

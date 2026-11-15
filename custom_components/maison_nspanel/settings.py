@@ -7,6 +7,8 @@ from typing import Any
 from .const import (
     BETA_DEFAULTS,
     BETA_EFFETS,
+    BETA_METEO,
+    BETA_MOMENT,
     BETA_VOLETS,
     CONF_AIR,
     CONF_BETA,
@@ -55,6 +57,10 @@ def beta_settings(raw: Any) -> dict[str, Any]:
             out[key] = raw[key]
     if raw.get("effets") in BETA_EFFETS:
         out["effets"] = raw["effets"]
+    if raw.get("meteo") in BETA_METEO:
+        out["meteo"] = raw["meteo"]
+    if raw.get("moment") in BETA_MOMENT:
+        out["moment"] = raw["moment"]
     if raw.get("volets") in BETA_VOLETS:
         out["volets"] = raw["volets"]
     for key, lo, hi in (("position", 0, 100), ("taille_heure", 8, 16)):
