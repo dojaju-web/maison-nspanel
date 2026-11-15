@@ -1224,7 +1224,13 @@ views:
             - background: >
                 [[[
                   // NSPanel-Beta : maison isométrique en fond, décalée vers le bas sous la date et les informations
-                  if (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') return '#131415';  // NSPanel-Beta : la maison est dessinée par la carte diorama
+                  if (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') {
+                    // NSPanel-Beta : la maison est dessinée par la carte diorama. Le fond de la carte reprend la couleur
+                    // du décor assombri selon la météo (mêmes coefficients que diorama-card), pour éviter toute bande.
+                    const bwx = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
+                    const bk = ({ partlycloudy: .94, cloudy: .84, 'windy-variant': .84, exceptional: .84, fog: .95, rainy: .96, 'snowy-rainy': .96, pouring: .86, hail: .86, lightning: .78, 'lightning-rainy': .78 })[bwx ? bwx.state : ''] || 1;
+                    return 'rgb(' + Math.round(18 * bk) + ',' + Math.round(20 * bk) + ',' + Math.round(22 * bk) + ')';
+                  }
                   const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                   const sun = states['sun.sun'];
                   const night = sun ? sun.state === 'below_horizon' : false;
@@ -1274,7 +1280,7 @@ views:
           custom_fields:
             diorama:
               - position: absolute
-              - top: max(0px, calc((100% - 100vw) / 2))
+              - top: max(0px, calc((100% - 100vw) * .58))
               - left: 0
               - width: 100%
               - height: min(100%, 100vw)
