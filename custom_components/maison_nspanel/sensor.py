@@ -21,6 +21,7 @@ from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_AIR,
+    CONF_BETA,
     CONF_CLIMATE,
     CONF_STYLE,
     DEFAULT_STYLE,
@@ -33,6 +34,7 @@ from .const import (
     PREVISIONS_RETRY_SECONDS,
 )
 from .rappels import active_reminders, normalize
+from .settings import beta_settings
 from .vigilance import DEFAULT_MIN, compute, find_source
 
 _LOGGER = logging.getLogger(__name__)
@@ -100,6 +102,7 @@ class MaisonRappelsSensor(SensorEntity):
             "rappels": self._active,
             "style": self._entry.options.get(CONF_STYLE) or DEFAULT_STYLE,
             "air_enabled": self._entry.options.get(CONF_AIR, True),
+            "beta": beta_settings(self._entry.options.get(CONF_BETA)),
             "climate_entity": self._entry.options.get(CONF_CLIMATE),
             "tous": [normalize(r) for r in self._entry.options.get(CONF_RAPPELS, [])],
         }

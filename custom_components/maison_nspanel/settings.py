@@ -5,7 +5,11 @@ from __future__ import annotations
 from typing import Any
 
 from .const import (
+    BETA_DEFAULTS,
+    BETA_EFFETS,
+    BETA_VOLETS,
     CONF_AIR,
+    CONF_BETA,
     CONF_CLIMATE,
     CONF_RAPPELS,
     CONF_SECTIONS,
@@ -41,6 +45,25 @@ ENTITY_KEYS = (
 
 
 
+def beta_settings(raw: Any) -> dict[str, Any]:
+    """Réglages NSPanel-Beta : valeurs par défaut + valeurs valides enregistrées."""
+    out = dict(BETA_DEFAULTS)
+    if not isinstance(raw, dict):
+        return out
+    for key in ("diorama", "rappels"):
+        if isinstance(raw.get(key), bool):
+            out[key] = raw[key]
+    if raw.get("effets") in BETA_EFFETS:
+        out["effets"] = raw["effets"]
+    if raw.get("volets") in BETA_VOLETS:
+        out["volets"] = raw["volets"]
+    for key, lo, hi in (("position", 0, 100), ("taille_heure", 8, 16)):
+        v = raw.get(key)
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            out[key] = max(lo, min(hi, int(round(v))))
+    return out
+
+
 def current_settings(entry) -> dict[str, Any]:
     """Réglages affichés dans le panneau (valeurs par défaut comprises)."""
     o = entry.options
@@ -51,6 +74,7 @@ def current_settings(entry) -> dict[str, Any]:
         "style": o.get(CONF_STYLE) or DEFAULT_STYLE,
         "climate_entity": o.get(CONF_CLIMATE) or DEFAULT_CLIMATE,
         "air_enabled": bool(o.get(CONF_AIR, True)),
+        "beta": beta_settings(o.get(CONF_BETA)),
         "vacuum_entity": o.get(CONF_VACUUM) or "",
         **{k: o.get(k) or "" for k in CONF_VAC_SENSORS},
         "rappels": [normalize(r) for r in o.get(CONF_RAPPELS, [])],
@@ -77,6 +101,10 @@ def clean_settings(raw: dict[str, Any]) -> dict[str, Any]:
         out["style"] = raw["style"]
     if "air_enabled" in raw:
         out["air_enabled"] = bool(raw["air_enabled"])
+    if "beta" in raw:
+        if not isinstance(raw["beta"], dict):
+            raise ValueError("Réglages NSPanel-Beta invalides")
+        out["beta"] = beta_settings(raw["beta"])
     if "rappels" in raw:
         out["rappels"] = [normalize(r) for r in raw["rappels"] if isinstance(r, dict)]
     if "sections" in raw:

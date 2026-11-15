@@ -67,6 +67,8 @@ svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-event
 #flash { background:#dfe8ff; opacity:0; mix-blend-mode:screen; }
 #flash.on { animation:flash 7s linear infinite; }
 @keyframes flash { 0%,61%,100%{opacity:0} 62%{opacity:.55} 63%{opacity:.08} 64.5%{opacity:.42} 67%{opacity:0} }
+/* page cachée : pas d'animation inutile */
+:host(.pause) .drop, :host(.pause) .flake, :host(.pause) .cloud, :host(.pause) #fog::before, :host(.pause) #fog::after, :host(.pause) #flash.on { animation-play-state:paused !important; }
 @media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog::before,#fog::after,#flash.on{ animation:none !important; } }
 `;
 
@@ -95,7 +97,7 @@ class DioramaCard extends HTMLElement {
     this._root = this.attachShadow({ mode: 'open' });
     this._root.innerHTML = `<style>${CSS}</style>
       <ha-card><div class="stage">
-        <img class="fond" id="fa" alt="Diorama de la maison"><img class="fond" id="fb" alt="">
+        <img class="fond" id="fa" decoding="async" alt="Diorama de la maison"><img class="fond" id="fb" decoding="async" alt="">
         <svg id="volets" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg>
         <div class="layer" id="clouds"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
         <div class="layer" id="fog"></div><div class="layer" id="fx"></div><div class="layer" id="flash"></div>
@@ -114,9 +116,17 @@ class DioramaCard extends HTMLElement {
       if (!was || before !== this._lite()) { this._key = null; this._update(); }
     });
     ro.observe(this._stage);
+    // onglet ou écran en veille : on met les animations en pause (économie de batterie et de processeur)
+    document.addEventListener('visibilitychange', this._vis = () => this._root.host.classList.toggle('pause', document.hidden));
   }
+  disconnectedCallback() { if (this._vis) document.removeEventListener('visibilitychange', this._vis); }
 
-  _lite() { const l = this._c.lite; return l === 'auto' ? (this._w > 0 && this._w <= 520) : !!l; }
+  // réglages choisis dans Maison NSPanel > Apparence > NSPanel-Beta (attribut « beta » du capteur de rappels)
+  _beta() { const r = this._hass && this._hass.states['sensor.maison_nspanel_rappels']; return (r && r.attributes && r.attributes.beta) || {}; }
+  _lite() {
+    const e = this._beta().effets, l = e === 'reduits' ? true : (e === 'complets' ? false : this._c.lite);
+    return l === 'auto' ? (this._w > 0 && this._w <= 520) : !!l;
+  }
   _state(id) { const s = id && this._hass && this._hass.states[id]; return s ? s.state : null; }
 
   _resolve() {
@@ -129,12 +139,14 @@ class DioramaCard extends HTMLElement {
     let meteo = METEO[this._state(wx)] || 'clair';
     const wo = this._state(c.weather_override);
     if (AMBIANCES.includes(wo)) meteo = wo;
+    const b = this._beta();
+    const shut = { nuit: 'night', jamais: 'never', toujours: 'always' }[b.volets] || c.shutters;
     let volets;
-    if (c.shutters === 'night') volets = moment === 'nuit';
-    else if (c.shutters === 'never') volets = false;
-    else if (c.shutters === 'always') volets = true;
-    else { const s = this._state(c.shutters); volets = ['closed', 'closing', 'on'].includes(s); }
-    return { moment, meteo, volets, lite: this._lite() };
+    if (shut === 'night') volets = moment === 'nuit';
+    else if (shut === 'never') volets = false;
+    else if (shut === 'always') volets = true;
+    else { const s = this._state(shut); volets = ['closed', 'closing', 'on'].includes(s); }
+    return { moment, meteo, volets, lite: this._lite(), fx: b.effets !== 'aucun' };
   }
 
   _update() {
@@ -145,7 +157,8 @@ class DioramaCard extends HTMLElement {
     const key = JSON.stringify(st);
     if (key === this._key) return;     // rien n'a changé : on ne touche pas aux animations
     this._key = key;
-    const { moment, meteo, volets, lite } = st, night = moment === 'nuit';
+    const { moment, meteo, volets, lite, fx } = st, night = moment === 'nuit';
+    const fxm = fx ? meteo : 'clair';   // effets (nuages, brouillard, éclairs, pluie, neige) coupés : le décor reste
     const wet = ['pluie', 'averse', 'orage'].includes(meteo);
     const sol = wet ? 'mouille' : (meteo === 'neige' ? 'neige' : 'sec');
 
@@ -162,16 +175,16 @@ class DioramaCard extends HTMLElement {
     this._fa.style.filter = this._fb.style.filter = filter;
 
     // nuages, brouillard, éclairs
-    const op = { clair: 0, eclaircies: .55, nuageux: .9, pluie: .85, averse: .92, orage: .95, neige: .7, brouillard: 0 }[meteo];
+    const op = { clair: 0, eclaircies: .55, nuageux: .9, pluie: .85, averse: .92, orage: .95, neige: .7, brouillard: 0 }[fxm];
     const dark = meteo === 'orage' || meteo === 'averse';
     const rgb = night ? (dark ? '20,24,34' : '70,82,104') : (dark ? '70,74,84' : (meteo === 'pluie' ? '150,156,166' : '214,218,224'));
     this._clouds.forEach((c) => { c.style.opacity = op;
       c.style.background = [[22,66,20,44],[44,44,26,66],[66,50,24,56],[84,62,18,40]].map(([x,y,w,h]) =>
         `radial-gradient(ellipse ${w}% ${h}% at ${x}% ${y}%, rgba(${rgb},.97) 58%, rgba(${rgb},0) 100%)`).join(','); });
-    this._fog.style.opacity = meteo === 'brouillard' ? (night ? .7 : 1) : 0;
-    this._flash.classList.toggle('on', meteo === 'orage');
+    this._fog.style.opacity = fxm === 'brouillard' ? (night ? .7 : 1) : 0;
+    this._flash.classList.toggle('on', fxm === 'orage');
 
-    this._particles(meteo, lite);
+    this._particles(fxm, lite);
     this._shutters(night, sol, volets);
   }
 

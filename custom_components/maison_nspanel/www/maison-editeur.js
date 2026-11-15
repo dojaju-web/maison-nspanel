@@ -312,9 +312,25 @@ class MaisonNspanelEditeur extends HTMLElement {
     </section></div>`;
   }
 
+  _betaBlock() {
+    const b = this._cfg.beta || {};
+    const sel = (k, opts) => `<select class="bsel" data-bkey="${k}">${opts.map(([v, l]) => `<option value="${v}" ${b[k] === v ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+    const rng = (k, lo, hi, unit) => `<div class="rngrow"><input type="range" class="brng" data-bkey="${k}" min="${lo}" max="${hi}" value="${b[k]}" /><b class="rngval" data-for="${k}">${b[k]}${unit}</b></div>`;
+    const chk = (k, l) => `<label class="check"><input type="checkbox" class="bchk" data-bkey="${k}" ${b[k] ? "checked" : ""} /><span>${l}</span></label>`;
+    return `<section class="card"><h3 style="margin:0 0 8px;font-size:16px">Réglages NSPanel-Beta</h3>
+      ${chk("diorama", "Maison animée en fond de l'accueil (jour/nuit et météo)")}
+      ${chk("rappels", "Afficher les rappels (poubelles…) sous la date")}
+      <label class="field"><span>Effets météo (pluie, neige, nuages, brouillard, éclairs)</span>${sel("effets", [["auto", "Automatique (allégés sur petit écran)"], ["complets", "Complets"], ["reduits", "Allégés"], ["aucun", "Aucun"]])}</label>
+      <label class="field"><span>Volets de la maison</span>${sel("volets", [["nuit", "Fermés la nuit"], ["jamais", "Toujours ouverts"], ["toujours", "Toujours fermés"]])}</label>
+      <label class="field"><span>Hauteur de la maison sur un écran en hauteur (téléphone)</span>${rng("position", 0, 100, " %")}</label>
+      <label class="field"><span>Taille de l'heure</span>${rng("taille_heure", 8, 16, "")}</label>
+      <div class="hint inner">Ces réglages ne concernent que le style NSPanel-Beta.</div>
+    </section>`;
+  }
+
   _tabStyle() {
     const cur = this._cfg.style;
-    return `<div class="one"><section class="card">
+    return `<div class="one">${this._cfg.style === "beta" ? this._betaBlock() : ""}<section class="card">
       ${Object.entries(STYLE_LABELS).map(([k, [l, h]]) => `<label class="radio ${cur === k ? "on" : ""}"><input type="radio" name="style" class="rad" data-key="style" value="${k}" ${cur === k ? "checked" : ""} /><div><b>${l}</b><small>${h}</small></div></label>`).join("")}
     </section></div>`;
   }
@@ -392,6 +408,8 @@ class MaisonNspanelEditeur extends HTMLElement {
         .switch i::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
         .switch input:checked+i{background:var(--primary-color)} .switch input:checked+i::after{left:20px}
         .check{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+        .rngrow{display:flex;align-items:center;gap:12px} .rngrow input{flex:1} .rngval{min-width:48px;text-align:right}
+        .field select{padding:8px;border-radius:8px;border:1px solid var(--divider-color);background:var(--card-background-color);color:var(--primary-text-color);font-size:15px}
         .radio{display:flex;align-items:flex-start;gap:12px;padding:12px;border:1px solid var(--divider-color);border-radius:10px;margin-bottom:10px;cursor:pointer}
         .radio.on{border-color:var(--primary-color);background:rgba(var(--rgb-primary-color,3,169,244),.08)}
         .radio div{display:flex;flex-direction:column;gap:2px} .radio small{white-space:normal}
@@ -457,6 +475,13 @@ class MaisonNspanelEditeur extends HTMLElement {
     }));
     r.querySelectorAll("input.ent").forEach((el) => el.addEventListener("change", () => { this._cfg[el.dataset.key] = el.value.trim(); this._render(); }));
     r.querySelectorAll("select.sel").forEach((el) => el.addEventListener("change", () => { this._cfg[el.dataset.key] = el.value; this._updateSave(); }));
+    const setBeta = (k, v) => { this._cfg.beta = { ...(this._cfg.beta || {}), [k]: v }; this._updateSave(); };
+    r.querySelectorAll("input.bchk").forEach((el) => el.addEventListener("change", () => setBeta(el.dataset.bkey, el.checked)));
+    r.querySelectorAll("select.bsel").forEach((el) => el.addEventListener("change", () => setBeta(el.dataset.bkey, el.value)));
+    r.querySelectorAll("input.brng").forEach((el) => el.addEventListener("input", () => {
+      const v = Number(el.value); setBeta(el.dataset.bkey, v);
+      const lab = r.querySelector(`.rngval[data-for="${el.dataset.bkey}"]`); if (lab) lab.textContent = v + (el.dataset.bkey === "position" ? " %" : "");
+    }));
     r.querySelectorAll("input.chk").forEach((el) => el.addEventListener("change", () => { this._cfg[el.dataset.key] = el.checked; this._updateSave(); }));
     r.querySelectorAll("input.rad").forEach((el) => el.addEventListener("change", () => { this._cfg[el.dataset.key] = el.value; this._render(); }));
     const ps = r.querySelector(".pool-search");

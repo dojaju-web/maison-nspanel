@@ -203,6 +203,8 @@ class LiquidContenu(unittest.TestCase):
             self.assertTrue((base / "meteo" / "diorama" / f"{f}.webp").exists())
         self.assertTrue((base / "www" / "diorama-card.js").exists())
         self.assertIn("custom:diorama-card", self.modele)
+        for k in ("diorama !== false", "taille_heure", ".position", "rappels === false"):
+            self.assertIn(k, self.modele)
         self.assertIn("z-index: -1", self.modele)
         
         # beta : infos à gauche, horloge à droite en haut, menu en bas
