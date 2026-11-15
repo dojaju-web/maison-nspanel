@@ -736,7 +736,7 @@ views:
                     + (ph ? '<span style="font-size:12px;font-weight:500;color:#8E8E93">' + ph + '</span>' : '') + '</span></div></div>';
                 }
               }
-              const pills = (BETA && ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.beta) || {}).rappels === false) ? '' : actifs.map(r => {
+              const pills = ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') && ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.beta) || {}).rappels === false) ? '' : actifs.map(r => {
                 const c = snap(r.couleur || '250,204,21');
                 if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid')) return '<div style="max-width:100%"><div style="display:inline-flex;align-items:center;gap:10px;padding:5px 16px 5px 5px;background:rgba(44,44,46,.80);border:1px solid rgba(255,255,255,.10);border-radius:22px;font-family:-apple-system,\'SF Pro Text\',Inter,Roboto,sans-serif">'
                   + '<span style="display:flex;flex:none;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgb(' + c + ')">'
