@@ -752,7 +752,7 @@ views:
               const BETA = (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta');
               return '<div style="text-align:' + (BETA ? 'right' : 'center') + '">'
                 + '<div style="' + panel + '">'
-                + '<div style="font-size:' + (BETA ? '13vh' : '21vh') + ';font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;color:#FFFFFF;text-shadow:0 2px 24px rgba(0,0,0,.65)">' + time + '</div>'
+                + '<div style="font-size:' + (BETA ? 'min(13vh, 15.5vw)' : '21vh') + ';font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;color:#FFFFFF;text-shadow:0 2px 24px rgba(0,0,0,.65)">' + time + '</div>'
                 + '<div style="margin-top:1.2vh;font-size:' + (BETA ? '15px' : '19px') + ';font-weight:600;letter-spacing:.5px;color:' + ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '#FFFFFF' : '#E2E8F0') + ';text-shadow:0 1px 10px rgba(0,0,0,.7)">' + date + '</div>'
                 + '</div>'
                 + ((pills || vigHtml) ? '<div style="display:flex;flex-wrap:wrap;justify-content:' + (BETA ? 'flex-end' : 'center') + ';align-items:center;gap:8px;margin-top:1.4vh">' + pills + vigHtml + '</div>' : '')
@@ -1213,8 +1213,8 @@ views:
             - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '100%' : 'auto' ]]]"
           card:
             - position: relative
-            - min-height: 100vh
-            - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '100vh' : 'auto' ]]]"
+            - min-height: "[[[ return (CSS.supports('height', '100dvh') ? '100dvh' : '100vh') ]]]"
+            - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? (CSS.supports('height', '100dvh') ? '100dvh' : '100vh') : 'auto' ]]]"
             - isolation: isolate
             - box-sizing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'border-box' : 'content-box' ]]]"
             - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 22vh 14px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '3vh 14px 1vh 14px' : '6vh 14px 3vh 14px') ]]]"
@@ -1274,10 +1274,10 @@ views:
           custom_fields:
             diorama:
               - position: absolute
-              - top: 0
+              - top: max(0px, calc((100% - 100vw) / 2))
               - left: 0
-              - width: 100vw
-              - height: 100vh
+              - width: 100%
+              - height: min(100%, 100vw)
               - overflow: hidden
               - z-index: -1
               - pointer-events: none

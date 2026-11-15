@@ -29,7 +29,9 @@ const FENETRES = [
 const CSS = `
 :host { display:block; }
 ha-card { background:var(--diorama-bg,#131415); overflow:hidden; border:none; box-shadow:none; }
-.stage { position:relative; width:100%; aspect-ratio:1/1; overflow:hidden; background:var(--diorama-bg,#131415); --s:480px; }
+.stage { position:relative; width:100%; aspect-ratio:1/1; overflow:hidden; background:var(--diorama-bg,#131415); --s:480px;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
+          mask-image:linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%); }
 img.fond { position:absolute; inset:0; width:100%; height:100%; display:block; opacity:0; transition:opacity .8s ease, filter .8s ease; }
 img.fond.show { opacity:1; }
 svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
