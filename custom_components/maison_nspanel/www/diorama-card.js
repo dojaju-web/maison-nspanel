@@ -35,10 +35,10 @@ img.fond.show { opacity:1; }
 svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 #volets { opacity:0; transition:opacity .8s ease; }
 #volets.on { opacity:1; }
-.cloud { position:absolute; border-radius:50%; filter:blur(calc(var(--s)*.03)); opacity:0; transition:opacity 1.2s ease; will-change:transform; }
-.c1 { left:-10%; top:6%;  width:62%; height:16%; animation:drift 46s linear infinite; }
-.c2 { left:30%;  top:14%; width:70%; height:15%; animation:drift 64s linear infinite reverse; }
-.c3 { left:8%;   top:1%;  width:50%; height:12%; animation:drift 80s linear infinite; }
+.cloud { position:absolute; filter:blur(calc(var(--s)*.011)); opacity:0; transition:opacity 1.2s ease; will-change:transform; }
+.c1 { left:-10%; top:5%;  width:58%; height:15%; animation:drift 46s linear infinite; }
+.c2 { left:34%;  top:15%; width:62%; height:13%; animation:drift 64s linear infinite reverse; }
+.c3 { left:6%;   top:0%;  width:46%; height:11%; animation:drift 80s linear infinite; }
 @keyframes drift { 0%{transform:translate3d(-8%,0,0)} 50%{transform:translate3d(10%,0,0)} 100%{transform:translate3d(-8%,0,0)} }
 .drop { position:absolute; top:-12%; width:max(1px,calc(var(--s)*.0022)); height:6%;
   background:linear-gradient(to bottom, rgba(200,220,245,0), rgba(200,220,245,.8));
@@ -46,16 +46,26 @@ svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-event
 @keyframes fall { from{transform:translate3d(0,0,0) rotate(11deg)} to{transform:translate3d(calc(var(--s)*-.22),calc(var(--s)*1.25),0) rotate(11deg)} }
 .flake { position:absolute; top:-4%; border-radius:50%; background:#fff; animation:snow linear infinite; will-change:transform; }
 @keyframes snow { 0%{transform:translate3d(0,0,0)} 50%{transform:translate3d(calc(var(--s)*.03),calc(var(--s)*.55),0)} 100%{transform:translate3d(calc(var(--s)*-.02),calc(var(--s)*1.1),0)} }
-#fog { opacity:0; transition:opacity 1.2s ease;
-  background:
-    radial-gradient(60% 22% at 30% 62%, rgba(215,220,226,.42), rgba(215,220,226,0) 70%),
-    radial-gradient(70% 26% at 68% 48%, rgba(215,220,226,.38), rgba(215,220,226,0) 70%),
-    radial-gradient(80% 30% at 50% 74%, rgba(215,220,226,.34), rgba(215,220,226,0) 72%);
-  animation:drift 38s linear infinite; }
+/* brouillard : voile bas et large (plus large que la carte, fondu en haut et en bas) -> aucun bord visible quand il dérive */
+#fog { left:-30%; width:160%; opacity:0; transition:opacity 1.4s ease;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 28%, #000 80%, transparent 100%);
+          mask-image:linear-gradient(to bottom, transparent 0%, #000 28%, #000 80%, transparent 100%); }
+#fog::before, #fog::after { content:''; position:absolute; inset:0; will-change:transform; }
+#fog::before { background:
+    radial-gradient(34% 20% at 22% 66%, rgba(222,226,232,.55), rgba(222,226,232,0) 100%),
+    radial-gradient(40% 22% at 58% 54%, rgba(222,226,232,.48), rgba(222,226,232,0) 100%),
+    radial-gradient(36% 20% at 86% 72%, rgba(222,226,232,.50), rgba(222,226,232,0) 100%);
+  animation:mist 52s ease-in-out infinite; }
+#fog::after { background:
+    linear-gradient(to bottom, rgba(222,226,232,0) 30%, rgba(222,226,232,.20) 55%, rgba(222,226,232,.26) 72%, rgba(222,226,232,0) 100%),
+    radial-gradient(44% 18% at 40% 78%, rgba(222,226,232,.40), rgba(222,226,232,0) 100%),
+    radial-gradient(30% 18% at 76% 44%, rgba(222,226,232,.36), rgba(222,226,232,0) 100%);
+  animation:mist 70s ease-in-out infinite reverse; }
+@keyframes mist { 0%,100%{transform:translate3d(-6%,0,0)} 50%{transform:translate3d(6%,0,0)} }
 #flash { background:#dfe8ff; opacity:0; mix-blend-mode:screen; }
 #flash.on { animation:flash 7s linear infinite; }
 @keyframes flash { 0%,61%,100%{opacity:0} 62%{opacity:.55} 63%{opacity:.08} 64.5%{opacity:.42} 67%{opacity:0} }
-@media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog,#flash.on{ animation:none !important; } }
+@media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog::before,#fog::after,#flash.on{ animation:none !important; } }
 `;
 
 class DioramaCard extends HTMLElement {
@@ -146,16 +156,17 @@ class DioramaCard extends HTMLElement {
     }
     const filter = { clair: 'none', eclaircies: 'brightness(.94) saturate(.92)', nuageux: 'brightness(.84) saturate(.78)',
       pluie: 'brightness(.96)', averse: 'brightness(.86)', orage: 'brightness(.78) saturate(.85)',
-      neige: 'none', brouillard: 'brightness(.93) saturate(.7) contrast(.92)' }[meteo];
+      neige: 'none', brouillard: 'brightness(.95) saturate(.75)' }[meteo];
     this._fa.style.filter = this._fb.style.filter = filter;
 
     // nuages, brouillard, éclairs
-    const op = { clair: 0, eclaircies: .28, nuageux: .5, pluie: .62, averse: .72, orage: .8, neige: .5, brouillard: .35 }[meteo];
+    const op = { clair: 0, eclaircies: .55, nuageux: .9, pluie: .85, averse: .92, orage: .95, neige: .7, brouillard: 0 }[meteo];
     const dark = meteo === 'orage' || meteo === 'averse';
     const rgb = night ? (dark ? '20,24,34' : '70,82,104') : (dark ? '70,74,84' : (meteo === 'pluie' ? '150,156,166' : '214,218,224'));
     this._clouds.forEach((c) => { c.style.opacity = op;
-      c.style.background = `radial-gradient(closest-side, rgba(${rgb},.95), rgba(${rgb},.55) 55%, rgba(${rgb},0) 100%)`; });
-    this._fog.style.opacity = meteo === 'brouillard' ? (night ? .55 : .9) : 0;
+      c.style.background = [[22,66,20,44],[44,44,26,66],[66,50,24,56],[84,62,18,40]].map(([x,y,w,h]) =>
+        `radial-gradient(ellipse ${w}% ${h}% at ${x}% ${y}%, rgba(${rgb},.97) 58%, rgba(${rgb},0) 100%)`).join(','); });
+    this._fog.style.opacity = meteo === 'brouillard' ? (night ? .7 : 1) : 0;
     this._flash.classList.toggle('on', meteo === 'orage');
 
     this._particles(meteo, lite);
