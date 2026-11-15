@@ -660,6 +660,11 @@ views:
         tap_action:
           action: none
         custom_fields:
+          diorama:
+            card:
+              type: custom:diorama-card
+              shutters: night
+              lite: auto
           clock: >
             [[[
               // Préchauffage : Home Assistant ne construit une page qu'à sa première visite. On les visite une fois,
@@ -1210,6 +1215,7 @@ views:
             - position: relative
             - min-height: 100vh
             - height: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '100vh' : 'auto' ]]]"
+            - isolation: isolate
             - box-sizing: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'border-box' : 'content-box' ]]]"
             - padding: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? '6vh 14px 22vh 14px' : ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? '3vh 14px 1vh 14px' : '6vh 14px 3vh 14px') ]]]"
             - border-radius: 0
@@ -1218,20 +1224,7 @@ views:
             - background: >
                 [[[
                   // NSPanel-Beta : maison isométrique en fond, décalée vers le bas sous la date et les informations
-                  if ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta')) {
-                    // NSPanel-Beta : la maison change avec la météo et le jour/la nuit (sun.sun)
-                    const bw = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
-                    const bsun = states['sun.sun'];
-                    const bnight = bsun ? bsun.state === 'below_horizon' : false;
-                    const bc = bw ? bw.state : 'unknown';
-                    let kind = 'cloudy';
-                    if (['sunny', 'clear-night', 'partlycloudy'].indexOf(bc) >= 0) kind = 'sunny';
-                    else if (['rainy', 'pouring', 'lightning', 'lightning-rainy'].indexOf(bc) >= 0) kind = 'rainy';
-                    else if (['snowy', 'snowy-rainy', 'hail'].indexOf(bc) >= 0) kind = 'snowy';
-                    // Pas d'image « nuit dégagée » : la nuit claire utilise la vue nuit calme
-                    if (bnight && kind === 'sunny') kind = 'cloudy';
-                    return 'url(/maison_nspanel/meteo/maison-' + (bnight ? 'nuit' : 'jour') + '-' + kind + '.jpg?v=1) center 24vh / 100% auto no-repeat, ' + (bnight ? '#060a0e' : '#141718');
-                  }
+                  if (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') return '#131415';  // NSPanel-Beta : la maison est dessinée par la carte diorama
                   const w = states[((states['sensor.maison_nspanel_previsions'] && states['sensor.maison_nspanel_previsions'].attributes.weather_entity) || 'weather.forecast_maison')];
                   const sun = states['sun.sun'];
                   const night = sun ? sun.state === 'below_horizon' : false;
@@ -1279,6 +1272,16 @@ views:
                   return ((states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'liquid') ? 'linear-gradient(180deg, rgba(28,28,30,.66) 0%, rgba(28,28,30,.86) 100%), ' : (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'linear-gradient(180deg, rgba(6,12,22,.40) 0%, rgba(6,12,22,.80) 100%), ' : '') + photo + (layers[c] || [shade, sky]).join(', ');
                 ]]]
           custom_fields:
+            diorama:
+              - position: absolute
+              - top: 0
+              - left: 0
+              - width: 100vw
+              - height: 100vh
+              - overflow: hidden
+              - z-index: -1
+              - pointer-events: none
+              - display: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'block' : 'none' ]]]"
             clock:
               - align-self: "[[[ return (states['sensor.maison_nspanel_rappels'] && states['sensor.maison_nspanel_rappels'].attributes.style === 'beta') ? 'start' : 'center' ]]]"
               - justify-self: stretch

@@ -90,6 +90,12 @@ async def async_register_panel(hass: HomeAssistant) -> None:
     if not store.get("panel_static"):
         await hass.http.async_register_static_paths([StaticPathConfig(STATIC_PANEL, str(WWW), False)])
         store["panel_static"] = True
+    if not store.get("diorama_js"):
+        # Carte « diorama-card » (maison animée de l'accueil NSPanel-Beta), chargée sur toutes les pages
+        from homeassistant.components import frontend
+
+        frontend.add_extra_js_url(hass, f"{STATIC_PANEL}/diorama-card.js?v={_version()}")
+        store["diorama_js"] = True
     await panel_custom.async_register_panel(
         hass,
         webcomponent_name=PANEL_COMPONENT,
