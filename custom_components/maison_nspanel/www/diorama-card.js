@@ -37,11 +37,13 @@ img.fond.show { opacity:1; }
 svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 #volets { opacity:0; transition:opacity .8s ease; }
 #volets.on { opacity:1; }
-.cloud { position:absolute; filter:blur(calc(var(--s)*.004)); opacity:0; transition:opacity 1.2s ease; will-change:transform; }
-.c1 { left:-12%; top:3%;  width:74%; height:27%; animation:drift 46s linear infinite; }
-.c2 { left:36%;  top:12%; width:70%; height:24%; animation:drift 64s linear infinite reverse; }
-.c3 { left:2%;   top:-2%; width:56%; height:20%; animation:drift 80s linear infinite; }
-@keyframes drift { 0%{transform:translate3d(-8%,0,0)} 50%{transform:translate3d(10%,0,0)} 100%{transform:translate3d(-8%,0,0)} }
+/* le nuage est coupé en haut de l'image : on fond le bord supérieur dans le ciel */
+#clouds { -webkit-mask-image:linear-gradient(to bottom, transparent 0, rgba(0,0,0,.55) 9%, #000 24%); mask-image:linear-gradient(to bottom, transparent 0, rgba(0,0,0,.55) 9%, #000 24%); }
+.cloud { position:absolute; opacity:0; transition:opacity 1.4s ease; will-change:transform; background:center / 100% 100% no-repeat; }
+.c1 { left:-6%;  top:-1%; width:112%; height:29.8%; animation:cdrift 70s ease-in-out infinite; }
+.c2 { left:20%;  top:6%;  width:86%;  height:22.9%; animation:cdrift2 52s ease-in-out infinite; }
+@keyframes cdrift  { 0%,100%{transform:translate3d(-3.5%,0,0)} 50%{transform:translate3d(3.5%,0,0)} }
+@keyframes cdrift2 { 0%,100%{transform:translate3d(5%,0,0) scaleX(-1)} 50%{transform:translate3d(-5%,0,0) scaleX(-1)} }
 .drop { position:absolute; top:-12%; width:max(1px,calc(var(--s)*.0022)); height:6%;
   background:linear-gradient(to bottom, rgba(200,220,245,0), rgba(200,220,245,.8));
   transform-origin:top; animation:fall linear infinite; will-change:transform; }
@@ -78,38 +80,24 @@ svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-event
 @media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog::before,#fog::after,#bolt.on{ animation:none !important; } }
 `;
 
-// Nuage cumulus procédural : bulles superposées, lumière en haut à gauche, base ombrée et fondue
-const _sprites = {};
-function cloudSprite(seed, lit, shade) {
-  const key = seed + '|' + lit + '|' + shade;
-  if (_sprites[key]) return _sprites[key];
-  let a = seed * 2654435761 >>> 0;
-  const rnd = () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  const W = 640, H = 240, base = H * .80, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-  const g = cv.getContext('2d'), puffs = [];
-  for (let n = 0; n < 34; n++) {
-    const t = .08 + rnd() * .84, dome = Math.pow(Math.sin(Math.PI * t), .7);
-    const r = (.06 + rnd() * .09) * W * (.55 + .6 * dome);
-    puffs.push({ x: t * W, y: base - r * .55 - rnd() * H * .52 * dome, r });
-  }
-  puffs.sort((p, q) => q.y - p.y);                       // du bas vers le haut : les sommets passent devant
-  const mix = (k) => lit.map((v, i) => Math.round(shade[i] + (v - shade[i]) * k));
-  puffs.forEach((p) => {
-    const hi = (base - p.y) / (H * .8);                  // plus haut = plus éclairé
-    const c0 = mix(Math.min(1, .55 + hi * .8)), c1 = mix(Math.max(.25, .35 + hi * .45));
-    const gr = g.createRadialGradient(p.x - p.r * .3, p.y - p.r * .35, p.r * .08, p.x, p.y, p.r);
-    gr.addColorStop(0, `rgba(${c0},1)`); gr.addColorStop(.62, `rgba(${c1},.96)`); gr.addColorStop(1, `rgba(${c1},0)`);
-    g.fillStyle = gr; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fill();
+// Nuage : une masse de nuages détourée (image avec transparence), teintée selon l'ambiance (multiplication + éclaircie), mise en cache
+const _teintes = {};
+function nuageTeinte(url, mul, lift) {
+  const key = url + '|' + mul + '|' + lift;
+  if (!_teintes[key]) _teintes[key] = new Promise((ok) => {
+    const im = new Image();
+    im.onload = () => {
+      const cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+      const g = cv.getContext('2d'); g.drawImage(im, 0, 0);
+      g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgb(${mul})`; g.fillRect(0, 0, cv.width, cv.height);
+      if (lift) { g.globalCompositeOperation = 'screen'; g.fillStyle = `rgba(255,255,255,${lift})`; g.fillRect(0, 0, cv.width, cv.height); }
+      g.globalCompositeOperation = 'destination-in'; g.drawImage(im, 0, 0);
+      ok(cv.toDataURL('image/png'));
+    };
+    im.onerror = () => ok(url);
+    im.src = url;
   });
-  g.globalCompositeOperation = 'source-atop';           // base plus sombre
-  const sh = g.createLinearGradient(0, H * .35, 0, base);
-  sh.addColorStop(0, `rgba(${shade},0)`); sh.addColorStop(1, `rgba(${shade},.6)`);
-  g.fillStyle = sh; g.fillRect(0, 0, W, H);
-  g.globalCompositeOperation = 'destination-in';        // fond plat qui s'estompe
-  const fd = g.createLinearGradient(0, base - H * .1, 0, base + H * .12);
-  fd.addColorStop(0, 'rgba(0,0,0,1)'); fd.addColorStop(1, 'rgba(0,0,0,0)');
-  g.fillStyle = fd; g.fillRect(0, 0, W, H);
-  return (_sprites[key] = cv.toDataURL('image/png'));
+  return _teintes[key];
 }
 
 class DioramaCard extends HTMLElement {
@@ -139,7 +127,7 @@ class DioramaCard extends HTMLElement {
       <ha-card><div class="stage">
         <img class="fond" id="fa" decoding="async" alt="Diorama de la maison"><img class="fond" id="fb" decoding="async" alt="">
         <svg id="volets" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg>
-        <div class="layer" id="clouds"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
+        <div class="layer" id="clouds"><div class="cloud c1"></div><div class="cloud c2"></div></div>
         <div class="layer" id="fog"></div><div class="layer" id="fx"></div><div class="layer" id="bolt"><div id="glow"></div><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path class="gl"/><path class="co"/><path class="br"/></svg></div>
       </div></ha-card>`;
     const $ = (id) => this._root.getElementById(id);
@@ -189,7 +177,7 @@ class DioramaCard extends HTMLElement {
     else if (shut === 'never') volets = false;
     else if (shut === 'always') volets = true;
     else { const s = this._state(shut); volets = ['closed', 'closing', 'on'].includes(s); }
-    return { moment, meteo, volets, lite: this._lite(), fx: b.effets !== 'aucun', nuages: b.nuages === 'simple' ? 'simple' : 'realiste' };
+    return { moment, meteo, volets, lite: this._lite(), fx: b.effets !== 'aucun' };
   }
 
   _update() {
@@ -200,7 +188,7 @@ class DioramaCard extends HTMLElement {
     const key = JSON.stringify(st);
     if (key === this._key) return;     // rien n'a changé : on ne touche pas aux animations
     this._key = key;
-    const { moment, meteo, volets, lite, fx, nuages } = st, night = moment === 'nuit';
+    const { moment, meteo, volets, lite, fx } = st, night = moment === 'nuit';
     const fxm = fx ? meteo : 'clair';   // effets (nuages, brouillard, éclairs, pluie, neige) coupés : le décor reste
     const wet = ['pluie', 'averse', 'orage'].includes(meteo);
     const sol = wet ? 'mouille' : (meteo === 'neige' ? 'neige' : 'sec');
@@ -218,19 +206,17 @@ class DioramaCard extends HTMLElement {
     this._fa.style.filter = this._fb.style.filter = filter;
 
     // nuages, brouillard, éclairs
-    const op = { clair: 0, eclaircies: .55, nuageux: .9, pluie: .85, averse: .92, orage: .95, neige: .7, brouillard: 0 }[fxm];
-    const dark = meteo === 'orage' || meteo === 'averse';
-    if (nuages === 'simple') {
-      const rgb = night ? (dark ? '20,24,34' : '70,82,104') : (dark ? '70,74,84' : (meteo === 'pluie' ? '150,156,166' : '214,218,224'));
-      this._clouds.forEach((c) => { c.style.opacity = op;
-        c.style.background = [[22,66,20,44],[44,44,26,66],[66,50,24,56],[84,62,18,40]].map(([x,y,w,h]) =>
-          `radial-gradient(ellipse ${w}% ${h}% at ${x}% ${y}%, rgba(${rgb},.97) 58%, rgba(${rgb},0) 100%)`).join(','); });
-    } else {
-      // cumulus dessinés une fois (canvas) : volumes éclairés par le haut, base grise et plate ; seul le déplacement est animé
-      const pal = night ? (dark ? [[54, 62, 80], [14, 18, 28]] : [[104, 118, 146], [30, 38, 58]])
-        : (dark ? [[150, 156, 170], [58, 64, 80]] : (meteo === 'pluie' || meteo === 'neige' ? [[206, 212, 222], [104, 112, 128]] : [[252, 253, 255], [150, 162, 182]]));
-      this._clouds.forEach((c, i) => { c.style.opacity = op; c.style.background = `url(${cloudSprite(11 + i * 7, pal[0], pal[1])}) center / 100% 100% no-repeat`; });
-    }
+    // éclaircies : un seul voile léger ; temps couvert, pluie, orage, neige : deux couches de nuages
+    const vis = { clair: [], eclaircies: [1], nuageux: [0, 1], pluie: [0, 1], averse: [0, 1], orage: [0, 1], neige: [0, 1], brouillard: [] }[fxm] || [];
+    const [mul, lift] = night
+      ? (fxm === 'orage' || fxm === 'averse' ? ['70,76,96', 0] : (fxm === 'pluie' ? ['110,120,146', 0] : ['150,162,190', .08]))
+      : (fxm === 'orage' ? ['150,156,172', 0] : (fxm === 'averse' ? ['196,202,214', 0] : (fxm === 'pluie' ? ['232,238,248', .04]
+        : (fxm === 'neige' ? ['244,248,255', .45] : (fxm === 'eclaircies' ? ['255,255,255', .55] : ['255,255,255', .2])))));
+    const gen = this._gen = (this._gen || 0) + 1;
+    this._clouds.forEach((c, i) => {
+      c.style.opacity = vis.includes(i) ? (i === 1 && fxm !== 'eclaircies' ? .8 : .97) : 0;
+      if (vis.includes(i)) nuageTeinte(`${this._c.path}nuage.webp`, mul, lift).then((u) => { if (gen === this._gen) c.style.backgroundImage = `url(${u})`; });
+    });
     this._fog.style.opacity = fxm === 'brouillard' ? (night ? .7 : 1) : 0;
     this._bolt.classList.toggle('on', fxm === 'orage');
     if (fxm === 'orage') this._strike();

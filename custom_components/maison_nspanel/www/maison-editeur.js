@@ -323,7 +323,6 @@ class MaisonNspanelEditeur extends HTMLElement {
       <label class="field"><span>Effets météo (pluie, neige, nuages, brouillard, éclairs)</span>${sel("effets", [["auto", "Automatique (allégés sur petit écran)"], ["complets", "Complets"], ["reduits", "Allégés"], ["aucun", "Aucun"]])}</label>
       <label class="field"><span>Tester une ambiance (la météo réelle est ignorée)</span>${sel("meteo", [["auto", "Météo réelle"], ["clair", "Ciel dégagé"], ["eclaircies", "Éclaircies"], ["nuageux", "Nuageux"], ["pluie", "Pluie"], ["averse", "Averse"], ["orage", "Orage"], ["neige", "Neige"], ["brouillard", "Brouillard"]])}</label>
       <label class="field"><span>Tester jour ou nuit</span>${sel("moment", [["auto", "Selon le soleil"], ["jour", "Jour"], ["nuit", "Nuit"]])}</label>
-      <label class="field"><span>Nuages</span>${sel("nuages", [["realiste", "Réalistes (cumulus avec volume)"], ["simple", "Simples (légers)"]])}</label>
       <label class="field"><span>Volets de la maison</span>${sel("volets", [["nuit", "Fermés la nuit"], ["jamais", "Toujours ouverts"], ["toujours", "Toujours fermés"]])}</label>
       <label class="field"><span>Hauteur de la maison sur un écran en hauteur (téléphone)</span>${rng("position", 0, 100, " %")}</label>
       <label class="field"><span>Taille de l'heure</span>${rng("taille_heure", 8, 16, "")}</label>
