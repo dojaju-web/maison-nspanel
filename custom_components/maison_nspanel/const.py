@@ -22,10 +22,12 @@ BETA_DEFAULTS = {
     "position": 72,          # 0-100 : hauteur de la maison sur un écran en hauteur (téléphone)
     "taille_heure": 13,      # 8-16 : taille de l'heure
     "rappels": True,         # pastilles de rappels (poubelles…) sous la date
+    "nuages": "realiste",    # realiste | simple
     "meteo": "auto",         # auto | clair | eclaircies | nuageux | pluie | averse | orage | neige | brouillard (test)
     "moment": "auto",        # auto | jour | nuit (test)
 }
 BETA_EFFETS = ("auto", "reduits", "complets", "aucun")
+BETA_NUAGES = ("realiste", "simple")
 BETA_VOLETS = ("nuit", "jamais", "toujours")
 BETA_METEO = ("auto", "clair", "eclaircies", "nuageux", "pluie", "averse", "orage", "neige", "brouillard")
 BETA_MOMENT = ("auto", "jour", "nuit")

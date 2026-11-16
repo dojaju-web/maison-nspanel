@@ -37,10 +37,10 @@ img.fond.show { opacity:1; }
 svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 #volets { opacity:0; transition:opacity .8s ease; }
 #volets.on { opacity:1; }
-.cloud { position:absolute; filter:blur(calc(var(--s)*.011)); opacity:0; transition:opacity 1.2s ease; will-change:transform; }
-.c1 { left:-10%; top:5%;  width:58%; height:15%; animation:drift 46s linear infinite; }
-.c2 { left:34%;  top:15%; width:62%; height:13%; animation:drift 64s linear infinite reverse; }
-.c3 { left:6%;   top:0%;  width:46%; height:11%; animation:drift 80s linear infinite; }
+.cloud { position:absolute; filter:blur(calc(var(--s)*.004)); opacity:0; transition:opacity 1.2s ease; will-change:transform; }
+.c1 { left:-12%; top:3%;  width:74%; height:27%; animation:drift 46s linear infinite; }
+.c2 { left:36%;  top:12%; width:70%; height:24%; animation:drift 64s linear infinite reverse; }
+.c3 { left:2%;   top:-2%; width:56%; height:20%; animation:drift 80s linear infinite; }
 @keyframes drift { 0%{transform:translate3d(-8%,0,0)} 50%{transform:translate3d(10%,0,0)} 100%{transform:translate3d(-8%,0,0)} }
 .drop { position:absolute; top:-12%; width:max(1px,calc(var(--s)*.0022)); height:6%;
   background:linear-gradient(to bottom, rgba(200,220,245,0), rgba(200,220,245,.8));
@@ -77,6 +77,40 @@ svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-event
 :host(.pause) .drop, :host(.pause) .flake, :host(.pause) .cloud, :host(.pause) #fog::before, :host(.pause) #fog::after, :host(.pause) #bolt.on { animation-play-state:paused !important; }
 @media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog::before,#fog::after,#bolt.on{ animation:none !important; } }
 `;
+
+// Nuage cumulus procédural : bulles superposées, lumière en haut à gauche, base ombrée et fondue
+const _sprites = {};
+function cloudSprite(seed, lit, shade) {
+  const key = seed + '|' + lit + '|' + shade;
+  if (_sprites[key]) return _sprites[key];
+  let a = seed * 2654435761 >>> 0;
+  const rnd = () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const W = 640, H = 240, base = H * .80, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d'), puffs = [];
+  for (let n = 0; n < 34; n++) {
+    const t = .08 + rnd() * .84, dome = Math.pow(Math.sin(Math.PI * t), .7);
+    const r = (.06 + rnd() * .09) * W * (.55 + .6 * dome);
+    puffs.push({ x: t * W, y: base - r * .55 - rnd() * H * .52 * dome, r });
+  }
+  puffs.sort((p, q) => q.y - p.y);                       // du bas vers le haut : les sommets passent devant
+  const mix = (k) => lit.map((v, i) => Math.round(shade[i] + (v - shade[i]) * k));
+  puffs.forEach((p) => {
+    const hi = (base - p.y) / (H * .8);                  // plus haut = plus éclairé
+    const c0 = mix(Math.min(1, .55 + hi * .8)), c1 = mix(Math.max(.25, .35 + hi * .45));
+    const gr = g.createRadialGradient(p.x - p.r * .3, p.y - p.r * .35, p.r * .08, p.x, p.y, p.r);
+    gr.addColorStop(0, `rgba(${c0},1)`); gr.addColorStop(.62, `rgba(${c1},.96)`); gr.addColorStop(1, `rgba(${c1},0)`);
+    g.fillStyle = gr; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fill();
+  });
+  g.globalCompositeOperation = 'source-atop';           // base plus sombre
+  const sh = g.createLinearGradient(0, H * .35, 0, base);
+  sh.addColorStop(0, `rgba(${shade},0)`); sh.addColorStop(1, `rgba(${shade},.6)`);
+  g.fillStyle = sh; g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = 'destination-in';        // fond plat qui s'estompe
+  const fd = g.createLinearGradient(0, base - H * .1, 0, base + H * .12);
+  fd.addColorStop(0, 'rgba(0,0,0,1)'); fd.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = fd; g.fillRect(0, 0, W, H);
+  return (_sprites[key] = cv.toDataURL('image/png'));
+}
 
 class DioramaCard extends HTMLElement {
   setConfig(config) {
@@ -155,7 +189,7 @@ class DioramaCard extends HTMLElement {
     else if (shut === 'never') volets = false;
     else if (shut === 'always') volets = true;
     else { const s = this._state(shut); volets = ['closed', 'closing', 'on'].includes(s); }
-    return { moment, meteo, volets, lite: this._lite(), fx: b.effets !== 'aucun' };
+    return { moment, meteo, volets, lite: this._lite(), fx: b.effets !== 'aucun', nuages: b.nuages === 'simple' ? 'simple' : 'realiste' };
   }
 
   _update() {
@@ -166,7 +200,7 @@ class DioramaCard extends HTMLElement {
     const key = JSON.stringify(st);
     if (key === this._key) return;     // rien n'a changé : on ne touche pas aux animations
     this._key = key;
-    const { moment, meteo, volets, lite, fx } = st, night = moment === 'nuit';
+    const { moment, meteo, volets, lite, fx, nuages } = st, night = moment === 'nuit';
     const fxm = fx ? meteo : 'clair';   // effets (nuages, brouillard, éclairs, pluie, neige) coupés : le décor reste
     const wet = ['pluie', 'averse', 'orage'].includes(meteo);
     const sol = wet ? 'mouille' : (meteo === 'neige' ? 'neige' : 'sec');
@@ -186,10 +220,17 @@ class DioramaCard extends HTMLElement {
     // nuages, brouillard, éclairs
     const op = { clair: 0, eclaircies: .55, nuageux: .9, pluie: .85, averse: .92, orage: .95, neige: .7, brouillard: 0 }[fxm];
     const dark = meteo === 'orage' || meteo === 'averse';
-    const rgb = night ? (dark ? '20,24,34' : '70,82,104') : (dark ? '70,74,84' : (meteo === 'pluie' ? '150,156,166' : '214,218,224'));
-    this._clouds.forEach((c) => { c.style.opacity = op;
-      c.style.background = [[22,66,20,44],[44,44,26,66],[66,50,24,56],[84,62,18,40]].map(([x,y,w,h]) =>
-        `radial-gradient(ellipse ${w}% ${h}% at ${x}% ${y}%, rgba(${rgb},.97) 58%, rgba(${rgb},0) 100%)`).join(','); });
+    if (nuages === 'simple') {
+      const rgb = night ? (dark ? '20,24,34' : '70,82,104') : (dark ? '70,74,84' : (meteo === 'pluie' ? '150,156,166' : '214,218,224'));
+      this._clouds.forEach((c) => { c.style.opacity = op;
+        c.style.background = [[22,66,20,44],[44,44,26,66],[66,50,24,56],[84,62,18,40]].map(([x,y,w,h]) =>
+          `radial-gradient(ellipse ${w}% ${h}% at ${x}% ${y}%, rgba(${rgb},.97) 58%, rgba(${rgb},0) 100%)`).join(','); });
+    } else {
+      // cumulus dessinés une fois (canvas) : volumes éclairés par le haut, base grise et plate ; seul le déplacement est animé
+      const pal = night ? (dark ? [[54, 62, 80], [14, 18, 28]] : [[104, 118, 146], [30, 38, 58]])
+        : (dark ? [[150, 156, 170], [58, 64, 80]] : (meteo === 'pluie' || meteo === 'neige' ? [[206, 212, 222], [104, 112, 128]] : [[252, 253, 255], [150, 162, 182]]));
+      this._clouds.forEach((c, i) => { c.style.opacity = op; c.style.background = `url(${cloudSprite(11 + i * 7, pal[0], pal[1])}) center / 100% 100% no-repeat`; });
+    }
     this._fog.style.opacity = fxm === 'brouillard' ? (night ? .7 : 1) : 0;
     this._bolt.classList.toggle('on', fxm === 'orage');
     if (fxm === 'orage') this._strike();

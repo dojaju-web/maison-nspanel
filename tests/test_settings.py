@@ -58,7 +58,7 @@ class Settings(unittest.TestCase):
 class Detection(unittest.TestCase):
     def test_beta_reglages(self):
         d = settings.current_settings(Entry())["beta"]
-        self.assertEqual(d, {"diorama": True, "effets": "auto", "volets": "nuit", "position": 72, "taille_heure": 13, "rappels": True, "meteo": "auto", "moment": "auto"})
+        self.assertEqual(d, {"diorama": True, "effets": "auto", "volets": "nuit", "position": 72, "taille_heure": 13, "rappels": True, "nuages": "realiste", "meteo": "auto", "moment": "auto"})
         out = settings.clean_settings({"beta": {"diorama": False, "effets": "aucun", "volets": "n'importe", "position": 250, "taille_heure": 2, "rappels": "x"}})["beta"]
         self.assertFalse(out["diorama"])
         self.assertEqual((out["effets"], out["volets"], out["position"], out["taille_heure"], out["rappels"]), ("aucun", "nuit", 100, 8, True))
