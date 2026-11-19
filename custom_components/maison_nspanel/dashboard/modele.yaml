@@ -874,7 +874,7 @@ views:
                   + '<div style="font-size:18px;font-weight:600;color:#FFFFFF;white-space:nowrap">' + temp + '</div></div></div>';
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
-                + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:' + ICO + ';flex:none"></ha-icon>'
+                + '<ha-icon icon="mdi:home-thermometer-outline" style="--mdc-icon-size:26px;color:' + ICO + ';flex:none;margin:0 2px 0 1px!important"></ha-icon>'
                 + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:' + LBL + ';white-space:nowrap">INTÉRIEUR' + hum + '</div>'
                 + '<div style="font-size:18px;font-weight:600;color:#FFFFFF;white-space:nowrap">' + temp + '</div></div></div>';
             ]]]
@@ -918,7 +918,7 @@ views:
                   + '<div style="font-size:18px;font-weight:600;color:#FFFFFF;white-space:nowrap">' + qLabel + '</div></div></div>';
               }
               return '<div style="display:flex;align-items:center;gap:10px;box-sizing:border-box;min-height:9vh;padding:8px 12px;border-radius:18px;' + GLASS + ';text-align:left">'
-                + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none"></ha-icon>'
+                + '<ha-icon icon="mdi:air-filter" style="--mdc-icon-size:26px;color:' + qCol + ';flex:none;margin:0 2px 0 1px!important"></ha-icon>'
                 + '<div style="min-width:0"><div style="font-size:10px;font-weight:800;letter-spacing:1px;color:' + LBL + ';white-space:nowrap">AIR' + (val ? ' · ' + val : '') + '</div>'
                 + '<div style="font-size:18px;font-weight:700;color:' + qCol + ';white-space:nowrap">' + qLabel + '</div></div></div>';
             ]]]
