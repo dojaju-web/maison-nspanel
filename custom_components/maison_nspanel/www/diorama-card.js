@@ -40,6 +40,11 @@ svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-event
 .cloud { position:absolute; opacity:0; transition:opacity 1.4s ease; will-change:transform; background:center / 100% 100% no-repeat;
   /* le nuage est coupé en haut de l'image : on fond son bord supérieur dans le ciel */
   -webkit-mask-image:linear-gradient(to bottom, transparent 0, rgba(0,0,0,.6) 10%, #000 26%); mask-image:linear-gradient(to bottom, transparent 0, rgba(0,0,0,.6) 10%, #000 26%); }
+/* jour de pluie : le nuage de l'image fournie, tel quel (sans teinte), défile en boucle vers la droite.
+   Deux copies côte à côte ; on glisse d'une largeur de carte puis on recommence : la boucle est invisible. */
+#band { position:absolute; left:0; top:0; width:200%; height:27.246%; opacity:0; display:none; transition:opacity 1.4s ease; will-change:transform;
+  background-repeat:repeat-x; background-size:50% 100%; background-position:left top; animation:bandmove 120s linear infinite; }
+@keyframes bandmove { from{transform:translate3d(-50%,0,0)} to{transform:translate3d(0,0,0)} }
 .c1 { left:28%;  top:3%;  width:68%; height:18.1%; animation:cdrift 70s ease-in-out infinite; }
 .c2 { left:2%;   top:12%; width:56%; height:14.9%; animation:cdrift2 52s ease-in-out infinite; }
 @keyframes cdrift  { 0%,100%{transform:translate3d(-4%,0,0)} 50%{transform:translate3d(4%,0,0)} }
@@ -76,8 +81,8 @@ svg, .layer { position:absolute; inset:0; width:100%; height:100%; pointer-event
 #glow { position:absolute; inset:0; mix-blend-mode:screen; background:radial-gradient(60% 55% at var(--bx,50%) 22%, rgba(120,160,255,.30), rgba(120,160,255,0) 70%); }
 @keyframes bolt { 0%,70%,100%{opacity:0} 71%{opacity:1} 72.5%{opacity:.25} 74%{opacity:.95} 75.5%{opacity:.3} 78%{opacity:.7} 84%{opacity:0} }
 /* page cachée : pas d'animation inutile */
-:host(.pause) .drop, :host(.pause) .flake, :host(.pause) .cloud, :host(.pause) #fog::before, :host(.pause) #fog::after, :host(.pause) #bolt.on { animation-play-state:paused !important; }
-@media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#fog::before,#fog::after,#bolt.on{ animation:none !important; } }
+:host(.pause) .drop, :host(.pause) .flake, :host(.pause) .cloud, :host(.pause) #band, :host(.pause) #fog::before, :host(.pause) #fog::after, :host(.pause) #bolt.on { animation-play-state:paused !important; }
+@media (prefers-reduced-motion:reduce){ .drop,.flake,.cloud,#band,#fog::before,#fog::after,#bolt.on{ animation:none !important; } }
 `;
 
 // Nuage : une masse de nuages détourée (image avec transparence), teintée selon l'ambiance (multiplication + éclaircie), mise en cache
@@ -127,7 +132,7 @@ class DioramaCard extends HTMLElement {
       <ha-card><div class="stage">
         <img class="fond" id="fa" decoding="async" alt="Diorama de la maison"><img class="fond" id="fb" decoding="async" alt="">
         <svg id="volets" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg>
-        <div class="layer" id="clouds"><div class="cloud c1"></div><div class="cloud c2"></div></div>
+        <div class="layer" id="clouds"><div class="cloud c1"></div><div class="cloud c2"></div><div id="band"></div></div>
         <div class="layer" id="fog"></div><div class="layer" id="fx"></div><div class="layer" id="bolt"><div id="glow"></div><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path class="gl"/><path class="co"/><path class="br"/></svg></div>
       </div></ha-card>`;
     const $ = (id) => this._root.getElementById(id);
@@ -136,6 +141,7 @@ class DioramaCard extends HTMLElement {
     this._svg = $('volets'); this._fx = $('fx'); this._fog = $('fog'); this._bolt = $('bolt');
     this._bolt.addEventListener('animationiteration', () => this._strike());
     this._clouds = [...this._root.querySelectorAll('.cloud')];
+    this._band = this._root.querySelector('#band');
     this._w = 0;
     const ro = new ResizeObserver(() => {
       const w = this._stage.clientWidth; if (w === this._w) return;
@@ -207,7 +213,12 @@ class DioramaCard extends HTMLElement {
 
     // nuages, brouillard, éclairs
     // éclaircies : un seul voile léger ; temps couvert, pluie, orage, neige : deux couches de nuages
-    const vis = { clair: [], eclaircies: [1], nuageux: [0, 1], pluie: [0, 1], averse: [0, 1], orage: [0, 1], neige: [0, 1], brouillard: [] }[fxm] || [];
+    const jourPluie = !night && fxm === 'pluie';   // image « jour de pluie » : son propre nuage défilant, pas les calques génériques
+    const vis = jourPluie ? [] : { clair: [], eclaircies: [1], nuageux: [0, 1], pluie: [0, 1], averse: [0, 1], orage: [0, 1], neige: [0, 1], brouillard: [] }[fxm] || [];
+    if (jourPluie) {
+      this._band.style.backgroundImage = `url(${this._c.path}nuage_pluie_jour.webp?v=${encodeURIComponent(this._c.version)})`;
+      this._band.style.display = 'block'; requestAnimationFrame(() => { this._band.style.opacity = 1; });
+    } else { this._band.style.opacity = 0; this._band.style.display = 'none'; }
     const [mul, lift] = night
       ? (fxm === 'orage' || fxm === 'averse' ? ['70,76,96', 0] : (fxm === 'pluie' ? ['110,120,146', 0] : ['150,162,190', .08]))
       : (fxm === 'orage' ? ['150,156,172', 0] : (fxm === 'averse' ? ['196,202,214', 0] : (fxm === 'pluie' ? ['232,238,248', .04]
@@ -249,7 +260,7 @@ class DioramaCard extends HTMLElement {
   _particles(meteo, lite) {
     const fx = this._fx, r = (a, b) => a + Math.random() * (b - a), k = lite ? .4 : 1;
     fx.textContent = '';
-    const n = { pluie: 70, averse: 110, orage: 95, neige: 64 }[meteo];
+    const n = { pluie: 90, averse: 110, orage: 95, neige: 64 }[meteo];
     if (!n) return;
     for (let i = 0; i < n * k; i++) {
       const d = document.createElement('div');
