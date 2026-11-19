@@ -110,3 +110,8 @@ Un panneau **Maison NSPanel** apparaît dans la barre latérale de Home Assistan
 - **Apparence** : style « verre sombre » ou « ardoise », menu de navigation en bas de l'accueil (barre d'onglets : l'onglet actif s'élargit et affiche son nom).
 
 Le menu **Configurer** de l'intégration renvoie simplement vers ce panneau.
+
+
+## Version 2.0 — Apple Design (branche `apple-design`)
+
+Nouveau style **Apple Design** (défaut sur cette branche) appliquant les principes Apple : plaques translucides au flou net avec bord supérieur lumineux, retour visuel dès l'appui et retour amorti sans rebond, matérialisation des tuiles, police système, interlettrage adapté à la taille, respect de `prefers-reduced-motion`, `prefers-reduced-transparency` et `prefers-contrast`. Il reprend la maison animée et les réglages NSPanel-Beta ; l'option « Plaques translucides » se décoche si l'écran du NSPanel rame. Les autres styles restent disponibles. Cette branche ne publie pas de release HACS : installer en copiant `custom_components/maison_nspanel` ou via HACS en choisissant la branche.

@@ -174,9 +174,9 @@ class LiquidContenu(unittest.TestCase):
     def test_style_beta(self):
         self.assertIn("\"beta\"", (Path(__file__).resolve().parent.parent / "custom_components" / "maison_nspanel" / "const.py").read_text(encoding="utf-8"))
         for name in ("tile_light", "tile_base", "tile_vac"):
-            self.assertIn("style === 'beta'", self._tpl(name), name)
-        self.assertGreaterEqual(self.modele.count("style === 'beta'"), 40)
-        self.assertIn("style === 'beta'", self.asp)
+            self.assertIn("replace('apple', 'beta') === 'beta'", self._tpl(name), name)
+        self.assertGreaterEqual(self.modele.count("replace('apple', 'beta') === 'beta'"), 40)
+        self.assertIn("replace('apple', 'beta') === 'beta'", self.asp)
 
     def test_duree_en_minutes_depuis_secondes(self):
         # sensor.*_clean_time (Xiaomi Miot) = 6006 sans unité : secondes → 1 h 40, minutes sous 1 h, sinon « 1 h 40 »

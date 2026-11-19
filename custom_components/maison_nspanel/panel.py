@@ -95,6 +95,8 @@ async def async_register_panel(hass: HomeAssistant) -> None:
         from homeassistant.components import frontend
 
         frontend.add_extra_js_url(hass, f"{STATIC_PANEL}/diorama-card.js?v={_version()}")
+        # Couche « Apple Design » : matières translucides, mouvement amorti, accessibilité (actif seulement avec le style Apple Design)
+        frontend.add_extra_js_url(hass, f"{STATIC_PANEL}/apple-layer.js?v={_version()}")
         store["diorama_js"] = True
     await panel_custom.async_register_panel(
         hass,

@@ -52,7 +52,7 @@ def beta_settings(raw: Any) -> dict[str, Any]:
     out = dict(BETA_DEFAULTS)
     if not isinstance(raw, dict):
         return out
-    for key in ("diorama", "rappels"):
+    for key in ("diorama", "rappels", "materiaux"):
         if isinstance(raw.get(key), bool):
             out[key] = raw[key]
     if raw.get("effets") in BETA_EFFETS:

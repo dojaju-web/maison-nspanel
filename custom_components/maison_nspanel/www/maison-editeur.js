@@ -10,7 +10,7 @@ const TABS = [
 ];
 const DAYS = [["mon", "Lun"], ["tue", "Mar"], ["wed", "Mer"], ["thu", "Jeu"], ["fri", "Ven"], ["sat", "Sam"], ["sun", "Dim"]];
 const MIN_LABELS = { jamais: "Jamais", jaune: "À partir de jaune", orange: "À partir d'orange", rouge: "Rouge seulement", toujours: "Toujours (même vert)" };
-const STYLE_LABELS = { verre: ["Verre sombre", "Cartes en verre teinté, titres en capitales (par défaut)."], ardoise: ["Ardoise", "Cartes sobres, titres en minuscules, météo en fond."], beta: ["NSPanel-Beta", "Cartes bleu nuit translucides teintées par couleur d'accent, titres gras, petits sous-titres en capitales espacées (inspiré du Dashboard2-Demo)."], liquid: ["iOS", "Style inspiré des recommandations Apple : surfaces plates, menu flottant en verre sur l'accueil, palette système."] };
+const STYLE_LABELS = { apple: ["Apple Design", "Plaques translucides au flou net, mouvement amorti sans rebond, retour immédiat à l'appui, casse de phrase et police système ; maison animée sur l'accueil (par défaut)."], verre: ["Verre sombre", "Cartes en verre teinté, titres en capitales (par défaut)."], ardoise: ["Ardoise", "Cartes sobres, titres en minuscules, météo en fond."], beta: ["NSPanel-Beta", "Cartes bleu nuit translucides teintées par couleur d'accent, titres gras, petits sous-titres en capitales espacées (inspiré du Dashboard2-Demo)."], liquid: ["iOS", "Style inspiré des recommandations Apple : surfaces plates, menu flottant en verre sur l'accueil, palette système."] };
 const VAC_FIELDS = [
   ["vac_battery", "Batterie", "sensor", "Capteur de batterie (%)"],
   ["vac_fan", "Puissance d'aspiration", "select", "Liste de choix (select) ou laissez vide pour utiliser l'aspirateur"],
@@ -317,7 +317,8 @@ class MaisonNspanelEditeur extends HTMLElement {
     const sel = (k, opts) => `<select class="bsel" data-bkey="${k}">${opts.map(([v, l]) => `<option value="${v}" ${b[k] === v ? "selected" : ""}>${l}</option>`).join("")}</select>`;
     const rng = (k, lo, hi, unit) => `<div class="rngrow"><input type="range" class="brng" data-bkey="${k}" min="${lo}" max="${hi}" value="${b[k]}" /><b class="rngval" data-for="${k}">${b[k]}${unit}</b></div>`;
     const chk = (k, l) => `<label class="check"><input type="checkbox" class="bchk" data-bkey="${k}" ${b[k] ? "checked" : ""} /><span>${l}</span></label>`;
-    return `<section class="card"><h3 style="margin:0 0 8px;font-size:16px">Réglages NSPanel-Beta</h3>
+    return `<section class="card"><h3 style="margin:0 0 8px;font-size:16px">Réglages de l'accueil (${this._cfg.style === "apple" ? "Apple Design" : "NSPanel-Beta"})</h3>
+      ${this._cfg.style === "apple" ? chk("materiaux", "Plaques translucides (flou) — décocher si l'écran rame") : ""}
       ${chk("diorama", "Maison animée en fond de l'accueil (jour/nuit et météo)")}
       ${chk("rappels", "Afficher les rappels (poubelles…) sous la date")}
       <label class="field"><span>Effets météo (pluie, neige, nuages, brouillard, éclairs)</span>${sel("effets", [["auto", "Automatique (allégés sur petit écran)"], ["complets", "Complets"], ["reduits", "Allégés"], ["aucun", "Aucun"]])}</label>
@@ -326,13 +327,13 @@ class MaisonNspanelEditeur extends HTMLElement {
       <label class="field"><span>Volets de la maison</span>${sel("volets", [["nuit", "Fermés la nuit"], ["jamais", "Toujours ouverts"], ["toujours", "Toujours fermés"]])}</label>
       <label class="field"><span>Hauteur de la maison sur un écran en hauteur (téléphone)</span>${rng("position", 0, 100, " %")}</label>
       <label class="field"><span>Taille de l'heure</span>${rng("taille_heure", 8, 16, "")}</label>
-      <div class="hint inner">Ces réglages ne concernent que le style NSPanel-Beta.</div>
+      <div class="hint inner">Ces réglages concernent les styles NSPanel-Beta et Apple Design.</div>
     </section>`;
   }
 
   _tabStyle() {
     const cur = this._cfg.style;
-    return `<div class="one">${this._cfg.style === "beta" ? this._betaBlock() : ""}<section class="card">
+    return `<div class="one">${this._cfg.style === "beta" || this._cfg.style === "apple" ? this._betaBlock() : ""}<section class="card">
       ${Object.entries(STYLE_LABELS).map(([k, [l, h]]) => `<label class="radio ${cur === k ? "on" : ""}"><input type="radio" name="style" class="rad" data-key="style" value="${k}" ${cur === k ? "checked" : ""} /><div><b>${l}</b><small>${h}</small></div></label>`).join("")}
     </section></div>`;
   }

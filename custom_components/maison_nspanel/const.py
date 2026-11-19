@@ -21,6 +21,7 @@ BETA_DEFAULTS = {
     "volets": "nuit",        # nuit | jamais | toujours
     "position": 72,          # 0-100 : hauteur de la maison sur un écran en hauteur (téléphone)
     "taille_heure": 13,      # 8-16 : taille de l'heure
+    "materiaux": True,       # Apple Design : plaques translucides (flou) ; sinon plaques pleines
     "rappels": True,         # pastilles de rappels (poubelles…) sous la date
     "meteo": "auto",         # auto | clair | eclaircies | nuageux | pluie | averse | orage | neige | brouillard (test)
     "moment": "auto",        # auto | jour | nuit (test)
@@ -31,8 +32,8 @@ BETA_METEO = ("auto", "clair", "eclaircies", "nuageux", "pluie", "averse", "orag
 BETA_MOMENT = ("auto", "jour", "nuit")
 
 # Styles du dashboard : "beta" (NSPanel-Beta, inspiré du Dashboard2-Demo), "verre" (verre sombre, défaut), "ardoise" (cartes sobres) ou "liquid" (affiché « iOS » : surfaces plates, menu flottant en verre)
-STYLES = ["verre", "ardoise", "liquid", "beta"]
-DEFAULT_STYLE = "verre"
+STYLES = ["verre", "ardoise", "liquid", "beta", "apple"]
+DEFAULT_STYLE = "apple"
 
 # Les images météo du dashboard sont servies à cette adresse
 STATIC_URL = "/maison_nspanel/meteo"
