@@ -1,9 +1,8 @@
 /* Maison NSPanel — couche « Apple Design » (style Apple Design uniquement).
  *
  * Principes appliqués (WWDC « Designing Fluid Interfaces », « Principles of Great Design ») :
- *  - Réponse : le retour visuel démarre à l'appui (:active), pas au relâchement.
- *  - Mouvement : retour à l'état de repos par un ressort amorti sans rebond (courbe cubic-bezier .22,1,.36,1),
- *    jamais d'animation bloquante ; les tuiles « se matérialisent » (flou + échelle + opacité) à leur arrivée.
+ *  - Réponse : le retour visuel démarre à l'appui (:active), pas au relâchement ; retour doux (courbe .22,1,.36,1).
+ *  - Aucune animation d'entrée ni transformation géométrique : elles faisaient clignoter les pages et décalaient la zone d'appui.
  *  - Matières : les tuiles sont des plaques translucides (backdrop-filter) avec un bord supérieur lumineux ;
  *    jamais de matière claire empilée sur une autre.
  *  - Typographie : police système, interlettrage adapté à la taille, casse « phrase » plutôt que capitales.
@@ -22,23 +21,20 @@
   -webkit-backdrop-filter: blur(24px) saturate(175%); backdrop-filter: blur(24px) saturate(175%);
   border-top-color: rgba(255,255,255,.26) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 8px 24px rgba(0,0,0,.26) !important;
-  transition: transform .42s cubic-bezier(.22,1,.36,1), border-color .3s ease !important;
-  animation: ap-in .5s cubic-bezier(.22,1,.36,1) backwards;
+  transition: filter .38s cubic-bezier(.22,1,.36,1), border-color .3s ease !important;
+  touch-action: manipulation;                         /* pas de zoom au double appui : un appui = un clic */
 }
 :host(.ap-tile:not(.ap-glass)) ha-card {
   background: rgba(26,32,44,.94) !important; -webkit-backdrop-filter: none; backdrop-filter: none;
 }
-:host(.ap-tile) ha-card:active { transform: scale(.965); opacity: 1 !important; transition-duration: .09s !important; }
+:host(.ap-tile) ha-card:active { filter: brightness(.82); opacity: 1 !important; transition-duration: .06s !important; }
 :host(.ap-tile) #name, :host(.ap-tile) #label, :host(.ap-tile) #state {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', Roboto, system-ui, sans-serif !important;
 }
 :host(.ap-tile) #name { text-transform: none !important; letter-spacing: -.012em !important; font-weight: 700 !important; font-size: 13px !important; }
 :host(.ap-tile) #label { letter-spacing: .005em !important; }
-@keyframes ap-in { from { opacity: 0; transform: scale(.96); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
-@keyframes ap-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  :host(.ap-tile) ha-card { animation: ap-fade .2s ease backwards !important; transition: border-color .2s ease !important; }
-  :host(.ap-tile) ha-card:active { transform: none; opacity: .72 !important; }
+  :host(.ap-tile) ha-card { transition: none !important; }
 }
 @media (prefers-reduced-transparency: reduce) {
   :host(.ap-tile) ha-card { background: rgb(26,32,44) !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -72,13 +68,16 @@
     eachCard(document, (host) => {
       const sr = host.shadowRoot, has = sr.adoptedStyleSheets.includes(sheet);
       if (!apple) {
-        if (has) { sr.adoptedStyleSheets = sr.adoptedStyleSheets.filter((x) => x !== sheet); host.classList.remove('ap-tile', 'ap-glass'); }
+        if (has) { sr.adoptedStyleSheets = sr.adoptedStyleSheets.filter((x) => x !== sheet); host.classList.remove('ap-tile', 'ap-glass'); host.__apDone = false; }
         return;
       }
       if (!has) sr.adoptedStyleSheets = [...sr.adoptedStyleSheets, sheet];
-      const r = host.getBoundingClientRect();
-      // une « tuile » est une carte qui ne remplit pas l'écran (la carte d'accueil, plein écran, reste telle quelle)
-      host.classList.toggle('ap-tile', r.height > 0 && r.height < window.innerHeight * 0.5);
+      // une « tuile » est une carte qui ne remplit pas l'écran (la carte d'accueil, plein écran, reste telle quelle) ;
+      // décidé une seule fois par carte, pour ne jamais rebasculer pendant une navigation
+      if (host.__apDone !== true) {
+        const r = host.getBoundingClientRect();
+        if (r.height > 0) { host.__apDone = true; if (r.height < window.innerHeight * 0.5) host.classList.add('ap-tile'); }
+      }
       host.classList.toggle('ap-glass', glass);
     });
   }
@@ -92,7 +91,6 @@
   setInterval(() => {                                   // changement de style ou de réglage : appliqué sans recharger
     const c = conf(), k = c.apple + '|' + c.glass;
     if (k !== last) { last = k; later(50); [600, 1500].forEach((m) => setTimeout(scan, m)); }
-    else if (c.apple) scan();
   }, 8000);
   [600, 1500, 3000, 6000].forEach((m) => setTimeout(scan, m));
 })();
